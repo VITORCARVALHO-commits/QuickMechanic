@@ -222,109 +222,294 @@ export const Home = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[#0E1A2C] mb-4">{t('home.quote.title')}</h2>
-            <p className="text-xl text-gray-600">Em menos de 2 minutos</p>
+            <p className="text-xl text-gray-600">Comece digitando a placa do seu veículo</p>
           </div>
 
           <Card className="p-8 shadow-xl border-0 bg-gradient-to-br from-white to-[#F5F7FA]">
-            <form onSubmit={handleGetQuote} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Car Make */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carMake')}</label>
-                  <Select value={quoteForm.make} onValueChange={handleMakeChange}>
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder={t('home.quote.selectMake')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {carMakes.map(make => (
-                        <SelectItem key={make.id} value={make.id}>{make.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            {/* Plate Search Section */}
+            {!vehicleFound && !showManualForm && (
+              <div className="space-y-6">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#1EC6C6] to-[#1AB5B5] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Car className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#0E1A2C] mb-2">Digite a Placa do Veículo</h3>
+                  <p className="text-gray-600">Buscaremos automaticamente as informações do seu carro</p>
                 </div>
 
-                {/* Car Model */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carModel')}</label>
-                  <Select 
-                    value={quoteForm.model} 
-                    onValueChange={(value) => setQuoteForm({...quoteForm, model: value})}
-                    disabled={!selectedMake}
+                <div className="max-w-md mx-auto space-y-4">
+                  <div className="space-y-2">
+                    <Input 
+                      placeholder="ABC-1234 ou ABC1234"
+                      value={plateInput}
+                      onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
+                      className="h-16 text-center text-2xl font-bold tracking-wider"
+                      maxLength={8}
+                      disabled={isSearchingPlate}
+                    />
+                    <p className="text-xs text-gray-500 text-center">
+                      Placas para teste: ABC-1234, DEF-5678, GHI-9012, JKL-3456
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={handlePlateSearch}
+                    disabled={isSearchingPlate}
+                    size="lg" 
+                    className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg"
                   >
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder={t('home.quote.selectModel')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedMake?.models.map(model => (
-                        <SelectItem key={model} value={model}>{model}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Year */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carYear')}</label>
-                  <Select value={quoteForm.year} onValueChange={(value) => setQuoteForm({...quoteForm, year: value})}>
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder={t('home.quote.selectYear')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map(year => (
-                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Service Type */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.serviceType')}</label>
-                  <Select value={quoteForm.service} onValueChange={(value) => setQuoteForm({...quoteForm, service: value})}>
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder={t('home.quote.selectService')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {serviceTypes.map(service => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.name[language]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {isSearchingPlate ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        Buscando Placa...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-5 w-5 mr-2" />
+                        Buscar Veículo
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
+            )}
 
-              {/* Location */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.location')}</label>
-                <Input 
-                  placeholder="Ex: São Paulo, SP" 
-                  value={quoteForm.location}
-                  onChange={(e) => setQuoteForm({...quoteForm, location: e.target.value})}
-                  className="h-12"
-                />
+            {/* Vehicle Found - Show Details */}
+            {vehicleFound && (
+              <div className="space-y-6">
+                {/* Vehicle Info Card */}
+                <Card className="p-6 bg-gradient-to-br from-[#27AE60]/10 to-white border-2 border-[#27AE60]/20">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-[#27AE60] rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-[#0E1A2C]">Veículo Identificado</h3>
+                        <p className="text-sm text-gray-600">Placa: {vehicleFound.plate}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={handleResetPlateSearch}
+                    >
+                      Alterar
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <div className="text-xs text-gray-600">Marca/Modelo</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.makeName} {vehicleFound.model}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Ano</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.year}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Cor</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.color}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Combustível</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.fuel}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Versão</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.version}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Categoria</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.category}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">Potência</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.power}</div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Service Form */}
+                <form onSubmit={handleGetQuote} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Service Type */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.serviceType')} *</label>
+                      <Select value={quoteForm.service} onValueChange={(value) => setQuoteForm({...quoteForm, service: value})}>
+                        <SelectTrigger className="h-12">
+                          <SelectValue placeholder={t('home.quote.selectService')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {serviceTypes.map(service => (
+                            <SelectItem key={service.id} value={service.id}>
+                              {service.name[language]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Location */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.location')} *</label>
+                      <Input 
+                        required
+                        placeholder="Ex: São Paulo, SP" 
+                        value={quoteForm.location}
+                        onChange={(e) => setQuoteForm({...quoteForm, location: e.target.value})}
+                        className="h-12"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.description')}</label>
+                    <Textarea 
+                      placeholder="Descreva o problema ou serviço necessário... (opcional)"
+                      value={quoteForm.description}
+                      onChange={(e) => setQuoteForm({...quoteForm, description: e.target.value})}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    {t('home.quote.calculate')}
+                  </Button>
+                </form>
               </div>
+            )}
 
-              {/* Description */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.description')}</label>
-                <Textarea 
-                  placeholder="Descreva o problema ou serviço necessário..."
-                  value={quoteForm.description}
-                  onChange={(e) => setQuoteForm({...quoteForm, description: e.target.value})}
-                  className="min-h-[100px]"
-                />
+            {/* Manual Form (if plate not found) */}
+            {showManualForm && (
+              <div className="space-y-6">
+                <Card className="p-6 bg-[#E84141]/10 border-2 border-[#E84141]/20">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-6 w-6 text-[#E84141] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-[#0E1A2C] mb-1">Placa Não Encontrada</h3>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Não conseguimos localizar o veículo com a placa <strong>{plateInput}</strong>. 
+                        Por favor, preencha os dados manualmente.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleResetPlateSearch}
+                      >
+                        Tentar Outra Placa
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <form onSubmit={handleGetQuote} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Car Make */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carMake')} *</label>
+                      <Select value={quoteForm.make} onValueChange={handleMakeChange}>
+                        <SelectTrigger className="h-12">
+                          <SelectValue placeholder={t('home.quote.selectMake')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {carMakes.map(make => (
+                            <SelectItem key={make.id} value={make.id}>{make.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Car Model */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carModel')} *</label>
+                      <Select 
+                        value={quoteForm.model} 
+                        onValueChange={(value) => setQuoteForm({...quoteForm, model: value})}
+                        disabled={!selectedMake}
+                      >
+                        <SelectTrigger className="h-12">
+                          <SelectValue placeholder={t('home.quote.selectModel')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedMake?.models.map(model => (
+                            <SelectItem key={model} value={model}>{model}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Year */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.carYear')} *</label>
+                      <Select value={quoteForm.year} onValueChange={(value) => setQuoteForm({...quoteForm, year: value})}>
+                        <SelectTrigger className="h-12">
+                          <SelectValue placeholder={t('home.quote.selectYear')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {years.map(year => (
+                            <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Service Type */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.serviceType')} *</label>
+                      <Select value={quoteForm.service} onValueChange={(value) => setQuoteForm({...quoteForm, service: value})}>
+                        <SelectTrigger className="h-12">
+                          <SelectValue placeholder={t('home.quote.selectService')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {serviceTypes.map(service => (
+                            <SelectItem key={service.id} value={service.id}>
+                              {service.name[language]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.location')} *</label>
+                    <Input 
+                      required
+                      placeholder="Ex: São Paulo, SP" 
+                      value={quoteForm.location}
+                      onChange={(e) => setQuoteForm({...quoteForm, location: e.target.value})}
+                      className="h-12"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.description')}</label>
+                    <Textarea 
+                      placeholder="Descreva o problema ou serviço necessário..."
+                      value={quoteForm.description}
+                      onChange={(e) => setQuoteForm({...quoteForm, description: e.target.value})}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    {t('home.quote.calculate')}
+                  </Button>
+                </form>
               </div>
-
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                {t('home.quote.calculate')}
-              </Button>
-            </form>
+            )}
           </Card>
         </div>
       </section>
