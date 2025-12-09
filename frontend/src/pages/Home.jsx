@@ -308,31 +308,45 @@ export const Home = () => {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <div className="text-xs text-gray-600">Marca/Modelo</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Make/Model' : 'Marca/Modelo'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.makeName} {vehicleFound.model}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Ano</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Year' : 'Ano'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.year}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Cor</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Colour' : 'Cor'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.color}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Combustível</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Fuel Type' : 'Combustível'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.fuel}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Versão</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Version' : 'Versão'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.version}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Categoria</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Category' : 'Categoria'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.category}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-600">Potência</div>
+                      <div className="text-xs text-gray-600">
+                        {vehicleFound.country === 'UK' ? 'Power' : 'Potência'}
+                      </div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.power}</div>
                     </div>
                   </div>
