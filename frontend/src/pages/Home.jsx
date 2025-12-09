@@ -286,8 +286,15 @@ export const Home = () => {
                         <CheckCircle className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-[#0E1A2C]">Veículo Identificado</h3>
-                        <p className="text-sm text-gray-600">Placa: {vehicleFound.plate}</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-[#0E1A2C]">
+                            {vehicleFound.country === 'UK' ? 'Vehicle Identified' : 'Veículo Identificado'}
+                          </h3>
+                          <span className="text-xl">{vehicleFound.country === 'UK' ? '🇬🇧' : '🇧🇷'}</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {vehicleFound.country === 'UK' ? 'Plate' : 'Placa'}: {vehicleFound.plate}
+                        </p>
                       </div>
                     </div>
                     <Button 
@@ -295,7 +302,7 @@ export const Home = () => {
                       size="sm"
                       onClick={handleResetPlateSearch}
                     >
-                      Alterar
+                      {vehicleFound.country === 'UK' ? 'Change' : 'Alterar'}
                     </Button>
                   </div>
 
