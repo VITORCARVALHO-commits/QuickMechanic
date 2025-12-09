@@ -1,7 +1,9 @@
-// Mock database de placas brasileiras para MVP
+// Mock database de placas brasileiras e UK para MVP
 export const mockPlatesDatabase = {
+  // === PLACAS BRASILEIRAS ===
   'ABC1234': {
     plate: 'ABC-1234',
+    country: 'BR',
     make: 'volkswagen',
     makeName: 'Volkswagen',
     model: 'Gol',
