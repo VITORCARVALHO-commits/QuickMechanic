@@ -6,21 +6,89 @@ import { Card } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
 import { Input } from '../components/ui/input';
-import { Shield, Clock, Award, MapPin, CheckCircle, Star, TrendingUp, Users } from 'lucide-react';
+import { toast } from '../hooks/use-toast';
+import { Shield, Clock, Award, MapPin, CheckCircle, Star, TrendingUp, Users, Search, Loader2, Car, AlertCircle } from 'lucide-react';
 import { carMakes, serviceTypes } from '../utils/mockData';
+import { searchPlate, validatePlateFormat } from '../utils/mockPlates';
 
 export const Home = () => {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
+  
+  // Plate search states
+  const [plateInput, setPlateInput] = useState('');
+  const [isSearchingPlate, setIsSearchingPlate] = useState(false);
+  const [vehicleFound, setVehicleFound] = useState(null);
+  const [showManualForm, setShowManualForm] = useState(false);
+  
+  // Quote form states
   const [quoteForm, setQuoteForm] = useState({
+    plate: '',
     make: '',
     model: '',
     year: '',
+    color: '',
+    fuel: '',
+    version: '',
+    category: '',
     service: '',
     location: '',
     description: ''
   });
   const [selectedMake, setSelectedMake] = useState(null);
+
+  const handlePlateSearch = async () => {
+    if (!plateInput.trim()) {
+      toast({
+        title: "Atenção",
+        description: "Por favor, digite a placa do veículo.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!validatePlateFormat(plateInput)) {
+      toast({
+        title: "Placa Inválida",
+        description: "Formato de placa inválido. Use o formato ABC-1234.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSearchingPlate(true);
+    
+    try {
+      const result = await searchPlate(plateInput);
+      setVehicleFound(result.data);
+      setQuoteForm({
+        ...quoteForm,
+        plate: result.data.plate,
+        make: result.data.make,
+        model: result.data.model,
+        year: result.data.year,
+        color: result.data.color,
+        fuel: result.data.fuel,
+        version: result.data.version,
+        category: result.data.category
+      });
+      
+      toast({
+        title: "✅ Veículo Encontrado!",
+        description: `${result.data.makeName} ${result.data.model} ${result.data.year}`
+      });
+    } catch (error) {
+      toast({
+        title: "❌ Placa Não Encontrada",
+        description: error.message,
+        variant: "destructive"
+      });
+      setVehicleFound(null);
+      setShowManualForm(true);
+    } finally {
+      setIsSearchingPlate(false);
+    }
+  };
 
   const handleMakeChange = (makeId) => {
     const make = carMakes.find(m => m.id === makeId);
@@ -30,8 +98,37 @@ export const Home = () => {
 
   const handleGetQuote = (e) => {
     e.preventDefault();
+    
+    if (!vehicleFound && !showManualForm) {
+      toast({
+        title: "Atenção",
+        description: "Por favor, busque a placa do veículo primeiro.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Navigate to search/booking page with quote data
     navigate('/search', { state: { quoteData: quoteForm } });
+  };
+
+  const handleResetPlateSearch = () => {
+    setPlateInput('');
+    setVehicleFound(null);
+    setShowManualForm(false);
+    setQuoteForm({
+      plate: '',
+      make: '',
+      model: '',
+      year: '',
+      color: '',
+      fuel: '',
+      version: '',
+      category: '',
+      service: '',
+      location: '',
+      description: ''
+    });
   };
 
   const currentYear = new Date().getFullYear();
