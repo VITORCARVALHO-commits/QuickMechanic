@@ -401,16 +401,39 @@ export const searchPlate = (plateInput) => {
       } else {
         reject({
           success: false,
-          message: 'Placa não encontrada em nossa base de dados.'
+          message: 'Plate not found in our database. / Placa não encontrada em nossa base de dados.'
         });
       }
     }, 800); // Simula latência de API
   });
 };
 
-// Função para validar formato de placa brasileira
+// Função para validar formato de placa brasileira ou UK
 export const validatePlateFormat = (plate) => {
-  // Aceita formatos: ABC1234, ABC-1234, ABC 1234
-  const plateRegex = /^[A-Z]{3}[-\s]?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/i;
-  return plateRegex.test(plate);
+  // Formato Brasil: ABC1234, ABC-1234, ABC 1234 ou Mercosul ABC1D23
+  const brazilPlateRegex = /^[A-Z]{3}[-\s]?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/i;
+  
+  // Formato UK: AB12 CDE, AB12CDE (2 letras, 2 números, 3 letras)
+  const ukPlateRegex = /^[A-Z]{2}\d{2}[-\s]?[A-Z]{3}$/i;
+  
+  return brazilPlateRegex.test(plate) || ukPlateRegex.test(plate);
+};
+
+// Função para detectar país da placa
+export const detectPlateCountry = (plate) => {
+  const cleanPlate = plate.replace(/[-\s]/g, '').toUpperCase();
+  
+  // UK plates: 2 letters + 2 numbers + 3 letters
+  const ukPattern = /^[A-Z]{2}\d{2}[A-Z]{3}$/;
+  if (ukPattern.test(cleanPlate)) {
+    return 'UK';
+  }
+  
+  // Brazil plates: 3 letters + 4 numbers or Mercosul format
+  const brazilPattern = /^[A-Z]{3}\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/;
+  if (brazilPattern.test(cleanPlate)) {
+    return 'BR';
+  }
+  
+  return null;
 };
