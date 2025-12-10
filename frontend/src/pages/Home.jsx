@@ -221,8 +221,8 @@ export const Home = () => {
                   <div className="w-20 h-20 bg-gradient-to-br from-[#1EC6C6] to-[#1AB5B5] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Car className="h-10 w-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-[#0E1A2C] mb-2">Digite a Placa do Veículo</h3>
-                  <p className="text-gray-600">Buscaremos automaticamente as informações do seu carro</p>
+                  <h3 className="text-2xl font-bold text-[#0E1A2C] mb-2">Enter Your Registration</h3>
+                  <p className="text-gray-600">Vehicle details will appear automatically</p>
                 </div>
 
                 <div className="max-w-md mx-auto space-y-4">
@@ -232,29 +232,17 @@ export const Home = () => {
                       value={plateInput}
                       onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
                       className="h-16 text-center text-2xl font-bold tracking-wider"
-                      maxLength={10}
+                      maxLength={7}
                       disabled={isSearchingPlate}
+                      autoFocus
                     />
-                  </div>
-
-                  <Button 
-                    onClick={handlePlateSearch}
-                    disabled={isSearchingPlate}
-                    size="lg" 
-                    className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg"
-                  >
-                    {isSearchingPlate ? (
-                      <>
-                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        Buscando Placa...
-                      </>
-                    ) : (
-                      <>
-                        <Search className="h-5 w-5 mr-2" />
-                        Buscar Veículo
-                      </>
+                    {isSearchingPlate && (
+                      <div className="flex items-center justify-center gap-2 text-[#1EC6C6]">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span className="text-sm">Searching...</span>
+                      </div>
                     )}
-                  </Button>
+                  </div>
                 </div>
               </div>
             )}
