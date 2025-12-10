@@ -80,8 +80,8 @@ export const Dashboard = () => {
             <div className="flex items-center justify-between mb-2">
               <Wrench className="h-8 w-8" />
             </div>
-            <div className="text-3xl font-bold mb-1">R$ 2.4k</div>
-            <div className="text-white/90 text-sm">Total Investido</div>
+            <div className="text-3xl font-bold mb-1">£1.2k</div>
+            <div className="text-white/90 text-sm">Total Spent</div>
           </Card>
         </div>
 
