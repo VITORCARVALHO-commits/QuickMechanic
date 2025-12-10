@@ -11,17 +11,22 @@ export const carMakes = [
   { id: 'renault', name: 'Renault', models: ['Kwid', 'Sandero', 'Duster', 'Oroch'] }
 ];
 
+// Preços baseados em valores de Londres (em £)
 export const serviceTypes = [
-  { id: 'oil_change', name: { pt: 'Troca de Óleo', en: 'Oil Change' }, basePrice: 150 },
-  { id: 'brakes', name: { pt: 'Sistema de Freios', en: 'Brake System' }, basePrice: 300 },
-  { id: 'suspension', name: { pt: 'Suspensão', en: 'Suspension' }, basePrice: 450 },
-  { id: 'diagnostic', name: { pt: 'Diagnóstico Completo', en: 'Full Diagnostic' }, basePrice: 200 },
-  { id: 'maintenance', name: { pt: 'Revisão Preventiva', en: 'Preventive Maintenance' }, basePrice: 350 },
-  { id: 'battery', name: { pt: 'Bateria', en: 'Battery' }, basePrice: 250 },
-  { id: 'air_conditioning', name: { pt: 'Ar Condicionado', en: 'Air Conditioning' }, basePrice: 280 },
-  { id: 'transmission', name: { pt: 'Transmissão', en: 'Transmission' }, basePrice: 800 },
-  { id: 'engine', name: { pt: 'Motor', en: 'Engine' }, basePrice: 1200 },
-  { id: 'electrical', name: { pt: 'Elétrica', en: 'Electrical' }, basePrice: 350 }
+  { id: 'oil_change', name: { pt: 'Oil & Filter Change', en: 'Oil & Filter Change' }, basePrice: 65, currency: '£' },
+  { id: 'brakes', name: { pt: 'Brake Service', en: 'Brake Service' }, basePrice: 180, currency: '£' },
+  { id: 'suspension', name: { pt: 'Suspension Repair', en: 'Suspension Repair' }, basePrice: 250, currency: '£' },
+  { id: 'diagnostic', name: { pt: 'Full Diagnostic', en: 'Full Diagnostic' }, basePrice: 85, currency: '£' },
+  { id: 'maintenance', name: { pt: 'Annual Service', en: 'Annual Service' }, basePrice: 150, currency: '£' },
+  { id: 'battery', name: { pt: 'Battery Replacement', en: 'Battery Replacement' }, basePrice: 120, currency: '£' },
+  { id: 'air_conditioning', name: { pt: 'Air Con Service', en: 'Air Con Service' }, basePrice: 95, currency: '£' },
+  { id: 'transmission', name: { pt: 'Gearbox Service', en: 'Gearbox Service' }, basePrice: 450, currency: '£' },
+  { id: 'engine', name: { pt: 'Engine Repair', en: 'Engine Repair' }, basePrice: 850, currency: '£' },
+  { id: 'electrical', name: { pt: 'Electrical Repair', en: 'Electrical Repair' }, basePrice: 140, currency: '£' },
+  { id: 'clutch', name: { pt: 'Clutch Replacement', en: 'Clutch Replacement' }, basePrice: 380, currency: '£' },
+  { id: 'mot', name: { pt: 'MOT Test', en: 'MOT Test' }, basePrice: 55, currency: '£' },
+  { id: 'tyres', name: { pt: 'Tyre Fitting', en: 'Tyre Fitting' }, basePrice: 80, currency: '£' },
+  { id: 'exhaust', name: { pt: 'Exhaust Repair', en: 'Exhaust Repair' }, basePrice: 160, currency: '£' }
 ];
 
 export const mockMechanics = [
