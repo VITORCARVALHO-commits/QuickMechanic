@@ -17,17 +17,21 @@ export const mockPlatesDatabase = {
     doors: '5',
     engineSize: '998cc'
   },
-  'DEF5678': {
-    plate: 'DEF-5678',
-    make: 'fiat',
-    makeName: 'Fiat',
-    model: 'Argo',
-    year: '2021',
-    color: 'Branco',
-    fuel: 'Flex',
-    version: '1.0 Fire',
+  'CD34FGH': {
+    plate: 'CD34 FGH',
+    country: 'UK',
+    make: 'volkswagen',
+    makeName: 'Volkswagen',
+    model: 'Golf',
+    year: '2015',
+    color: 'Silver',
+    fuel: 'Diesel',
+    version: '2.0 TDI GT',
     category: 'Hatchback',
-    power: '77cv'
+    power: '150bhp',
+    transmission: 'Manual',
+    doors: '5',
+    engineSize: '1968cc'
   },
   'GHI9012': {
     plate: 'GHI-9012',
