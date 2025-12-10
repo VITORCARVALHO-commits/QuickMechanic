@@ -1,18 +1,21 @@
-// Mock database de placas brasileiras e UK para MVP
+// Mock database de placas UK para MVP
 export const mockPlatesDatabase = {
-  // === PLACAS BRASILEIRAS ===
-  'ABC1234': {
-    plate: 'ABC-1234',
-    country: 'BR',
-    make: 'volkswagen',
-    makeName: 'Volkswagen',
-    model: 'Gol',
-    year: '2020',
-    color: 'Prata',
-    fuel: 'Flex',
-    version: '1.6 MSI',
+  // === UK REGISTRATION PLATES ===
+  'AB12CDE': {
+    plate: 'AB12 CDE',
+    country: 'UK',
+    make: 'ford',
+    makeName: 'Ford',
+    model: 'Fiesta',
+    year: '2012',
+    color: 'Blue',
+    fuel: 'Petrol',
+    version: '1.0 EcoBoost',
     category: 'Hatchback',
-    power: '120cv'
+    power: '125bhp',
+    transmission: 'Manual',
+    doors: '5',
+    engineSize: '998cc'
   },
   'DEF5678': {
     plate: 'DEF-5678',
