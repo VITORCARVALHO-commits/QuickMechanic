@@ -37,58 +37,46 @@ export const Home = () => {
   });
   const [selectedMake, setSelectedMake] = useState(null);
 
-  const handlePlateSearch = async () => {
-    if (!plateInput.trim()) {
-      toast({
-        title: "Atenção",
-        description: "Por favor, digite a placa do veículo.",
-        variant: "destructive"
-      });
-      return;
-    }
+  // Auto-search when plate is complete
+  React.useEffect(() => {
+    const searchWhenComplete = async () => {
+      if (isPlateComplete(plateInput) && validatePlateFormat(plateInput)) {
+        setIsSearchingPlate(true);
+        
+        try {
+          const result = await searchPlate(plateInput);
+          setVehicleFound(result.data);
+          setQuoteForm({
+            ...quoteForm,
+            plate: result.data.plate,
+            make: result.data.make,
+            model: result.data.model,
+            year: result.data.year,
+            color: result.data.color,
+            fuel: result.data.fuel,
+            version: result.data.version,
+            category: result.data.category
+          });
+          
+          toast({
+            title: "✅ Vehicle Found!",
+            description: `${result.data.makeName} ${result.data.model} ${result.data.year}`
+          });
+        } catch (error) {
+          toast({
+            title: "❌ Not Found",
+            description: error.message,
+            variant: "destructive"
+          });
+          setVehicleFound(null);
+        } finally {
+          setIsSearchingPlate(false);
+        }
+      }
+    };
 
-    if (!validatePlateFormat(plateInput)) {
-      toast({
-        title: "Placa Inválida",
-        description: "Formato de placa inválido. Use o formato ABC-1234.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSearchingPlate(true);
-    
-    try {
-      const result = await searchPlate(plateInput);
-      setVehicleFound(result.data);
-      setQuoteForm({
-        ...quoteForm,
-        plate: result.data.plate,
-        make: result.data.make,
-        model: result.data.model,
-        year: result.data.year,
-        color: result.data.color,
-        fuel: result.data.fuel,
-        version: result.data.version,
-        category: result.data.category
-      });
-      
-      toast({
-        title: "✅ Veículo Encontrado!",
-        description: `${result.data.makeName} ${result.data.model} ${result.data.year}`
-      });
-    } catch (error) {
-      toast({
-        title: "❌ Placa Não Encontrada",
-        description: error.message,
-        variant: "destructive"
-      });
-      setVehicleFound(null);
-      setShowManualForm(true);
-    } finally {
-      setIsSearchingPlate(false);
-    }
-  };
+    searchWhenComplete();
+  }, [plateInput]);
 
   const handleMakeChange = (makeId) => {
     const make = carMakes.find(m => m.id === makeId);
