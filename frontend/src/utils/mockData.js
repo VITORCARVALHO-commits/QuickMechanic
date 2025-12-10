@@ -32,20 +32,20 @@ export const serviceTypes = [
 export const mockMechanics = [
   {
     id: '1',
-    name: 'Carlos Silva',
+    name: 'James Anderson',
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
     rating: 4.9,
     reviewCount: 127,
-    specialties: ['oil_change', 'brakes', 'maintenance'],
+    specialties: ['oil_change', 'brakes', 'maintenance', 'mot'],
     mobile: true,
     workshop: true,
-    location: 'São Paulo, SP',
+    location: 'Central London',
     yearsExperience: 12,
-    certifications: ['ASE Certified', 'Bosch Trained'],
-    about: 'Especialista em manutenção preventiva com mais de 12 anos de experiência.',
+    certifications: ['IMI Certified', 'City & Guilds Level 3'],
+    about: 'Specialist in preventive maintenance with over 12 years experience across London.',
     reviews: [
-      { id: 1, user: 'João Pedro', rating: 5, comment: 'Excelente profissional! Muito atencioso e rápido.', date: '2025-06-15' },
-      { id: 2, user: 'Maria Santos', rating: 5, comment: 'Serviço impecável. Recomendo!', date: '2025-06-10' }
+      { id: 1, user: 'Sarah Williams', rating: 5, comment: 'Excellent service! Very professional and quick.', date: '2025-06-15' },
+      { id: 2, user: 'Tom Roberts', rating: 5, comment: 'Impeccable work. Highly recommend!', date: '2025-06-10' }
     ]
   },
   {
