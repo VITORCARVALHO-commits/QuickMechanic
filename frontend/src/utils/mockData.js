@@ -50,19 +50,19 @@ export const mockMechanics = [
   },
   {
     id: '2',
-    name: 'Roberto Oliveira',
+    name: 'Michael Thompson',
     photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
     rating: 4.8,
     reviewCount: 95,
-    specialties: ['engine', 'transmission', 'diagnostic'],
+    specialties: ['engine', 'transmission', 'diagnostic', 'electrical'],
     mobile: false,
     workshop: true,
-    location: 'Rio de Janeiro, RJ',
+    location: 'North London',
     yearsExperience: 15,
-    certifications: ['Master Technician', 'Volkswagen Specialist'],
-    about: 'Especializado em motores e diagnósticos complexos.',
+    certifications: ['Master Technician', 'BMW Specialist'],
+    about: 'Specialist in complex engine diagnostics and repairs.',
     reviews: [
-      { id: 1, user: 'Ana Costa', rating: 5, comment: 'Resolveu um problema que outros não conseguiram!', date: '2025-06-12' }
+      { id: 1, user: 'Emma Clarke', rating: 5, comment: 'Fixed a problem others couldn\'t solve!', date: '2025-06-12' }
     ]
   },
   {
