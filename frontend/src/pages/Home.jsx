@@ -9,7 +9,7 @@ import { Input } from '../components/ui/input';
 import { toast } from '../hooks/use-toast';
 import { Shield, Clock, Award, MapPin, CheckCircle, Star, TrendingUp, Users, Search, Loader2, Car, AlertCircle } from 'lucide-react';
 import { carMakes, serviceTypes } from '../utils/mockData';
-import { searchPlate, validatePlateFormat } from '../utils/mockPlates';
+import { searchPlate, validatePlateFormat, isPlateComplete } from '../utils/mockPlates';
 
 export const Home = () => {
   const { t, language } = useLanguage();
