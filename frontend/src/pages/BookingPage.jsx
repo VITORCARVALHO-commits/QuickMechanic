@@ -246,7 +246,7 @@ export const BookingPage = () => {
                 <div className="mt-4 p-3 bg-[#27AE60]/10 rounded-lg">
                   <div className="flex items-center gap-2 text-sm text-[#27AE60]">
                     <CreditCard className="h-4 w-4" />
-                    <span className="font-semibold">Pagamento após conclusão</span>
+                    <span className="font-semibold">Pay after job completion</span>
                   </div>
                 </div>
               </Card>
