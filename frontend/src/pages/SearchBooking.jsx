@@ -178,7 +178,7 @@ export const SearchBooking = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-[#1EC6C6]">R$ {estimatedPrice}</div>
+                        <div className="text-3xl font-bold text-[#1EC6C6]">£{estimatedPrice}</div>
                         <div className="text-sm text-gray-600">{t('common.estimated')}</div>
                       </div>
                     </div>
