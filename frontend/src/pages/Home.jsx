@@ -240,17 +240,13 @@ export const Home = () => {
                 <div className="max-w-md mx-auto space-y-4">
                   <div className="space-y-2">
                     <Input 
-                      placeholder="ABC-1234 ou AB12 CDE"
+                      placeholder="YOUR CAR REG"
                       value={plateInput}
                       onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
                       className="h-16 text-center text-2xl font-bold tracking-wider"
                       maxLength={10}
                       disabled={isSearchingPlate}
                     />
-                    <div className="text-xs text-gray-500 text-center space-y-1">
-                      <p className="font-semibold">🇧🇷 Placas Brasil: ABC-1234, DEF-5678, GHI-9012</p>
-                      <p className="font-semibold">🇬🇧 Placas UK: AB12 CDE, CD34 FGH, EF56 IJK</p>
-                    </div>
                   </div>
 
                   <Button 
