@@ -168,22 +168,22 @@ export const mockMechanics = [
 export const mockBookings = [
   {
     id: 'B001',
-    service: 'Troca de Óleo',
-    mechanic: 'Carlos Silva',
+    service: 'Oil & Filter Change',
+    mechanic: 'John Smith',
     date: '2025-07-10',
     time: '14:00',
     status: 'confirmed',
-    price: 180,
-    car: 'Volkswagen Gol 2020'
+    price: 75,
+    car: 'Ford Fiesta 2012'
   },
   {
     id: 'B002',
-    service: 'Sistema de Freios',
-    mechanic: 'Roberto Oliveira',
+    service: 'Brake Service',
+    mechanic: 'David Wilson',
     date: '2025-07-05',
     time: '10:00',
     status: 'completed',
-    price: 350,
-    car: 'Fiat Argo 2021'
+    price: 195,
+    car: 'VW Golf 2015'
   }
 ];
