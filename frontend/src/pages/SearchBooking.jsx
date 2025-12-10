@@ -22,11 +22,11 @@ export const SearchBooking = () => {
   const quoteData = location.state?.quoteData || {};
 
   useEffect(() => {
-    // Simulate AI price calculation
+    // Simulate AI price calculation (London-based pricing in £)
     setTimeout(() => {
       const service = serviceTypes.find(s => s.id === quoteData.service);
-      const basePrice = service?.basePrice || 200;
-      const variation = Math.floor(Math.random() * 100) + 50;
+      const basePrice = service?.basePrice || 100;
+      const variation = Math.floor(Math.random() * 30) + 10; // London variation
       setEstimatedPrice(basePrice + variation);
       
       // Filter mechanics by service
