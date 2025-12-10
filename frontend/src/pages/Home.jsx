@@ -252,21 +252,17 @@ export const Home = () => {
               <div className="space-y-6">
                 {/* Vehicle Info Card */}
                 <Card className="p-6 bg-gradient-to-br from-[#27AE60]/10 to-white border-2 border-[#27AE60]/20">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-[#27AE60] rounded-full flex items-center justify-center">
                         <CheckCircle className="h-6 w-6 text-white" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-xl font-bold text-[#0E1A2C]">
-                            {vehicleFound.country === 'UK' ? 'Vehicle Identified' : 'Veículo Identificado'}
-                          </h3>
-                          <span className="text-xl">{vehicleFound.country === 'UK' ? '🇬🇧' : '🇧🇷'}</span>
+                          <h3 className="text-xl font-bold text-[#0E1A2C]">Vehicle Found</h3>
+                          <span className="text-xl">🇬🇧</span>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          {vehicleFound.country === 'UK' ? 'Plate' : 'Placa'}: {vehicleFound.plate}
-                        </p>
+                        <p className="text-sm text-gray-600">Registration: {vehicleFound.plate}</p>
                       </div>
                     </div>
                     <Button 
@@ -274,52 +270,59 @@ export const Home = () => {
                       size="sm"
                       onClick={handleResetPlateSearch}
                     >
-                      {vehicleFound.country === 'UK' ? 'Change' : 'Alterar'}
+                      Change
                     </Button>
                   </div>
 
+                  {/* Main Vehicle Info */}
+                  <div className="mb-6">
+                    <h4 className="text-3xl font-bold text-[#0E1A2C] mb-1">
+                      {vehicleFound.makeName} {vehicleFound.model}
+                    </h4>
+                    <p className="text-lg text-gray-600">{vehicleFound.version}</p>
+                  </div>
+
+                  {/* Specifications Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Make/Model' : 'Marca/Modelo'}
-                      </div>
-                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.makeName} {vehicleFound.model}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Year' : 'Ano'}
-                      </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Year</div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.year}</div>
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Colour' : 'Cor'}
-                      </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Colour</div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.color}</div>
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Fuel Type' : 'Combustível'}
-                      </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Fuel Type</div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.fuel}</div>
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Version' : 'Versão'}
-                      </div>
-                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.version}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Category' : 'Categoria'}
-                      </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Body Type</div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.category}</div>
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-600">
-                        {vehicleFound.country === 'UK' ? 'Power' : 'Potência'}
-                      </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Power</div>
                       <div className="font-bold text-[#0E1A2C]">{vehicleFound.power}</div>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Transmission</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.transmission}</div>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Doors</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.doors}</div>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Engine Size</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.engineSize}</div>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">CO2 Emissions</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.co2}</div>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">MPG (Combined)</div>
+                      <div className="font-bold text-[#0E1A2C]">{vehicleFound.mpg}</div>
                     </div>
                   </div>
                 </Card>
