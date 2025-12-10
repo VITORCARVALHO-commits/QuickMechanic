@@ -76,27 +76,36 @@ async def get_status_checks():
 @api_router.get("/vehicle/plate/{plate}")
 async def search_vehicle_by_plate_endpoint(plate: str):
     """
-    Busca veículo pela placa
+    Busca veículo pela placa usando DVLA API (com fallback para mock)
     Endpoint: GET /api/vehicle/plate/AB12CDE
+    
+    Fluxo:
+    1. Tenta buscar na DVLA API oficial do governo UK
+    2. Se falhar ou não encontrar, usa mock database interno
+    3. Retorna dados formatados
     """
     try:
         # Normaliza a placa
         clean_plate = plate.replace('-', '').replace(' ', '').upper()
         
-        # Busca no mock database
-        vehicle_data = search_vehicle_by_plate(clean_plate)
+        logger.info(f"Buscando veículo para placa: {clean_plate}")
+        
+        # Busca com fallback (DVLA primeiro, depois mock)
+        vehicle_data = search_vehicle_with_fallback(clean_plate)
         
         if vehicle_data:
             return {
                 "success": True,
                 "data": vehicle_data,
-                "message": "Veículo encontrado com sucesso"
+                "message": "Veículo encontrado com sucesso",
+                "source": "DVLA API" if vehicle_data.get('tax_status') else "Mock Database"
             }
         else:
             return {
                 "success": False,
                 "data": None,
-                "message": "Placa não encontrada em nossa base de dados"
+                "message": "Placa não encontrada. Veículo pode não estar registrado no UK ou placa inválida.",
+                "source": None
             }
     except Exception as e:
         logger.error(f"Erro ao buscar veículo: {str(e)}")
