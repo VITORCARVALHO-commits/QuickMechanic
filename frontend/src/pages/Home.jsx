@@ -38,35 +38,47 @@ export const Home = () => {
   });
   const [selectedMake, setSelectedMake] = useState(null);
 
-  // Auto-search when plate is complete
-  React.useEffect(() => {
+  // Auto-search when plate is complete (usando API real)
+  useEffect(() => {
     const searchWhenComplete = async () => {
       if (isPlateComplete(plateInput) && validatePlateFormat(plateInput)) {
         setIsSearchingPlate(true);
         
         try {
-          const result = await searchPlate(plateInput);
-          setVehicleFound(result.data);
-          setQuoteForm({
-            ...quoteForm,
-            plate: result.data.plate,
-            make: result.data.make,
-            model: result.data.model,
-            year: result.data.year,
-            color: result.data.color,
-            fuel: result.data.fuel,
-            version: result.data.version,
-            category: result.data.category
-          });
+          // Chama API real do backend
+          const result = await searchVehicleByPlate(plateInput);
           
-          toast({
-            title: "✅ Vehicle Found!",
-            description: `${result.data.makeName} ${result.data.model} ${result.data.year}`
-          });
+          if (result.success && result.data) {
+            setVehicleFound(result.data);
+            setQuoteForm({
+              ...quoteForm,
+              plate: result.data.plate,
+              make: result.data.make,
+              model: result.data.model,
+              year: result.data.year,
+              color: result.data.color,
+              fuel: result.data.fuel,
+              version: result.data.version,
+              category: result.data.category
+            });
+            
+            toast({
+              title: "✅ Veículo Encontrado!",
+              description: `${result.data.make_name} ${result.data.model} ${result.data.year}`
+            });
+          } else {
+            toast({
+              title: "❌ Placa Não Encontrada",
+              description: result.message || "Veículo não encontrado em nossa base de dados.",
+              variant: "destructive"
+            });
+            setVehicleFound(null);
+          }
         } catch (error) {
+          console.error('Erro na busca:', error);
           toast({
-            title: "❌ Not Found",
-            description: error.message,
+            title: "❌ Erro na Busca",
+            description: "Ocorreu um erro ao buscar o veículo. Tente novamente.",
             variant: "destructive"
           });
           setVehicleFound(null);
