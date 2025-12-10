@@ -326,7 +326,7 @@ export const Home = () => {
                   {/* Main Vehicle Info */}
                   <div className="mb-6">
                     <h4 className="text-3xl font-bold text-[#0E1A2C] mb-1">
-                      {vehicleFound.makeName} {vehicleFound.model}
+                      {vehicleFound.make_name} {vehicleFound.model}
                     </h4>
                     <p className="text-lg text-gray-600">{vehicleFound.version}</p>
                   </div>
