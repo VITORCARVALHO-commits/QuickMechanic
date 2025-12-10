@@ -107,8 +107,8 @@ export const SearchBooking = () => {
             </div>
             <div className="text-right">
               <div className="text-sm text-white/90 mb-1">{t('common.estimated')}</div>
-              <div className="text-5xl font-bold">R$ {estimatedPrice}</div>
-              <div className="text-sm text-white/90 mt-1">+ peças (se necessário)</div>
+              <div className="text-5xl font-bold">£{estimatedPrice}</div>
+              <div className="text-sm text-white/90 mt-1">+ parts (if required)</div>
             </div>
           </div>
         </Card>
