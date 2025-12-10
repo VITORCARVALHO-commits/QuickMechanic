@@ -10,14 +10,14 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
-# Import our models and services
+# Load environment variables FIRST
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env', override=True)
+
+# Import our models and services AFTER loading env
 from models import Vehicle, VehicleResponse, Quote, QuoteCreate, QuoteResponse
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
-
-
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env', override=True)
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
