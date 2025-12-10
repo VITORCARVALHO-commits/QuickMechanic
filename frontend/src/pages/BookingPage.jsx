@@ -257,8 +257,8 @@ export const BookingPage = () => {
                   <div className="w-12 h-12 bg-[#27AE60] rounded-full flex items-center justify-center mx-auto mb-3">
                     <Star className="h-6 w-6 text-white" />
                   </div>
-                  <h4 className="font-bold text-[#0E1A2C] mb-2">Garantia de 12 Meses</h4>
-                  <p className="text-sm text-gray-600">Serviço e peças garantidos</p>
+                  <h4 className="font-bold text-[#0E1A2C] mb-2">12-Month Guarantee</h4>
+                  <p className="text-sm text-gray-600">Parts & labour covered</p>
                 </div>
               </Card>
             </div>
