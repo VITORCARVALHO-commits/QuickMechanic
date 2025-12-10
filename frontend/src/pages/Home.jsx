@@ -97,7 +97,7 @@ export const Home = () => {
     setQuoteForm({ ...quoteForm, make: makeId, model: '' });
   };
 
-  const handleGetQuote = (e) => {
+  const handleGetQuote = async (e) => {
     e.preventDefault();
     
     if (!vehicleFound && !showManualForm) {
@@ -109,8 +109,44 @@ export const Home = () => {
       return;
     }
     
-    // Navigate to search/booking page with quote data
-    navigate('/search', { state: { quoteData: quoteForm } });
+    try {
+      // Salva o orçamento na API
+      const quoteData = {
+        plate: quoteForm.plate,
+        make: quoteForm.make,
+        model: quoteForm.model,
+        year: quoteForm.year,
+        color: quoteForm.color || '',
+        fuel: quoteForm.fuel || '',
+        version: quoteForm.version || '',
+        category: quoteForm.category || '',
+        service: quoteForm.service,
+        location: quoteForm.location,
+        description: quoteForm.description || ''
+      };
+      
+      const result = await createQuote(quoteData);
+      
+      if (result.success) {
+        toast({
+          title: "✅ Orçamento Salvo!",
+          description: "Seu orçamento foi registrado com sucesso."
+        });
+        
+        // Navigate to search/booking page with quote data
+        navigate('/search', { state: { quoteData: quoteForm, quoteId: result.data.id } });
+      }
+    } catch (error) {
+      console.error('Erro ao salvar orçamento:', error);
+      toast({
+        title: "❌ Erro",
+        description: "Erro ao salvar orçamento. Continuando...",
+        variant: "destructive"
+      });
+      
+      // Mesmo com erro, navega para a próxima página
+      navigate('/search', { state: { quoteData: quoteForm } });
+    }
   };
 
   const handleResetPlateSearch = () => {
