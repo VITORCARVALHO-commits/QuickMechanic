@@ -127,7 +127,7 @@ async def create_quote(quote_data: QuoteCreate):
         quote = Quote(**quote_data.model_dump())
         
         # Salva no MongoDB
-        result = await db.quotes.insert_one(quote.model_dump())
+        await db.quotes.insert_one(quote.model_dump())
         
         logger.info(f"Orçamento criado: {quote.id} - Placa: {quote.plate}")
         
