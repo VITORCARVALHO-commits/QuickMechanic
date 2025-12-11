@@ -6,7 +6,7 @@ import { Card } from '../components/ui/card';
 import { Search, Calendar, Wrench, CreditCard, Shield, Clock, Award, CheckCircle } from 'lucide-react';
 
 export const HowItWorks = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   const steps = [
