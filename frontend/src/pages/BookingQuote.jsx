@@ -6,15 +6,16 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
 import { Calendar } from '../components/ui/calendar';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from '../hooks/use-toast';
 import { 
   Car, CheckCircle, Clock, MapPin, Calendar as CalendarIcon,
   Wrench, Shield, ChevronRight, AlertCircle, Loader2,
   Home, Building2, Droplet, Disc, Gauge, Battery,
-  Zap, Wind, Cog, FileText
+  Zap, Wind, Cog, FileText, CreditCard, Info
 } from 'lucide-react';
 import { serviceTypes } from '../utils/mockData';
-import { createQuote } from '../services/api';
+import { createQuote, createPayment } from '../services/api';
 
 export const BookingQuote = () => {
   const location = useLocation();
