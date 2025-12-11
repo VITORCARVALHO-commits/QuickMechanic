@@ -53,21 +53,71 @@ export const translations = {
       },
       howItWorks: {
         title: 'Como funciona',
+        subtitle: 'Reparos de carro simplificados. Obtenha cotações competitivas de mecânicos locais em apenas 4 passos fáceis. Pague apenas £12 para garantir sua reserva!',
         step1: {
-          title: 'Obtenha Orçamento',
-          desc: 'Informe seu carro e o problema'
+          title: 'Pesquise Seu Veículo',
+          desc: 'Encontre seu carro instantaneamente com matrícula UK',
+          details: 'Digite o número de matrícula do seu veículo UK e buscaremos automaticamente todos os detalhes do seu carro na base de dados DVLA. Sem entrada manual necessária - tornamos rápido e fácil!'
         },
         step2: {
-          title: 'Agende o Serviço',
-          desc: 'Escolha data, hora e local'
+          title: 'Reserve e Pague Depósito de £12',
+          desc: 'Garanta sua reserva com um pequeno depósito',
+          details: 'Escolha seu serviço, data e local preferidos. Pague apenas £12 para confirmar sua reserva - isso será deduzido da sua conta final. O depósito previne reservas falsas e garante consultas sérias.',
+          depositInfo: 'Por que depósito de £12? Previne reservas falsas e garante solicitações sérias. Este valor é totalmente deduzido da sua conta final!'
         },
         step3: {
-          title: 'Mecânico Atende',
-          desc: 'Profissional vai até você'
+          title: 'Receba Cotações de Mecânicos',
+          desc: 'Receba cotações competitivas',
+          details: 'Mecânicos locais verão sua solicitação e enviarão cotações com seus preços finais. Compare preços, avaliações e comentários. Escolha o mecânico que melhor atende suas necessidades e orçamento.'
         },
         step4: {
-          title: 'Pague ao Final',
-          desc: 'Só pague quando estiver satisfeito'
+          title: 'Aceite Cotação e Obtenha Serviço',
+          desc: 'Pague com segurança e conserte seu carro',
+          details: 'Aceite a cotação que você mais gosta e pague o valor restante com segurança. O mecânico vem ao seu local ou você visita a oficina dele. Só pague quando estiver 100% satisfeito com o serviço!'
+        },
+        benefits: {
+          title: 'Por que escolher QuickMechanic?',
+          subtitle: 'Benefícios que fazem a diferença',
+          guarantee: {
+            title: 'Garantia de 12 Meses',
+            desc: 'Garantia total em todos os serviços e peças. Sua segurança é nossa prioridade.'
+          },
+          fast: {
+            title: 'Resposta Rápida',
+            desc: 'Mecânicos respondem em até 24 horas. Agendamento flexível para você.'
+          },
+          verified: {
+            title: 'Profissionais Verificados',
+            desc: 'Todos os mecânicos são verificados, certificados e avaliados por clientes reais.'
+          },
+          pricing: {
+            title: 'Preços Justos',
+            desc: 'Sem taxas ocultas. Depósito de £12 deduzido da conta final. Preços transparentes.'
+          }
+        },
+        pricing: {
+          title: 'Como Funciona Nossa Precificação',
+          deposit: {
+            title: 'Depósito de £12 para Pré-Reserva:',
+            desc: 'Garante sua reserva e previne solicitações falsas. Totalmente deduzido da sua conta final.'
+          },
+          competitive: {
+            title: 'Cotações Competitivas:',
+            desc: 'Múltiplos mecânicos competem pelo seu trabalho, garantindo que você obtenha o melhor preço.'
+          },
+          platform: {
+            title: 'Taxa de Plataforma Transparente:',
+            desc: 'Pequena taxa de serviço (£5 + 10%) nos ajuda a manter a plataforma e verificar mecânicos.'
+          },
+          noHidden: {
+            title: 'Sem Cobranças Ocultas:',
+            desc: 'O que você vê é o que você paga. Sem taxas surpresa ou custos extras.'
+          }
+        },
+        cta: {
+          title: 'Pronto para Começar?',
+          subtitle: 'Obtenha cotações competitivas de mecânicos locais em minutos. Apenas £12 para garantir sua reserva!',
+          button: 'Pesquise Seu Veículo Agora'
         }
       },
       stats: {
@@ -194,21 +244,71 @@ export const translations = {
       },
       howItWorks: {
         title: 'How it works',
+        subtitle: 'Car repairs made simple. Get competitive quotes from local mechanics in just 4 easy steps. Pay only £12 to secure your booking!',
         step1: {
-          title: 'Get Quote',
-          desc: 'Tell us about your car and issue'
+          title: 'Search Your Vehicle',
+          desc: 'Find your car instantly with UK registration',
+          details: 'Enter your UK vehicle registration number and we\'ll automatically fetch all your car details from the DVLA database. No manual entry needed - we make it quick and easy!'
         },
         step2: {
-          title: 'Schedule Service',
-          desc: 'Choose date, time and location'
+          title: 'Book & Pay £12 Deposit',
+          desc: 'Secure your booking with a small deposit',
+          details: 'Choose your service, preferred date and location. Pay just £12 to confirm your booking - this will be deducted from your final bill. The deposit prevents fake bookings and guarantees serious enquiries.',
+          depositInfo: 'Why £12 deposit? It prevents fake bookings and ensures serious requests. This amount is fully deducted from your final bill!'
         },
         step3: {
-          title: 'Mechanic Arrives',
-          desc: 'Professional comes to you'
+          title: 'Get Quotes from Mechanics',
+          desc: 'Receive competitive quotes',
+          details: 'Local mechanics will see your request and send you quotes with their final prices. Compare prices, ratings, and reviews. Choose the mechanic that best fits your needs and budget.'
         },
         step4: {
-          title: 'Pay After',
-          desc: 'Only pay when satisfied'
+          title: 'Accept Quote & Get Service',
+          desc: 'Pay securely and get your car fixed',
+          details: 'Accept the quote you like best and pay the remaining amount securely. The mechanic comes to your location or you visit their workshop. Only pay when you\'re 100% satisfied with the service!'
+        },
+        benefits: {
+          title: 'Why Choose QuickMechanic?',
+          subtitle: 'Benefits that make the difference',
+          guarantee: {
+            title: '12-Month Guarantee',
+            desc: 'Full warranty on all services and parts. Your safety is our top priority.'
+          },
+          fast: {
+            title: 'Fast Response',
+            desc: 'Mechanics respond within 24 hours. Flexible scheduling to suit you.'
+          },
+          verified: {
+            title: 'Verified Professionals',
+            desc: 'All mechanics are verified, certified and rated by real customers.'
+          },
+          pricing: {
+            title: 'Fair Pricing',
+            desc: 'No hidden fees. £12 deposit deducted from final bill. Transparent pricing.'
+          }
+        },
+        pricing: {
+          title: 'How Our Pricing Works',
+          deposit: {
+            title: '£12 Pre-booking Deposit:',
+            desc: 'Secures your booking and prevents fake requests. Fully deducted from your final bill.'
+          },
+          competitive: {
+            title: 'Competitive Quotes:',
+            desc: 'Multiple mechanics compete for your job, ensuring you get the best price.'
+          },
+          platform: {
+            title: 'Transparent Platform Fee:',
+            desc: 'Small service fee (£5 + 10%) helps us maintain the platform and verify mechanics.'
+          },
+          noHidden: {
+            title: 'No Hidden Charges:',
+            desc: 'What you see is what you pay. No surprise fees or extra costs.'
+          }
+        },
+        cta: {
+          title: 'Ready to Get Started?',
+          subtitle: 'Get competitive quotes from local mechanics in minutes. Just £12 to secure your booking!',
+          button: 'Search Your Vehicle Now'
         }
       },
       stats: {
