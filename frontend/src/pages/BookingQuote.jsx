@@ -411,6 +411,72 @@ export const BookingQuote = () => {
             )}
           </div>
 
+          {/* Pre-booking Modal */}
+          {showPrebookingModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="max-w-md w-full p-6 bg-white">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-[#1EC6C6] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CreditCard className="h-8 w-8 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">Confirm Pre-Booking</h2>
+                  <p className="text-gray-600">Secure your booking with a £12 deposit</p>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div className="text-sm text-yellow-800">
+                      <p className="font-semibold mb-1">How it works:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Pay £12 now to confirm your booking</li>
+                        <li>This will be <strong>deducted from your final bill</strong></li>
+                        <li>If you cancel, the £12 is <strong>non-refundable</strong></li>
+                        <li>Prevents fake bookings</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between items-center p-3 bg-[#F5F7FA] rounded-lg">
+                    <span className="text-gray-700">Pre-booking Fee</span>
+                    <span className="text-2xl font-bold text-[#1EC6C6]">£12.00</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => setShowPrebookingModal(false)}
+                    variant="outline"
+                    className="flex-1"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handlePrebookingPayment}
+                    disabled={loading}
+                    className="flex-1 bg-[#27AE60] hover:bg-[#229954] text-white"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-5 w-5 mr-2" />
+                        Pay £12
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+          </div>
+
           {/* Sidebar Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
