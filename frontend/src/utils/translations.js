@@ -105,10 +105,6 @@ export const translations = {
             title: 'Cotações Competitivas:',
             desc: 'Múltiplos mecânicos competem pelo seu trabalho, garantindo que você obtenha o melhor preço.'
           },
-          platform: {
-            title: 'Taxa de Plataforma Transparente:',
-            desc: 'Pequena taxa de serviço (£5 + 10%) nos ajuda a manter a plataforma e verificar mecânicos.'
-          },
           noHidden: {
             title: 'Sem Cobranças Ocultas:',
             desc: 'O que você vê é o que você paga. Sem taxas surpresa ou custos extras.'
@@ -295,10 +291,6 @@ export const translations = {
           competitive: {
             title: 'Competitive Quotes:',
             desc: 'Multiple mechanics compete for your job, ensuring you get the best price.'
-          },
-          platform: {
-            title: 'Transparent Platform Fee:',
-            desc: 'Small service fee (£5 + 10%) helps us maintain the platform and verify mechanics.'
           },
           noHidden: {
             title: 'No Hidden Charges:',

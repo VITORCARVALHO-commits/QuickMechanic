@@ -169,13 +169,6 @@ export const HowItWorks = () => {
               <div className="flex items-start gap-4">
                 <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
                 <div>
-                  <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.platform.title')}</strong>
-                  <p className="text-gray-600">{t('home.howItWorks.pricing.platform.desc')}</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
-                <div>
                   <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.noHidden.title')}</strong>
                   <p className="text-gray-600">{t('home.howItWorks.pricing.noHidden.desc')}</p>
                 </div>
