@@ -19,6 +19,7 @@ import { createQuote } from '../services/api';
 export const BookingQuote = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const { vehicleData, plateSearch } = location.state || {};
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -29,9 +30,11 @@ export const BookingQuote = () => {
     locationType: 'mobile', // mobile or workshop
     date: null,
     time: '',
-    notes: ''
+    notes: '',
+    travelFee: 0
   });
   const [loading, setLoading] = useState(false);
+  const [showPrebookingModal, setShowPrebookingModal] = useState(false);
 
   // Service icons mapping
   const serviceIcons = {
@@ -68,6 +71,24 @@ export const BookingQuote = () => {
   };
 
   const handleConfirmBooking = async () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Save vehicle data and booking state to localStorage
+      localStorage.setItem('pendingBooking', JSON.stringify({
+        vehicleData,
+        bookingData,
+        selectedService
+      }));
+      
+      toast({
+        title: "Login Required",
+        description: "Please login or create an account to continue",
+      });
+      
+      navigate('/login', { state: { from: '/quote', vehicleData } });
+      return;
+    }
+
     if (!bookingData.postcode || !bookingData.date || !bookingData.time) {
       toast({
         title: "Missing Information",
@@ -77,6 +98,11 @@ export const BookingQuote = () => {
       return;
     }
 
+    // Show pre-booking modal
+    setShowPrebookingModal(true);
+  };
+
+  const handlePrebookingPayment = async () => {
     setLoading(true);
 
     try {
@@ -91,35 +117,48 @@ export const BookingQuote = () => {
         category: vehicleData?.category || '',
         service: selectedService.id,
         location: bookingData.postcode,
-        description: bookingData.notes
+        description: bookingData.notes,
+        date: bookingData.date?.toISOString().split('T')[0],
+        time: bookingData.time,
+        location_type: bookingData.locationType
       };
 
-      const result = await createQuote(quotePayload);
+      // Create quote
+      const quoteResult = await createQuote(quotePayload);
 
-      if (result.success) {
-        toast({
-          title: "✅ Booking Request Received!",
-          description: "We'll find the best mechanic for you."
+      if (quoteResult.success) {
+        // Process pre-booking payment (£12)
+        const paymentResult = await createPayment({
+          quote_id: quoteResult.data.id,
+          amount: 12,
+          payment_method: 'mock',
+          payment_type: 'prebooking'
         });
 
-        setTimeout(() => {
-          navigate('/search', { 
-            state: { 
-              quoteData: quotePayload,
-              bookingDetails: bookingData 
-            } 
+        if (paymentResult.success) {
+          toast({
+            title: "✅ Pre-booking Confirmed!",
+            description: "£12 paid. You'll receive quotes from mechanics soon.",
           });
-        }, 1500);
+
+          // Clear pending booking
+          localStorage.removeItem('pendingBooking');
+
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 1500);
+        }
       }
     } catch (error) {
       console.error('Booking error:', error);
       toast({
         title: "Error",
-        description: "Failed to create booking. Please try again.",
+        description: "Failed to process pre-booking. Please try again.",
         variant: "destructive"
       });
     } finally {
       setLoading(false);
+      setShowPrebookingModal(false);
     }
   };
 
