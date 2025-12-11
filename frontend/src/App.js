@@ -8,6 +8,7 @@ import { Toaster } from "./components/ui/toaster";
 import { Home } from "./pages/Home";
 import { SearchBooking } from "./pages/SearchBooking";
 import { BookingPage } from "./pages/BookingPage";
+import { BookingQuote } from "./pages/BookingQuote";
 import { MechanicProfile } from "./pages/MechanicProfile";
 import { Dashboard } from "./pages/Dashboard";
 import { HowItWorks } from "./pages/HowItWorks";
