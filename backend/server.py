@@ -310,48 +310,6 @@ async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get
         logger.error(f"Erro ao criar orçamento: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/quotes/{quote_id}")
-async def get_quote(quote_id: str):
-    """
-    Busca um orçamento específico
-    Endpoint: GET /api/quotes/{quote_id}
-    """
-    try:
-        quote = await db.quotes.find_one({"id": quote_id})
-        
-        if quote:
-            return {
-                "success": True,
-                "data": Quote(**quote),
-                "message": "Orçamento encontrado"
-            }
-        else:
-            return {
-                "success": False,
-                "data": None,
-                "message": "Orçamento não encontrado"
-            }
-    except Exception as e:
-        logger.error(f"Erro ao buscar orçamento: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/quotes")
-async def list_quotes(limit: int = 100):
-    """
-    Lista todos os orçamentos
-    Endpoint: GET /api/quotes?limit=100
-    """
-    try:
-        quotes = await db.quotes.find({}, {"_id": 0}).sort("created_at", -1).to_list(limit)
-        return {
-            "success": True,
-            "data": [Quote(**quote) for quote in quotes],
-            "message": f"{len(quotes)} orçamentos encontrados"
-        }
-    except Exception as e:
-        logger.error(f"Erro ao listar orçamentos: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @api_router.get("/quotes/my-quotes")
 async def get_my_quotes(current_user: User = Depends(get_current_user)):
     """Get quotes for the current user (client or mechanic)"""
@@ -377,6 +335,48 @@ async def get_my_quotes(current_user: User = Depends(get_current_user)):
         }
     except Exception as e:
         logger.error(f"Error fetching user quotes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/quotes")
+async def list_quotes(limit: int = 100):
+    """
+    Lista todos os orçamentos
+    Endpoint: GET /api/quotes?limit=100
+    """
+    try:
+        quotes = await db.quotes.find({}, {"_id": 0}).sort("created_at", -1).to_list(limit)
+        return {
+            "success": True,
+            "data": [Quote(**quote) for quote in quotes],
+            "message": f"{len(quotes)} orçamentos encontrados"
+        }
+    except Exception as e:
+        logger.error(f"Erro ao listar orçamentos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/quotes/{quote_id}")
+async def get_quote(quote_id: str):
+    """
+    Busca um orçamento específico
+    Endpoint: GET /api/quotes/{quote_id}
+    """
+    try:
+        quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        
+        if quote:
+            return {
+                "success": True,
+                "data": Quote(**quote),
+                "message": "Orçamento encontrado"
+            }
+        else:
+            return {
+                "success": False,
+                "data": None,
+                "message": "Orçamento não encontrado"
+            }
+    except Exception as e:
+        logger.error(f"Erro ao buscar orçamento: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.patch("/quotes/{quote_id}/status")
