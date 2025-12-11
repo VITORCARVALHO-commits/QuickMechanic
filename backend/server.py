@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -15,9 +16,13 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
 # Import our models and services AFTER loading env
-from models import Vehicle, VehicleResponse, Quote, QuoteCreate, QuoteResponse
+from models import (
+    Vehicle, VehicleResponse, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
+    User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate
+)
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
+from auth import hash_password, verify_password, create_access_token, decode_token
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -29,6 +34,52 @@ app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Security
+security = HTTPBearer()
+
+# ===== AUTH DEPENDENCY =====
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current authenticated user from JWT token"""
+    token = credentials.credentials
+    payload = decode_token(token)
+    
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return User(**user)
+
+async def get_current_user_optional(authorization: Optional[str] = Header(None)):
+    """Get current user if token is provided, otherwise return None"""
+    if not authorization:
+        return None
+    
+    try:
+        token = authorization.replace("Bearer ", "")
+        payload = decode_token(token)
+        
+        if not payload:
+            return None
+        
+        user_id = payload.get("user_id")
+        if not user_id:
+            return None
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            return None
+        
+        return User(**user)
+    except:
+        return None
 
 
 # Define Models
