@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../components/ui/textarea';
 import { Input } from '../components/ui/input';
 import { toast } from '../hooks/use-toast';
-import { Shield, Clock, Award, MapPin, CheckCircle, Star, TrendingUp, Users, Search, Loader2, Car, AlertCircle } from 'lucide-react';
+import { Shield, Clock, Award, MapPin, CheckCircle, Star, TrendingUp, Users, Search, Loader2, Car, AlertCircle, ChevronRight } from 'lucide-react';
 import { carMakes, serviceTypes } from '../utils/mockData';
 import { validatePlateFormat, isPlateComplete } from '../utils/mockPlates';
 import { searchVehicleByPlate } from '../services/api';
