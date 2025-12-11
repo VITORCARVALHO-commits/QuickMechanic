@@ -180,15 +180,18 @@ backend:
 frontend:
   - task: "User Registration & Authentication"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Register.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "testing"
           comment: "Frontend registration and authentication components implemented. Need to test client and mechanic registration flows, login functionality, and dashboard routing."
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: Both client and mechanic registration working perfectly. User type selection, form validation, successful account creation, automatic login, and dashboard redirection all functional. Login/logout flows working correctly."
 
   - task: "Vehicle Search & Booking Flow"
     implemented: true
