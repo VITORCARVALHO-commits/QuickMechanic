@@ -423,6 +423,87 @@ async def update_quote_status(
         logger.error(f"Error updating quote: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== PAYMENT ENDPOINTS =====
+
+@api_router.post("/payments")
+async def create_payment(payment_data: PaymentCreate, current_user: User = Depends(get_current_user)):
+    """Process payment for a quote (mock payment for now)"""
+    try:
+        # Verify quote exists and belongs to user
+        quote = await db.quotes.find_one({"id": payment_data.quote_id}, {"_id": 0})
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        if quote.get("client_id") != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized to pay for this quote")
+        
+        # Create payment record
+        payment = Payment(
+            quote_id=payment_data.quote_id,
+            client_id=current_user.id,
+            amount=payment_data.amount,
+            payment_method=payment_data.payment_method,
+            status="completed"
+        )
+        
+        # Save payment
+        payment_dict = payment.model_dump()
+        payment_dict['created_at'] = payment_dict['created_at'].isoformat()
+        await db.payments.insert_one(payment_dict)
+        
+        # Update quote status to paid
+        await db.quotes.update_one(
+            {"id": payment_data.quote_id},
+            {"$set": {"status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        logger.info(f"Payment processed: {payment.id} for quote {payment_data.quote_id}")
+        
+        return {
+            "success": True,
+            "data": payment,
+            "message": "Payment processed successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Payment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/payments/my-payments")
+async def get_my_payments(current_user: User = Depends(get_current_user)):
+    """Get payment history for current user"""
+    try:
+        payments = await db.payments.find({"client_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        return {
+            "success": True,
+            "data": [Payment(**payment) for payment in payments],
+            "message": f"{len(payments)} payments found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching payments: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== MECHANIC ENDPOINTS =====
+
+@api_router.get("/mechanics")
+async def list_mechanics():
+    """List all active mechanics"""
+    try:
+        mechanics = await db.users.find(
+            {"user_type": "mechanic", "is_active": True},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(100)
+        
+        return {
+            "success": True,
+            "data": mechanics,
+            "message": f"{len(mechanics)} mechanics found"
+        }
+    except Exception as e:
+        logger.error(f"Error listing mechanics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
