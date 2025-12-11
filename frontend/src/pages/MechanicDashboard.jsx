@@ -20,9 +20,12 @@ export const MechanicDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [submittingQuote, setSubmittingQuote] = useState(null);
   const [quotePrice, setQuotePrice] = useState({});
+  const [travelFee, setTravelFee] = useState({});
+  const [wallet, setWallet] = useState(null);
 
   useEffect(() => {
     loadQuotes();
+    loadWallet();
   }, []);
 
   const loadQuotes = async () => {
@@ -39,6 +42,22 @@ export const MechanicDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadWallet = async () => {
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/wallet/balance`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setWallet(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load wallet:', error);
     }
   };
 
