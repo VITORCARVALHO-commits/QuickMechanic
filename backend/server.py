@@ -545,6 +545,103 @@ async def get_my_payments(current_user: User = Depends(get_current_user)):
         logger.error(f"Error fetching payments: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== WALLET & PAYOUT ENDPOINTS =====
+
+@api_router.get("/wallet/balance")
+async def get_wallet_balance(current_user: User = Depends(get_current_user)):
+    """Get mechanic wallet balance"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics have wallets")
+        
+        wallet = await db.wallets.find_one({"mechanic_id": current_user.id}, {"_id": 0})
+        
+        if not wallet:
+            # Create wallet if doesn't exist
+            from models import Wallet
+            new_wallet = Wallet(mechanic_id=current_user.id)
+            wallet_dict = new_wallet.model_dump()
+            wallet_dict['updated_at'] = wallet_dict['updated_at'].isoformat()
+            await db.wallets.insert_one(wallet_dict)
+            wallet = wallet_dict
+        
+        return {
+            "success": True,
+            "data": wallet,
+            "message": "Wallet balance retrieved"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching wallet: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/wallet/payout")
+async def request_payout(amount: float, current_user: User = Depends(get_current_user)):
+    """Request payout from wallet"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can request payouts")
+        
+        wallet = await db.wallets.find_one({"mechanic_id": current_user.id}, {"_id": 0})
+        
+        if not wallet or wallet.get("available_balance", 0) < amount:
+            raise HTTPException(status_code=400, detail="Insufficient balance")
+        
+        # Create payout request
+        from models import PayoutRequest
+        payout = PayoutRequest(
+            mechanic_id=current_user.id,
+            amount=amount
+        )
+        
+        payout_dict = payout.model_dump()
+        payout_dict['requested_at'] = payout_dict['requested_at'].isoformat()
+        await db.payout_requests.insert_one(payout_dict)
+        
+        # Update wallet (move from available to pending payout)
+        await db.wallets.update_one(
+            {"mechanic_id": current_user.id},
+            {
+                "$inc": {"available_balance": -amount},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        return {
+            "success": True,
+            "data": payout,
+            "message": "Payout request submitted"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Payout request error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/wallet/payouts")
+async def get_payout_history(current_user: User = Depends(get_current_user)):
+    """Get payout history for mechanic"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics have payout history")
+        
+        payouts = await db.payout_requests.find(
+            {"mechanic_id": current_user.id},
+            {"_id": 0}
+        ).sort("requested_at", -1).to_list(100)
+        
+        return {
+            "success": True,
+            "data": payouts,
+            "message": f"{len(payouts)} payouts found"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching payouts: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== MECHANIC ENDPOINTS =====
 
 @api_router.get("/mechanics")
