@@ -278,30 +278,26 @@ async def search_vehicle_by_plate_endpoint(plate: str):
 # ===== QUOTE ENDPOINTS =====
 
 @api_router.post("/quotes")
-async def create_quote(quote_data: QuoteCreate):
+async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get_current_user_optional)):
     """
     Cria um novo orçamento com dados do veículo
-    Endpoint: POST /api/quotes
-    Body: {
-        "plate": "AB12CDE",
-        "make": "ford",
-        "model": "Fiesta",
-        "year": "2012",
-        "color": "Azul",
-        "fuel": "Gasolina",
-        "version": "1.0 EcoBoost",
-        "category": "Hatchback",
-        "service": "oil_change",
-        "location": "London, UK",
-        "description": "Preciso trocar o óleo"
-    }
+    Pode ser criado com ou sem autenticação
     """
     try:
         # Cria objeto Quote
-        quote = Quote(**quote_data.model_dump())
+        quote_dict = quote_data.model_dump()
+        
+        # Add client_id if user is authenticated
+        if current_user:
+            quote_dict['client_id'] = current_user.id
+        
+        quote = Quote(**quote_dict)
         
         # Salva no MongoDB
-        await db.quotes.insert_one(quote.model_dump())
+        doc = quote.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        doc['updated_at'] = doc['updated_at'].isoformat()
+        await db.quotes.insert_one(doc)
         
         logger.info(f"Orçamento criado: {quote.id} - Placa: {quote.plate}")
         
@@ -346,7 +342,7 @@ async def list_quotes(limit: int = 100):
     Endpoint: GET /api/quotes?limit=100
     """
     try:
-        quotes = await db.quotes.find().sort("created_at", -1).to_list(limit)
+        quotes = await db.quotes.find({}, {"_id": 0}).sort("created_at", -1).to_list(limit)
         return {
             "success": True,
             "data": [Quote(**quote) for quote in quotes],
@@ -354,6 +350,77 @@ async def list_quotes(limit: int = 100):
         }
     except Exception as e:
         logger.error(f"Erro ao listar orçamentos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/quotes/my-quotes")
+async def get_my_quotes(current_user: User = Depends(get_current_user)):
+    """Get quotes for the current user (client or mechanic)"""
+    try:
+        if current_user.user_type == "client":
+            # Get quotes created by this client
+            quotes = await db.quotes.find({"client_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        elif current_user.user_type == "mechanic":
+            # Get quotes assigned to this mechanic OR pending quotes
+            quotes = await db.quotes.find({
+                "$or": [
+                    {"mechanic_id": current_user.id},
+                    {"status": "pending"}
+                ]
+            }, {"_id": 0}).sort("created_at", -1).to_list(100)
+        else:
+            quotes = []
+        
+        return {
+            "success": True,
+            "data": [Quote(**quote) for quote in quotes],
+            "message": f"{len(quotes)} quotes found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching user quotes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.patch("/quotes/{quote_id}/status")
+async def update_quote_status(
+    quote_id: str,
+    update_data: QuoteUpdateStatus,
+    current_user: User = Depends(get_current_user)
+):
+    """Update quote status and optionally assign mechanic/price"""
+    try:
+        quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        update_fields = {
+            "status": update_data.status,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # If mechanic is submitting a quote
+        if current_user.user_type == "mechanic" and update_data.final_price:
+            update_fields["mechanic_id"] = current_user.id
+            update_fields["final_price"] = update_data.final_price
+        
+        # Update in database
+        await db.quotes.update_one(
+            {"id": quote_id},
+            {"$set": update_fields}
+        )
+        
+        # Fetch updated quote
+        updated_quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        
+        logger.info(f"Quote {quote_id} updated to status: {update_data.status}")
+        
+        return {
+            "success": True,
+            "data": Quote(**updated_quote),
+            "message": "Quote updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating quote: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Include the router in the main app
