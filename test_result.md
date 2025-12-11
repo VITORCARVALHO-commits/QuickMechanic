@@ -225,15 +225,18 @@ frontend:
 
   - task: "Mechanic Dashboard & Quote Submission"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/MechanicDashboard.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "testing"
           comment: "Mechanic dashboard with quote request viewing, price submission, and job management implemented. Need to test quote submission and job status updates."
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: Mechanic dashboard working perfectly. Shows 'New Requests (2)' with existing quote requests for VO11WRE vehicle (Oil Change and Brakes services). Quote price input, submission functionality working. 'My Active Jobs' section displays correctly. Quote submission process functional."
 
   - task: "UI/UX & Responsive Design"
     implemented: true
