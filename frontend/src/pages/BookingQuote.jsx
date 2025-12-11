@@ -576,12 +576,11 @@ export const BookingQuote = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Pre-booking Modal */}
-      {showPrebookingModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full p-6 bg-white">
+        {/* Pre-booking Modal */}
+        {showPrebookingModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-md w-full p-6 bg-white">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-[#1EC6C6] rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="h-8 w-8 text-white" />
