@@ -427,7 +427,7 @@ async def update_quote_status(
 
 @api_router.post("/payments")
 async def create_payment(payment_data: PaymentCreate, current_user: User = Depends(get_current_user)):
-    """Process payment for a quote (mock payment for now)"""
+    """Process payment for a quote with platform commission calculation"""
     try:
         # Verify quote exists and belongs to user
         quote = await db.quotes.find_one({"id": payment_data.quote_id}, {"_id": 0})
@@ -437,12 +437,39 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         if quote.get("client_id") != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized to pay for this quote")
         
+        # Calculate commission (Modelo Híbrido: £5 base + 10%)
+        BASE_FEE = 5.0
+        COMMISSION_RATE = 0.10
+        
+        if payment_data.payment_type == "prebooking":
+            # Pre-booking: £12 fixo
+            platform_fee = 12.0
+            mechanic_earnings = 0.0
+            new_status = "prebooked"
+        else:
+            # Final payment
+            total_amount = payment_data.amount
+            travel_fee = quote.get("travel_fee", 0.0)
+            
+            # Se já pagou pre-booking, desconta do total
+            if quote.get("prebooking_paid"):
+                total_amount -= quote.get("prebooking_amount", 12.0)
+            
+            # Comissão: £5 + 10% do valor do serviço (sem taxa de deslocamento)
+            service_amount = payment_data.amount - travel_fee
+            platform_fee = BASE_FEE + (service_amount * COMMISSION_RATE)
+            mechanic_earnings = payment_data.amount - platform_fee
+            new_status = "paid"
+        
         # Create payment record
         payment = Payment(
             quote_id=payment_data.quote_id,
             client_id=current_user.id,
             amount=payment_data.amount,
             payment_method=payment_data.payment_method,
+            payment_type=payment_data.payment_type,
+            platform_fee=platform_fee,
+            mechanic_earnings=mechanic_earnings,
             status="completed"
         )
         
@@ -451,13 +478,47 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         payment_dict['created_at'] = payment_dict['created_at'].isoformat()
         await db.payments.insert_one(payment_dict)
         
-        # Update quote status to paid
-        await db.quotes.update_one(
-            {"id": payment_data.quote_id},
-            {"$set": {"status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
-        )
+        # Update quote
+        update_data = {
+            "status": new_status,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
         
-        logger.info(f"Payment processed: {payment.id} for quote {payment_data.quote_id}")
+        if payment_data.payment_type == "prebooking":
+            update_data["prebooking_paid"] = True
+        
+        await db.quotes.update_one({"id": payment_data.quote_id}, {"$set": update_data})
+        
+        # Update mechanic wallet if final payment
+        if payment_data.payment_type == "final" and quote.get("mechanic_id"):
+            mechanic_id = quote.get("mechanic_id")
+            wallet = await db.wallets.find_one({"mechanic_id": mechanic_id}, {"_id": 0})
+            
+            if wallet:
+                # Update existing wallet
+                await db.wallets.update_one(
+                    {"mechanic_id": mechanic_id},
+                    {
+                        "$inc": {
+                            "pending_balance": mechanic_earnings,
+                            "total_earned": mechanic_earnings
+                        },
+                        "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+                    }
+                )
+            else:
+                # Create new wallet
+                from models import Wallet
+                new_wallet = Wallet(
+                    mechanic_id=mechanic_id,
+                    pending_balance=mechanic_earnings,
+                    total_earned=mechanic_earnings
+                )
+                wallet_dict = new_wallet.model_dump()
+                wallet_dict['updated_at'] = wallet_dict['updated_at'].isoformat()
+                await db.wallets.insert_one(wallet_dict)
+        
+        logger.info(f"Payment processed: {payment.id} - Type: {payment_data.payment_type} - Platform: £{platform_fee} - Mechanic: £{mechanic_earnings}")
         
         return {
             "success": True,
