@@ -15,6 +15,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ClientDashboard } from "./pages/ClientDashboard";
 import { MechanicDashboard } from "./pages/MechanicDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
@@ -52,6 +53,10 @@ const DashboardRouter = () => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user.user_type === 'admin') {
+    return <AdminDashboard />;
   }
 
   if (user.user_type === 'mechanic') {
