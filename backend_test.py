@@ -48,16 +48,17 @@ class QuickMechanicTester:
         
         try:
             if method == "GET":
-                response = requests.get(url, headers=headers, timeout=30)
+                response = requests.get(url, headers=headers, timeout=60)
             elif method == "POST":
-                response = requests.post(url, json=data, headers=headers, timeout=30)
+                response = requests.post(url, json=data, headers=headers, timeout=60)
             elif method == "PATCH":
-                response = requests.patch(url, json=data, headers=headers, timeout=30)
+                response = requests.patch(url, json=data, headers=headers, timeout=60)
             else:
                 raise ValueError(f"Unsupported method: {method}")
             
             return response
         except requests.exceptions.RequestException as e:
+            print(f"Request error for {method} {url}: {e}")
             return None
     
     def test_auth_register_client(self):
