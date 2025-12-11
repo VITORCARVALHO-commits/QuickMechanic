@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Wrench, Menu, X } from 'lucide-react';
+import { Wrench, Menu, X, User, LogOut } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Button } from './ui/button';
-import { useState } from 'react';
 
 export const Navbar = () => {
   const { t } = useLanguage();
+  const { isAuthenticated, user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -41,9 +42,29 @@ export const Navbar = () => {
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
-            <Link to="/login">
-              <Button variant="outline">{t('nav.login')}</Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    {user?.name}
+                  </Button>
+                </Link>
+                <Button variant="ghost" onClick={logout} className="flex items-center gap-2">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline">{t('nav.login')}</Button>
+                </Link>
+                <Link to="/register">
+                  <Button className="bg-[#1EC6C6] hover:bg-[#1AB5B5]">Sign Up</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -91,14 +112,36 @@ export const Navbar = () => {
               {t('nav.becomeMechanic')}
             </Link>
             <div className="pt-4 space-y-2">
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full">{t('nav.login')}</Button>
-              </Link>
-              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white">
-                  {t('nav.dashboard')}
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">{t('nav.login')}</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
