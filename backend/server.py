@@ -93,6 +93,119 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# ===== AUTHENTICATION ROUTES =====
+
+@api_router.post("/auth/register")
+async def register(user_data: UserCreate):
+    """Register a new user (client or mechanic)"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create user
+        user = User(
+            email=user_data.email,
+            password_hash=hash_password(user_data.password),
+            name=user_data.name,
+            phone=user_data.phone,
+            user_type=user_data.user_type
+        )
+        
+        # Save to database
+        user_dict = user.model_dump()
+        user_dict['created_at'] = user_dict['created_at'].isoformat()
+        await db.users.insert_one(user_dict)
+        
+        # Create JWT token
+        token = create_access_token({"user_id": user.id, "user_type": user.user_type})
+        
+        logger.info(f"New user registered: {user.email} ({user.user_type})")
+        
+        return {
+            "success": True,
+            "token": token,
+            "user": UserResponse(
+                id=user.id,
+                email=user.email,
+                name=user.name,
+                phone=user.phone,
+                user_type=user.user_type,
+                is_active=user.is_active,
+                rating=user.rating,
+                review_count=user.review_count
+            ),
+            "message": "User registered successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/auth/login")
+async def login(credentials: UserLogin):
+    """Login user and return JWT token"""
+    try:
+        # Find user
+        user_doc = await db.users.find_one({"email": credentials.email}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        user = User(**user_doc)
+        
+        # Verify password
+        if not verify_password(credentials.password, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Check if active
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="Account is not active")
+        
+        # Create JWT token
+        token = create_access_token({"user_id": user.id, "user_type": user.user_type})
+        
+        logger.info(f"User logged in: {user.email}")
+        
+        return {
+            "success": True,
+            "token": token,
+            "user": UserResponse(
+                id=user.id,
+                email=user.email,
+                name=user.name,
+                phone=user.phone,
+                user_type=user.user_type,
+                is_active=user.is_active,
+                rating=user.rating,
+                review_count=user.review_count
+            ),
+            "message": "Login successful"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/auth/me")
+async def get_me(current_user: User = Depends(get_current_user)):
+    """Get current user information"""
+    return {
+        "success": True,
+        "user": UserResponse(
+            id=current_user.id,
+            email=current_user.email,
+            name=current_user.name,
+            phone=current_user.phone,
+            user_type=current_user.user_type,
+            is_active=current_user.is_active,
+            rating=current_user.rating,
+            review_count=current_user.review_count
+        )
+    }
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
