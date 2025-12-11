@@ -4,12 +4,13 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
+import { StatCard } from '../components/StatCard';
 import { useAuth } from '../contexts/AuthContext';
 import { getMyQuotes, updateQuoteStatus } from '../services/api';
 import { toast } from '../hooks/use-toast';
 import { 
   Car, Calendar, MapPin, Wrench, Clock, CheckCircle, 
-  DollarSign, Loader2, User, LogOut, Send
+  DollarSign, Loader2, User, LogOut, Send, FileText, TrendingUp
 } from 'lucide-react';
 
 export const MechanicDashboard = () => {
@@ -167,6 +168,36 @@ export const MechanicDashboard = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <StatCard
+            title="New Requests"
+            value={pendingQuotes.length}
+            icon={FileText}
+            color="bg-yellow-500"
+          />
+          <StatCard
+            title="Active Jobs"
+            value={myActiveJobs.length}
+            icon={Wrench}
+            color="bg-blue-500"
+          />
+          <StatCard
+            title="Completed"
+            value={myCompletedJobs.length}
+            icon={CheckCircle}
+            color="bg-[#27AE60]"
+          />
+          <StatCard
+            title="Total Earnings"
+            value={`£${myCompletedJobs.reduce((sum, q) => sum + (q.final_price || 0), 0).toFixed(2)}`}
+            icon={DollarSign}
+            color="bg-[#1EC6C6]"
+            trend="up"
+            trendValue="+12%"
+          />
+        </div>
+
         {/* Pending Requests */}
         <div>
           <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">
@@ -180,7 +211,7 @@ export const MechanicDashboard = () => {
           ) : (
             <div className="space-y-4">
               {pendingQuotes.map((quote) => (
-                <Card key={quote.id} className="p-6 border-2 border-yellow-200 bg-yellow-50/30">
+                <Card key={quote.id} className="p-6 border-2 border-yellow-200 bg-yellow-50/30 hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-left-4">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-[#1EC6C6]/10 rounded-lg flex items-center justify-center">
@@ -274,7 +305,7 @@ export const MechanicDashboard = () => {
           ) : (
             <div className="space-y-4">
               {myActiveJobs.map((quote) => (
-                <Card key={quote.id} className="p-6">
+                <Card key={quote.id} className="p-6 hover:shadow-xl transition-all duration-300 animate-in fade-in">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-[#1EC6C6]/10 rounded-lg flex items-center justify-center">
