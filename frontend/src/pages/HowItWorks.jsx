@@ -13,33 +13,34 @@ export const HowItWorks = () => {
     {
       icon: Search,
       number: '01',
-      title: 'Search Your Vehicle',
-      description: 'Find your car instantly with UK registration',
-      details: 'Enter your UK vehicle registration number and we\'ll automatically fetch all your car details from the DVLA database. No manual entry needed - we make it quick and easy!',
+      title: t('home.howItWorks.step1.title'),
+      description: t('home.howItWorks.step1.desc'),
+      details: t('home.howItWorks.step1.details'),
       color: 'from-[#1EC6C6] to-[#1AB5B5]'
     },
     {
       icon: Calendar,
       number: '02',
-      title: 'Book & Pay £12 Deposit',
-      description: 'Secure your booking with a small deposit',
-      details: 'Choose your service, preferred date and location. Pay just £12 to confirm your booking - this will be deducted from your final bill. The deposit prevents fake bookings and guarantees serious enquiries.',
+      title: t('home.howItWorks.step2.title'),
+      description: t('home.howItWorks.step2.desc'),
+      details: t('home.howItWorks.step2.details'),
+      depositInfo: t('home.howItWorks.step2.depositInfo'),
       color: 'from-[#FF9F1C] to-[#FF8C00]'
     },
     {
       icon: Wrench,
       number: '03',
-      title: 'Get Quotes from Mechanics',
-      description: 'Receive competitive quotes',
-      details: 'Local mechanics will see your request and send you quotes with their final prices. Compare prices, ratings, and reviews. Choose the mechanic that best fits your needs and budget.',
+      title: t('home.howItWorks.step3.title'),
+      description: t('home.howItWorks.step3.desc'),
+      details: t('home.howItWorks.step3.details'),
       color: 'from-[#27AE60] to-[#229954]'
     },
     {
       icon: CreditCard,
       number: '04',
-      title: 'Accept Quote & Get Service',
-      description: 'Pay securely and get your car fixed',
-      details: 'Accept the quote you like best and pay the remaining amount securely. The mechanic comes to your location or you visit their workshop. Only pay when you\'re 100% satisfied with the service!',
+      title: t('home.howItWorks.step4.title'),
+      description: t('home.howItWorks.step4.desc'),
+      details: t('home.howItWorks.step4.details'),
       color: 'from-[#2D9CDB] to-[#1976D2]'
     }
   ];
@@ -47,23 +48,23 @@ export const HowItWorks = () => {
   const benefits = [
     {
       icon: Shield,
-      title: '12-Month Guarantee',
-      description: 'Full warranty on all services and parts. Your safety is our top priority.'
+      title: t('home.howItWorks.benefits.guarantee.title'),
+      description: t('home.howItWorks.benefits.guarantee.desc')
     },
     {
       icon: Clock,
-      title: 'Fast Response',
-      description: 'Mechanics respond within 24 hours. Flexible scheduling to suit you.'
+      title: t('home.howItWorks.benefits.fast.title'),
+      description: t('home.howItWorks.benefits.fast.desc')
     },
     {
       icon: Award,
-      title: 'Verified Professionals',
-      description: 'All mechanics are verified, certified and rated by real customers.'
+      title: t('home.howItWorks.benefits.verified.title'),
+      description: t('home.howItWorks.benefits.verified.desc')
     },
     {
       icon: CheckCircle,
-      title: 'Fair Pricing',
-      description: 'No hidden fees. £12 deposit deducted from final bill. Transparent pricing.'
+      title: t('home.howItWorks.benefits.pricing.title'),
+      description: t('home.howItWorks.benefits.pricing.desc')
     }
   ];
 
@@ -72,9 +73,9 @@ export const HowItWorks = () => {
       {/* Hero */}
       <section className="bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">How QuickMechanic Works</h1>
+          <h1 className="text-5xl font-bold mb-6">{t('home.howItWorks.title')}</h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Car repairs made simple. Get competitive quotes from local mechanics in just 4 easy steps. Pay only £12 to secure your booking!
+            {t('home.howItWorks.subtitle')}
           </p>
         </div>
       </section>
@@ -102,17 +103,17 @@ export const HowItWorks = () => {
                 <div className="flex-1">
                   <div className="inline-block mb-4">
                     <span className={`bg-gradient-to-r ${step.color} text-white px-6 py-2 rounded-full text-lg font-bold`}>
-                      Step {step.number}
+                      {language === 'pt' ? 'Passo' : 'Step'} {step.number}
                     </span>
                   </div>
                   <h2 className="text-4xl font-bold text-[#0E1A2C] mb-4">{step.title}</h2>
                   <p className="text-xl text-gray-600 mb-4">{step.description}</p>
                   <p className="text-gray-700 leading-relaxed">{step.details}</p>
                   
-                  {step.number === '02' && (
+                  {step.number === '02' && step.depositInfo && (
                     <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
                       <p className="text-sm text-yellow-800">
-                        <strong>Why £12 deposit?</strong> It prevents fake bookings and ensures serious requests. This amount is fully deducted from your final bill!
+                        {step.depositInfo}
                       </p>
                     </div>
                   )}
@@ -127,8 +128,8 @@ export const HowItWorks = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#0E1A2C] mb-4">Why Choose QuickMechanic?</h2>
-            <p className="text-xl text-gray-600">Benefits that make the difference</p>
+            <h2 className="text-4xl font-bold text-[#0E1A2C] mb-4">{t('home.howItWorks.benefits.title')}</h2>
+            <p className="text-xl text-gray-600">{t('home.howItWorks.benefits.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -149,34 +150,34 @@ export const HowItWorks = () => {
       <section className="py-16 bg-[#F5F7FA]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="p-8 bg-white shadow-xl">
-            <h3 className="text-2xl font-bold text-[#0E1A2C] mb-6 text-center">How Our Pricing Works</h3>
+            <h3 className="text-2xl font-bold text-[#0E1A2C] mb-6 text-center">{t('home.howItWorks.pricing.title')}</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
                 <div>
-                  <strong className="text-[#0E1A2C]">£12 Pre-booking Deposit:</strong>
-                  <p className="text-gray-600">Secures your booking and prevents fake requests. Fully deducted from your final bill.</p>
+                  <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.deposit.title')}</strong>
+                  <p className="text-gray-600">{t('home.howItWorks.pricing.deposit.desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
                 <div>
-                  <strong className="text-[#0E1A2C]">Competitive Quotes:</strong>
-                  <p className="text-gray-600">Multiple mechanics compete for your job, ensuring you get the best price.</p>
+                  <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.competitive.title')}</strong>
+                  <p className="text-gray-600">{t('home.howItWorks.pricing.competitive.desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
                 <div>
-                  <strong className="text-[#0E1A2C]">Transparent Platform Fee:</strong>
-                  <p className="text-gray-600">Small service fee (£5 + 10%) helps us maintain the platform and verify mechanics.</p>
+                  <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.platform.title')}</strong>
+                  <p className="text-gray-600">{t('home.howItWorks.pricing.platform.desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-1 flex-shrink-0" />
                 <div>
-                  <strong className="text-[#0E1A2C]">No Hidden Charges:</strong>
-                  <p className="text-gray-600">What you see is what you pay. No surprise fees or extra costs.</p>
+                  <strong className="text-[#0E1A2C]">{t('home.howItWorks.pricing.noHidden.title')}</strong>
+                  <p className="text-gray-600">{t('home.howItWorks.pricing.noHidden.desc')}</p>
                 </div>
               </div>
             </div>
@@ -188,17 +189,17 @@ export const HowItWorks = () => {
       <section className="py-20 bg-gradient-to-br from-[#1EC6C6] to-[#1AB5B5]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Get Started?
+            {t('home.howItWorks.cta.title')}
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Get competitive quotes from local mechanics in minutes. Just £12 to secure your booking!
+            {t('home.howItWorks.cta.subtitle')}
           </p>
           <Button 
             size="lg" 
             className="bg-white text-[#1EC6C6] hover:bg-gray-100 px-12 py-6 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
             onClick={() => navigate('/')}
           >
-            Search Your Vehicle Now
+            {t('home.howItWorks.cta.button')}
           </Button>
         </div>
       </section>
