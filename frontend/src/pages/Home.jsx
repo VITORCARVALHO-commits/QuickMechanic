@@ -345,56 +345,15 @@ export const Home = () => {
                   </div>
                 </Card>
 
-                {/* Service Form */}
+                {/* Continue Button */}
                 <form onSubmit={handleGetQuote} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Service Type */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.serviceType')} *</label>
-                      <Select value={quoteForm.service} onValueChange={(value) => setQuoteForm({...quoteForm, service: value})}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder={t('home.quote.selectService')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {serviceTypes.map(service => (
-                            <SelectItem key={service.id} value={service.id}>
-                              {service.name[language]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Location */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.location')} *</label>
-                      <Input 
-                        required
-                        placeholder="Ex: São Paulo, SP" 
-                        value={quoteForm.location}
-                        onChange={(e) => setQuoteForm({...quoteForm, location: e.target.value})}
-                        className="h-12"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#0E1A2C]">{t('home.quote.description')}</label>
-                    <Textarea 
-                      placeholder="Descreva o problema ou serviço necessário... (opcional)"
-                      value={quoteForm.description}
-                      onChange={(e) => setQuoteForm({...quoteForm, description: e.target.value})}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
                   <Button 
                     type="submit" 
                     size="lg" 
                     className="w-full h-14 bg-gradient-to-r from-[#1EC6C6] to-[#1AB5B5] hover:from-[#1AB5B5] hover:to-[#1EC6C6] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
-                    {t('home.quote.calculate')}
+                    Continue to Booking
+                    <ChevronRight className="h-5 w-5 ml-2" />
                   </Button>
                 </form>
               </div>
