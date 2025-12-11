@@ -60,9 +60,6 @@ export const Navbar = () => {
                 <Link to="/login">
                   <Button variant="outline">{t('nav.login')}</Button>
                 </Link>
-                <Link to="/register">
-                  <Button className="bg-[#1EC6C6] hover:bg-[#1AB5B5]">Sign Up</Button>
-                </Link>
               </>
             )}
           </div>
@@ -133,11 +130,8 @@ export const Navbar = () => {
               ) : (
                 <>
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">{t('nav.login')}</Button>
-                  </Link>
-                  <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white">
-                      Sign Up
+                      {t('nav.login')}
                     </Button>
                   </Link>
                 </>
