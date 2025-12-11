@@ -44,11 +44,6 @@ export const Navbar = () => {
             <Link to="/login">
               <Button variant="outline">{t('nav.login')}</Button>
             </Link>
-            <Link to="/dashboard">
-              <Button className="bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white">
-                {t('nav.dashboard')}
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
