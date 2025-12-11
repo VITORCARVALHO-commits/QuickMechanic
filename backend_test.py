@@ -520,7 +520,7 @@ class QuickMechanicTester:
         if response and response.status_code == 401:
             self.log_result("Error Handling - Invalid Login", True, "Invalid credentials properly rejected")
         else:
-            self.log_result("Error Handling - Invalid Login", False, "Invalid credentials not properly handled")
+            self.log_result("Error Handling - Invalid Login", False, f"Expected 401, got {response.status_code if response else 'No response'}")
         
         # Test unauthorized access
         response = self.make_request("GET", "/auth/me")
@@ -528,7 +528,7 @@ class QuickMechanicTester:
         if response and response.status_code == 403:
             self.log_result("Error Handling - Unauthorized Access", True, "Unauthorized access properly blocked")
         else:
-            self.log_result("Error Handling - Unauthorized Access", False, "Unauthorized access not properly handled")
+            self.log_result("Error Handling - Unauthorized Access", False, f"Expected 403, got {response.status_code if response else 'No response'}")
     
     def run_all_tests(self):
         """Run all tests in sequence"""
