@@ -504,6 +504,92 @@ async def list_mechanics():
         logger.error(f"Error listing mechanics: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== ADMIN ENDPOINTS =====
+
+async def require_admin(current_user: User = Depends(get_current_user)):
+    """Ensure user is admin"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+@api_router.get("/admin/users")
+async def get_all_users(admin: User = Depends(require_admin)):
+    """Get all users (admin only)"""
+    try:
+        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+        return {
+            "success": True,
+            "data": users,
+            "message": f"{len(users)} users found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching users: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.patch("/admin/users/{user_id}/status")
+async def update_user_status(
+    user_id: str,
+    status_data: dict,
+    admin: User = Depends(require_admin)
+):
+    """Update user active status (admin only)"""
+    try:
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"is_active": status_data.get("is_active")}}
+        )
+        
+        return {
+            "success": True,
+            "message": "User status updated"
+        }
+    except Exception as e:
+        logger.error(f"Error updating user status: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/payments")
+async def get_all_payments(admin: User = Depends(require_admin)):
+    """Get all payments (admin only)"""
+    try:
+        payments = await db.payments.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        return {
+            "success": True,
+            "data": payments,
+            "message": f"{len(payments)} payments found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching payments: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: User = Depends(require_admin)):
+    """Get platform statistics (admin only)"""
+    try:
+        total_users = await db.users.count_documents({})
+        total_mechanics = await db.users.count_documents({"user_type": "mechanic"})
+        total_clients = await db.users.count_documents({"user_type": "client"})
+        total_quotes = await db.quotes.count_documents({})
+        completed_quotes = await db.quotes.count_documents({"status": "completed"})
+        
+        # Calculate total revenue
+        payments = await db.payments.find({}, {"_id": 0, "amount": 1}).to_list(10000)
+        total_revenue = sum(p.get("amount", 0) for p in payments)
+        
+        return {
+            "success": True,
+            "data": {
+                "total_users": total_users,
+                "total_mechanics": total_mechanics,
+                "total_clients": total_clients,
+                "total_quotes": total_quotes,
+                "completed_quotes": completed_quotes,
+                "total_revenue": total_revenue
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error fetching stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
