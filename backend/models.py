@@ -107,7 +107,10 @@ class Quote(BaseModel):
     location_type: Optional[str] = "mobile"
     estimated_price: Optional[float] = None
     final_price: Optional[float] = None
-    status: str = "pending"  # pending, quoted, accepted, paid, in_progress, completed, cancelled
+    travel_fee: Optional[float] = 0.0  # Taxa de deslocamento negociável
+    prebooking_paid: bool = False  # Se pagou os £12 de pre-booking
+    prebooking_amount: float = 12.0  # Valor fixo de pre-booking
+    status: str = "pending"  # pending, prebooked, quoted, accepted, paid, in_progress, completed, cancelled
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -126,6 +129,7 @@ class PaymentCreate(BaseModel):
     quote_id: str
     amount: float
     payment_method: str = "mock"  # mock, stripe, etc
+    payment_type: str = "prebooking"  # prebooking, final
 
 class Payment(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -133,5 +137,25 @@ class Payment(BaseModel):
     client_id: str
     amount: float
     payment_method: str
-    status: str = "completed"  # pending, completed, failed
+    payment_type: str = "final"  # prebooking, final
+    platform_fee: Optional[float] = None
+    mechanic_earnings: Optional[float] = None
+    status: str = "completed"  # pending, completed, failed, refunded
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ===== WALLET MODELS =====
+class Wallet(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    mechanic_id: str
+    available_balance: float = 0.0
+    pending_balance: float = 0.0
+    total_earned: float = 0.0
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PayoutRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    mechanic_id: str
+    amount: float
+    status: str = "pending"  # pending, approved, paid, rejected
+    requested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    processed_at: Optional[datetime] = None
