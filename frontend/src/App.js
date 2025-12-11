@@ -24,6 +24,7 @@ function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/quote" element={<BookingQuote />} />
               <Route path="/search" element={<SearchBooking />} />
               <Route path="/booking/:mechanicId" element={<BookingPage />} />
               <Route path="/mechanic/:mechanicId" element={<MechanicProfile />} />
