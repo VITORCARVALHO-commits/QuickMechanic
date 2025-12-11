@@ -641,6 +641,7 @@ export const BookingQuote = () => {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 };
