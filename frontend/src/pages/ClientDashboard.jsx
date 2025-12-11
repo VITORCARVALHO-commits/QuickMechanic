@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { StatCard } from '../components/StatCard';
 import { useAuth } from '../contexts/AuthContext';
 import { getMyQuotes, updateQuoteStatus, createPayment } from '../services/api';
 import { toast } from '../hooks/use-toast';
 import { 
   Car, Calendar, MapPin, Wrench, Clock, CheckCircle, 
-  XCircle, DollarSign, Loader2, CreditCard, User, LogOut
+  XCircle, DollarSign, Loader2, CreditCard, User, LogOut,
+  FileText, TrendingUp, AlertCircle
 } from 'lucide-react';
 
 export const ClientDashboard = () => {
@@ -160,6 +162,36 @@ export const ClientDashboard = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Statistics */}
+        {quotes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <StatCard
+              title="Total Bookings"
+              value={quotes.length}
+              icon={FileText}
+              color="bg-[#1EC6C6]"
+            />
+            <StatCard
+              title="Pending Quotes"
+              value={quotes.filter(q => q.status === 'pending').length}
+              icon={Clock}
+              color="bg-yellow-500"
+            />
+            <StatCard
+              title="Active Jobs"
+              value={quotes.filter(q => ['paid', 'in_progress'].includes(q.status)).length}
+              icon={Wrench}
+              color="bg-blue-500"
+            />
+            <StatCard
+              title="Completed"
+              value={quotes.filter(q => q.status === 'completed').length}
+              icon={CheckCircle}
+              color="bg-[#27AE60]"
+            />
+          </div>
+        )}
+
         {quotes.length === 0 ? (
           <Card className="p-12 text-center">
             <Car className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -177,7 +209,7 @@ export const ClientDashboard = () => {
             <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">My Bookings</h2>
             
             {quotes.map((quote) => (
-              <Card key={quote.id} className="p-6">
+              <Card key={quote.id} className="p-6 hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-[#1EC6C6]/10 rounded-lg flex items-center justify-center">
