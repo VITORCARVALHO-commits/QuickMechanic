@@ -283,7 +283,7 @@ async def create_vehicle(vehicle_data: VehicleCreate, current_user: User = Depen
         # Check if vehicle already exists for this user
         existing = await db.vehicles.find_one({
             "plate": vehicle_data.plate.upper(),
-            "user_id": current_user.id
+            "client_id": current_user.id
         })
         
         if existing:
