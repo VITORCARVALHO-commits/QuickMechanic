@@ -18,7 +18,8 @@ load_dotenv(ROOT_DIR / '.env', override=False)
 # Import our models and services AFTER loading env
 from models import (
     Vehicle, VehicleResponse, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
-    User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate
+    User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate,
+    Part, PartCreate, PartReservation, PaymentSplit
 )
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
