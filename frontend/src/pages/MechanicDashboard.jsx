@@ -22,6 +22,10 @@ export const MechanicDashboard = () => {
   const [quotePrice, setQuotePrice] = useState({});
   const [travelFee, setTravelFee] = useState({});
   const [wallet, setWallet] = useState(null);
+  const [showPartsModal, setShowPartsModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [availableParts, setAvailableParts] = useState([]);
+  const [selectedPart, setSelectedPart] = useState(null);
 
   useEffect(() => {
     loadQuotes();
@@ -76,26 +80,116 @@ export const MechanicDashboard = () => {
     setSubmittingQuote(quoteId);
 
     try {
-      const response = await updateQuoteStatus(quoteId, {
-        status: 'quoted',
-        final_price: parseFloat(price)
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`${API_URL}/api/orders/${quoteId}/accept`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          labor_price: parseFloat(price)
+        })
       });
 
-      if (response.success) {
+      if (response.ok) {
         toast({
-          title: "Quote submitted!",
-          description: "Client will be notified"
+          title: "Order accepted!",
+          description: "Order status updated"
         });
         loadQuotes();
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to submit quote",
+        description: "Failed to accept order",
         variant: "destructive"
       });
     } finally {
       setSubmittingQuote(null);
+    }
+  };
+
+  const handleSelectParts = async (order) => {
+    setSelectedOrder(order);
+    
+    // Fetch available parts based on service
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(
+        `${API_URL}/api/parts/search?service_type=${order.service}&car_make=${order.make}&car_model=${order.model}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setAvailableParts(data.data);
+        setShowPartsModal(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load parts",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleReservePart = async () => {
+    if (!selectedPart) {
+      toast({
+        title: "Error",
+        description: "Please select a part",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`${API_URL}/api/parts/prereserve`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          order_id: selectedOrder.id,
+          part_id: selectedPart.id
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: "Part reservation request sent to AutoPeça"
+        });
+        setShowPartsModal(false);
+        setSelectedPart(null);
+        loadQuotes();
+      } else {
+        toast({
+          title: "Error",
+          description: data.detail || "Failed to reserve part",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reserve part",
+        variant: "destructive"
+      });
     }
   };
 
