@@ -322,18 +322,40 @@ export const AutoPartsDashboard = () => {
                         </p>
                       </div>
                       <Badge className={
-                        res.status === 'picked_up' ? 'bg-green-100 text-green-800' :
-                        res.status === 'reserved' ? 'bg-yellow-100 text-yellow-800' :
+                        res.status === 'RETIRADO' ? 'bg-green-100 text-green-800' :
+                        res.status === 'PRONTO_PARA_RETIRADA' ? 'bg-blue-100 text-blue-800' :
+                        res.status === 'PENDENTE_CONFIRMACAO' ? 'bg-yellow-100 text-yellow-800' :
+                        res.status === 'RECUSADO' ? 'bg-red-100 text-red-800' :
                         'bg-gray-100 text-gray-800'
                       }>
-                        {res.status}
+                        {res.status.replace(/_/g, ' ')}
                       </Badge>
                     </div>
+                    
+                    {res.status === 'PENDENTE_CONFIRMACAO' && (
+                      <div className="flex gap-3 pt-4 border-t mb-4">
+                        <Button
+                          onClick={() => handleConfirmReservation(res.id, true)}
+                          className="flex-1 bg-[#27AE60] hover:bg-[#229954] text-white"
+                        >
+                          <CheckCircle className="h-5 w-5 mr-2" />
+                          Confirm Reservation
+                        </Button>
+                        <Button
+                          onClick={() => handleConfirmReservation(res.id, false)}
+                          variant="outline"
+                          className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                        >
+                          Refuse
+                        </Button>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center justify-between pt-4 border-t">
                       <div>
                         <div className="text-sm text-gray-600">Pickup Code</div>
                         <div className="text-2xl font-bold text-[#1EC6C6] font-mono">
-                          {res.pickup_code}
+                          {res.pickup_code || 'Pending'}
                         </div>
                       </div>
                       <div className="text-right">
