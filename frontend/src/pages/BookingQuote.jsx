@@ -397,7 +397,7 @@ export const BookingQuote = () => {
 
                 {/* Date Selection */}
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Select Date</label>
+                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Selecione a Data</label>
                   <div className="border rounded-lg p-4 bg-white">
                     <Calendar
                       mode="single"
