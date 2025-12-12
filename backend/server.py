@@ -25,6 +25,7 @@ from vehicle_mock_db import search_vehicle_by_plate
 from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
 from payment_brasil import BrasilPaymentGateway, format_currency_brl
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -678,6 +679,218 @@ async def get_admin_stats(admin: User = Depends(require_admin)):
     except Exception as e:
         logger.error(f"Error fetching stats: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# ===== STRIPE PAYMENT ENDPOINTS =====
+
+@api_router.post("/stripe/checkout")
+async def create_stripe_checkout(request: dict, http_request: Request, current_user: User = Depends(get_current_user)):
+    """Create Stripe checkout session"""
+    try:
+        # Get Stripe API key
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        # Get host URL from request
+        host_url = str(http_request.base_url).rstrip('/')
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        
+        # Initialize Stripe
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Get order info
+        order_id = request.get("order_id")
+        order = await db.quotes.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Build URLs from frontend origin
+        frontend_origin = request.get("origin_url", host_url)
+        success_url = f"{frontend_origin}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{frontend_origin}/dashboard"
+        
+        # Create checkout request (R$ 50 pre-booking)
+        amount = 50.0
+        checkout_request = CheckoutSessionRequest(
+            amount=amount,
+            currency="brl",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "order_id": order_id,
+                "user_id": current_user.id,
+                "payment_type": "prebooking"
+            }
+        )
+        
+        # Create checkout session
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create payment transaction record
+        transaction = {
+            "id": str(uuid.uuid4()),
+            "session_id": session.session_id,
+            "order_id": order_id,
+            "user_id": current_user.id,
+            "amount": amount,
+            "currency": "brl",
+            "payment_status": "pending",
+            "status": "initiated",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.payment_transactions.insert_one(transaction)
+        
+        logger.info(f"Stripe checkout created: {session.session_id} for order {order_id}")
+        
+        return {
+            "success": True,
+            "url": session.url,
+            "session_id": session.session_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating Stripe checkout: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/stripe/status/{session_id}")
+async def get_stripe_status(session_id: str, current_user: User = Depends(get_current_user)):
+    """Get Stripe checkout session status"""
+    try:
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        # Get from DB first
+        transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+        
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+        
+        # If already processed, return cached status
+        if transaction.get("payment_status") == "paid":
+            return {
+                "success": True,
+                "status": "complete",
+                "payment_status": "paid",
+                "data": transaction
+            }
+        
+        # Poll Stripe for latest status
+        host_url = "https://quickmechanic.com"  # Will be replaced in production
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        checkout_status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update transaction if status changed
+        if checkout_status.payment_status == "paid" and transaction.get("payment_status") != "paid":
+            # Update transaction
+            await db.payment_transactions.update_one(
+                {"session_id": session_id},
+                {
+                    "$set": {
+                        "payment_status": "paid",
+                        "status": "complete",
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Update order
+            order_id = transaction.get("order_id")
+            if order_id:
+                await db.quotes.update_one(
+                    {"id": order_id},
+                    {
+                        "$set": {
+                            "prebooking_paid": True,
+                            "status": "prebooked",
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+                
+                logger.info(f"Payment confirmed for order {order_id}")
+        
+        return {
+            "success": True,
+            "status": checkout_status.status,
+            "payment_status": checkout_status.payment_status,
+            "amount_total": checkout_status.amount_total,
+            "currency": checkout_status.currency
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting Stripe status: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhooks"""
+    try:
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        # Get webhook body and signature
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        if not signature:
+            raise HTTPException(status_code=400, detail="Missing signature")
+        
+        # Initialize Stripe
+        host_url = str(request.base_url).rstrip('/')
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Process based on event type
+        if webhook_response.payment_status == "paid":
+            session_id = webhook_response.session_id
+            metadata = webhook_response.metadata
+            
+            # Update transaction
+            await db.payment_transactions.update_one(
+                {"session_id": session_id},
+                {
+                    "$set": {
+                        "payment_status": "paid",
+                        "status": "complete",
+                        "webhook_received": True,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Update order
+            order_id = metadata.get("order_id")
+            if order_id:
+                await db.quotes.update_one(
+                    {"id": order_id},
+                    {
+                        "$set": {
+                            "prebooking_paid": True,
+                            "status": "prebooked",
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+            
+            logger.info(f"Webhook processed: Payment confirmed for session {session_id}")
+        
+        return {"success": True, "received": True}
+        
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}")
+        return {"success": False, "error": str(e)}
 
 # Root endpoint
 @api_router.get("/")
