@@ -572,11 +572,10 @@ class AutoPecaTester:
             self.log_result("AutoParts Confirm Pickup", False, "No autoparts token or pickup code available")
             return False
         
-        data = {
-            "pickup_code": self.pickup_code
-        }
+        # Send pickup_code as query parameter
+        params = f"?pickup_code={self.pickup_code}"
         
-        response = self.make_request("POST", "/autoparts/confirm-pickup", data, token=self.autoparts_token)
+        response = self.make_request("POST", f"/autoparts/confirm-pickup{params}", token=self.autoparts_token)
         
         if response and response.status_code == 200:
             result = response.json()
