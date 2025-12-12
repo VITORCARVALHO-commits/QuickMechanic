@@ -507,34 +507,31 @@ class AutoPecaTester:
             self.log_result("Mechanic Pre-reserve Part", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_client_accept_quote(self):
-        """Test client accepting quote"""
-        if not self.client_token or not self.test_quote_id:
-            self.log_result("Client Accept Quote", False, "No client token or quote ID available")
+    def test_autoparts_view_reservations(self):
+        """Test AutoParts viewing pending reservations"""
+        if not self.autoparts_token:
+            self.log_result("AutoParts View Reservations", False, "No autoparts token available")
             return False
         
-        data = {
-            "status": "accepted"
-        }
-        
-        response = self.make_request("PATCH", f"/quotes/{self.test_quote_id}/status", data, token=self.client_token)
+        response = self.make_request("GET", "/autoparts/reservations", token=self.autoparts_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                quote = result["data"]
-                if quote.get("status") == "accepted":
-                    self.log_result("Client Accept Quote", True, "Quote accepted successfully")
+            if result.get("success"):
+                reservations = result.get("data", [])
+                pending_reservations = [r for r in reservations if r.get("status") == "PENDENTE_CONFIRMACAO"]
+                if len(pending_reservations) > 0:
+                    self.log_result("AutoParts View Reservations", True, f"Found {len(pending_reservations)} pending reservations")
                     return True
                 else:
-                    self.log_result("Client Accept Quote", False, "Quote status not updated", result)
-                    return False
+                    self.log_result("AutoParts View Reservations", True, f"Found {len(reservations)} total reservations (none pending)")
+                    return True
             else:
-                self.log_result("Client Accept Quote", False, "Quote acceptance failed", result)
+                self.log_result("AutoParts View Reservations", False, "Failed to get reservations", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Client Accept Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("AutoParts View Reservations", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_process_payment(self):
