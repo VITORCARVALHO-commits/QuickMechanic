@@ -278,38 +278,58 @@ async def search_vehicle_by_plate_endpoint(plate: str):
 
 # ===== QUOTE ENDPOINTS =====
 
-@api_router.post("/quotes")
-async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get_current_user_optional)):
-    """
-    Cria um novo orçamento com dados do veículo
-    Pode ser criado com ou sem autenticação
-    """
+@api_router.post("/orders")
+async def create_order(order_data: OrderCreate, current_user: User = Depends(get_current_user)):
+    """Create a new service order"""
     try:
-        # Cria objeto Quote
-        quote_dict = quote_data.model_dump()
+        # Get vehicle info
+        vehicle = await db.vehicles.find_one({"id": order_data.vehicle_id}, {"_id": 0})
+        if not vehicle:
+            raise HTTPException(status_code=404, detail="Vehicle not found")
         
-        # Add client_id if user is authenticated
-        if current_user:
-            quote_dict['client_id'] = current_user.id
+        # Create order
+        order = Order(
+            client_id=current_user.id,
+            vehicle_id=order_data.vehicle_id,
+            plate=vehicle["plate"],
+            make=vehicle["make"],
+            model=vehicle["model"],
+            year=vehicle["year"],
+            service=order_data.service,
+            location=order_data.location,
+            description=order_data.description,
+            date=order_data.date,
+            time=order_data.time,
+            location_type=order_data.location_type,
+            has_parts=order_data.has_parts,
+            status="AGUARDANDO_MECANICO"
+        )
         
-        quote = Quote(**quote_dict)
-        
-        # Salva no MongoDB
-        doc = quote.model_dump()
+        doc = order.model_dump()
         doc['created_at'] = doc['created_at'].isoformat()
         doc['updated_at'] = doc['updated_at'].isoformat()
-        await db.quotes.insert_one(doc)
+        await db.orders.insert_one(doc)
         
-        logger.info(f"Orçamento criado: {quote.id} - Placa: {quote.plate}")
+        logger.info(f"Order created: {order.id} - {order.make} {order.model}")
         
         return {
             "success": True,
-            "data": quote,
-            "message": "Orçamento salvo com sucesso"
+            "data": order,
+            "message": "Order created successfully"
         }
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Erro ao criar orçamento: {str(e)}")
+        logger.error(f"Error creating order: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Backward compatibility - keep /quotes endpoint
+@api_router.post("/quotes")
+async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get_current_user_optional)):
+    """Legacy endpoint - redirects to orders"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return await create_order(quote_data, current_user)
 
 @api_router.get("/quotes/my-quotes")
 async def get_my_quotes(current_user: User = Depends(get_current_user)):
