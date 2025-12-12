@@ -87,7 +87,7 @@ export const Register = () => {
           {/* User Type Selection */}
           <div>
             <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">I am a...</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, user_type: 'client' })}
