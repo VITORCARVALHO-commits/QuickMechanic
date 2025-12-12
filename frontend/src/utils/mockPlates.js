@@ -368,11 +368,17 @@ export const searchPlate = (plateInput) => {
   });
 };
 
-// Validate UK plate format
+// Validate Brazilian plate format
 export const validatePlateFormat = (plate) => {
-  // UK format: AB12 CDE or AB12CDE (2 letters, 2 numbers, 3 letters)
-  const ukPlateRegex = /^[A-Z]{2}\d{2}[-\s]?[A-Z]{3}$/i;
-  return ukPlateRegex.test(plate);
+  const cleanPlate = plate.replace(/[-\s]/g, '').toUpperCase();
+  
+  // Formato antigo: ABC1234 (3 letras + 4 números)
+  const formatoAntigo = /^[A-Z]{3}\d{4}$/;
+  
+  // Formato Mercosul: ABC1D23 (3 letras + 1 número + 1 letra + 2 números)
+  const formatoMercosul = /^[A-Z]{3}\d{1}[A-Z]{1}\d{2}$/;
+  
+  return formatoAntigo.test(cleanPlate) || formatoMercosul.test(cleanPlate);
 };
 
 // Check if plate format is complete (7 characters)
