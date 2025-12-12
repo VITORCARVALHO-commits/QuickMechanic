@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { serviceTypes } from '../utils/mockData';
 import { createQuote, createPayment } from '../services/api';
+import { StripeCheckout } from '../components/StripeCheckout';
 
 export const BookingQuote = () => {
   const location = useLocation();
