@@ -590,30 +590,25 @@ class AutoPecaTester:
             self.log_result("AutoParts Confirm Pickup", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_verify_quote_paid_status(self):
-        """Test that quote status changed to paid after payment"""
-        if not self.test_quote_id:
-            self.log_result("Verify Quote Paid Status", False, "No quote ID available")
+    def test_mechanic_start_service(self):
+        """Test mechanic starting service"""
+        if not self.mechanic_token or not self.test_order_id:
+            self.log_result("Mechanic Start Service", False, "No mechanic token or order ID available")
             return False
         
-        response = self.make_request("GET", f"/quotes/{self.test_quote_id}")
+        response = self.make_request("POST", f"/orders/{self.test_order_id}/start-service", token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                quote = result["data"]
-                if quote.get("status") == "paid":
-                    self.log_result("Verify Quote Paid Status", True, "Quote status correctly updated to paid")
-                    return True
-                else:
-                    self.log_result("Verify Quote Paid Status", False, f"Quote status is {quote.get('status')}, expected 'paid'", result)
-                    return False
+            if result.get("success"):
+                self.log_result("Mechanic Start Service", True, "Service started successfully")
+                return True
             else:
-                self.log_result("Verify Quote Paid Status", False, "Failed to get quote", result)
+                self.log_result("Mechanic Start Service", False, "Service start failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Verify Quote Paid Status", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Start Service", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_mechanic_start_job(self):
