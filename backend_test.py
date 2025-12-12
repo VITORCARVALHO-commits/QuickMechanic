@@ -781,11 +781,11 @@ class AutoPecaTester:
 
 def main():
     """Main test runner"""
-    print("QuickMechanic Backend API Test Suite")
+    print("AutoPeça Feature Backend API Test Suite")
     print(f"Testing against: {BACKEND_URL}")
     print()
     
-    tester = QuickMechanicTester()
+    tester = AutoPecaTester()
     passed, failed = tester.run_all_tests()
     
     # Exit with error code if tests failed
