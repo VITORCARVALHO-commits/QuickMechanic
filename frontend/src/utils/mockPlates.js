@@ -1,4 +1,4 @@
-// Mock database - UK Registration Plates
+// Mock database - Placas Brasileiras
 export const mockPlatesDatabase = {
   'AB12CDE': {
     plate: 'AB12 CDE',
