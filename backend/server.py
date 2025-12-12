@@ -232,10 +232,9 @@ async def get_vehicle_info(plate: str, current_user: Optional[User] = Depends(ge
         vehicle_data = await search_brasil_placa(plate)
         
         if vehicle_data:
-            vehicle = Vehicle(**vehicle_data)
             return VehicleResponse(
                 success=True,
-                data=vehicle,
+                data=vehicle_data,
                 message="Veículo encontrado"
             )
         else:
