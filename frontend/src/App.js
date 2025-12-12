@@ -19,6 +19,7 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
+import { PaymentSuccess } from "./pages/PaymentSuccess";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requireAuth = true }) => {
@@ -93,6 +94,14 @@ function App() {
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/become-mechanic" element={<BecomeMechanic />} />
+                <Route 
+                  path="/payment-success" 
+                  element={
+                    <ProtectedRoute>
+                      <PaymentSuccess />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />
