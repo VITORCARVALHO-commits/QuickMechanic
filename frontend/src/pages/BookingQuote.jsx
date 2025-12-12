@@ -349,7 +349,7 @@ export const BookingQuote = () => {
             {/* Step 3: Location & Schedule */}
             {currentStep >= 2 && selectedService && (
               <Card className="p-6">
-                <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">Where & When?</h2>
+                <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">Onde & Quando?</h2>
 
                 {/* Location Type */}
                 <div className="mb-6">
