@@ -519,6 +519,82 @@ export const MechanicDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Parts Selection Modal */}
+      {showPartsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-2xl w-full p-6 bg-white max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-[#0E1A2C]">Select Part from AutoPeça</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPartsModal(false)}
+              >
+                Close
+              </Button>
+            </div>
+
+            {availableParts.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600">No parts available for this service</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {availableParts.map((part) => (
+                  <div
+                    key={part.id}
+                    onClick={() => setSelectedPart(part)}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      selectedPart?.id === part.id
+                        ? 'border-[#1EC6C6] bg-[#1EC6C6]/10'
+                        : 'border-gray-200 hover:border-[#1EC6C6]/50'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-[#0E1A2C]">{part.name}</h3>
+                        {part.description && (
+                          <p className="text-sm text-gray-600 mt-1">{part.description}</p>
+                        )}
+                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                          {part.part_number && <span>Part #: {part.part_number}</span>}
+                          {part.stock && <span>Stock: {part.stock}</span>}
+                        </div>
+                        {part.shop_info && (
+                          <div className="mt-2 text-sm">
+                            <span className="font-semibold text-gray-700">Shop: </span>
+                            <span className="text-gray-600">{part.shop_info.shop_name}</span>
+                            {part.shop_info.shop_address && (
+                              <span className="text-gray-500"> • {part.shop_info.shop_address}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right ml-4">
+                        <div className="text-2xl font-bold text-[#1EC6C6]">£{part.price.toFixed(2)}</div>
+                        {selectedPart?.id === part.id && (
+                          <CheckCircle className="h-6 w-6 text-[#1EC6C6] mt-2" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedPart && (
+              <Button
+                onClick={handleReservePart}
+                className="w-full mt-6 h-12 bg-[#1EC6C6] hover:bg-[#1AB5B5]"
+              >
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Reserve This Part
+              </Button>
+            )}
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
