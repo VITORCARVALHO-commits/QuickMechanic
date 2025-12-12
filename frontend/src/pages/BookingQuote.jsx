@@ -353,7 +353,7 @@ export const BookingQuote = () => {
 
                 {/* Location Type */}
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#0E1A2C] mb-3 block">Service Location</label>
+                  <label className="text-sm font-semibold text-[#0E1A2C] mb-3 block">Local do Serviço</label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => setBookingData({...bookingData, locationType: 'mobile'})}
