@@ -642,6 +642,260 @@ async def get_payout_history(current_user: User = Depends(get_current_user)):
         logger.error(f"Error fetching payouts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== AUTOPARTS ENDPOINTS =====
+
+@api_router.post("/autoparts/parts")
+async def create_part(part_data: PartCreate, current_user: User = Depends(get_current_user)):
+    """Create a new part in catalog (AutoParts only)"""
+    try:
+        if current_user.user_type != "autoparts":
+            raise HTTPException(status_code=403, detail="Only auto parts shops can add parts")
+        
+        from models import Part
+        part = Part(
+            autoparts_id=current_user.id,
+            **part_data.model_dump()
+        )
+        
+        part_dict = part.model_dump()
+        part_dict['created_at'] = part_dict['created_at'].isoformat()
+        await db.parts.insert_one(part_dict)
+        
+        logger.info(f"Part created: {part.name} by {current_user.shop_name}")
+        
+        return {
+            "success": True,
+            "data": part,
+            "message": "Part added successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating part: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/autoparts/parts")
+async def get_my_parts(current_user: User = Depends(get_current_user)):
+    """Get parts catalog for current autoparts shop"""
+    try:
+        if current_user.user_type != "autoparts":
+            raise HTTPException(status_code=403, detail="Only auto parts shops can view catalog")
+        
+        parts = await db.parts.find({"autoparts_id": current_user.id}, {"_id": 0}).to_list(1000)
+        
+        return {
+            "success": True,
+            "data": parts,
+            "message": f"{len(parts)} parts found"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching parts: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/parts/search")
+async def search_parts(
+    car_make: Optional[str] = None,
+    car_model: Optional[str] = None,
+    service_type: Optional[str] = None,
+    postcode: Optional[str] = None
+):
+    """Search for compatible parts"""
+    try:
+        query = {"is_available": True, "stock": {"$gt": 0}}
+        
+        if car_make:
+            query["car_make"] = {"$regex": car_make, "$options": "i"}
+        if car_model:
+            query["car_model"] = {"$regex": car_model, "$options": "i"}
+        if service_type:
+            query["service_type"] = service_type
+        
+        parts = await db.parts.find(query, {"_id": 0}).to_list(100)
+        
+        # Enhance with shop info
+        for part in parts:
+            shop = await db.users.find_one(
+                {"id": part["autoparts_id"]},
+                {"_id": 0, "shop_name": 1, "shop_address": 1, "postcode": 1}
+            )
+            if shop:
+                part["shop_info"] = shop
+        
+        return {
+            "success": True,
+            "data": parts,
+            "message": f"{len(parts)} parts found"
+        }
+    except Exception as e:
+        logger.error(f"Error searching parts: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/parts/reserve")
+async def reserve_part(
+    quote_id: str,
+    part_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Reserve a part for a quote (Mechanic only)"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can reserve parts")
+        
+        # Check part availability
+        part = await db.parts.find_one({"id": part_id}, {"_id": 0})
+        if not part:
+            raise HTTPException(status_code=404, detail="Part not found")
+        
+        if part["stock"] <= 0:
+            raise HTTPException(status_code=400, detail="Part out of stock")
+        
+        # Generate pickup code
+        import random
+        import string
+        pickup_code = "QM-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        # Create reservation
+        from models import PartReservation
+        from datetime import timedelta
+        
+        reservation = PartReservation(
+            quote_id=quote_id,
+            part_id=part_id,
+            autoparts_id=part["autoparts_id"],
+            mechanic_id=current_user.id,
+            pickup_code=pickup_code,
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=24)
+        )
+        
+        res_dict = reservation.model_dump()
+        res_dict['reserved_at'] = res_dict['reserved_at'].isoformat()
+        res_dict['expires_at'] = res_dict['expires_at'].isoformat()
+        await db.part_reservations.insert_one(res_dict)
+        
+        # Update quote
+        await db.quotes.update_one(
+            {"id": quote_id},
+            {
+                "$set": {
+                    "needs_parts": True,
+                    "part_id": part_id,
+                    "autoparts_id": part["autoparts_id"],
+                    "part_price": part["price"],
+                    "pickup_code": pickup_code,
+                    "part_status": "reserved",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Decrease stock
+        await db.parts.update_one(
+            {"id": part_id},
+            {"$inc": {"stock": -1}}
+        )
+        
+        logger.info(f"Part reserved: {pickup_code} for quote {quote_id}")
+        
+        return {
+            "success": True,
+            "data": {
+                "pickup_code": pickup_code,
+                "part": part,
+                "expires_at": reservation.expires_at.isoformat()
+            },
+            "message": "Part reserved successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error reserving part: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/autoparts/confirm-pickup")
+async def confirm_pickup(pickup_code: str, current_user: User = Depends(get_current_user)):
+    """Confirm part pickup (AutoParts only)"""
+    try:
+        if current_user.user_type != "autoparts":
+            raise HTTPException(status_code=403, detail="Only auto parts shops can confirm pickups")
+        
+        reservation = await db.part_reservations.find_one(
+            {"pickup_code": pickup_code, "autoparts_id": current_user.id},
+            {"_id": 0}
+        )
+        
+        if not reservation:
+            raise HTTPException(status_code=404, detail="Invalid pickup code")
+        
+        if reservation["status"] == "picked_up":
+            raise HTTPException(status_code=400, detail="Part already picked up")
+        
+        # Update reservation
+        await db.part_reservations.update_one(
+            {"pickup_code": pickup_code},
+            {
+                "$set": {
+                    "status": "picked_up",
+                    "picked_up_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Update quote
+        await db.quotes.update_one(
+            {"pickup_code": pickup_code},
+            {"$set": {"part_status": "picked_up"}}
+        )
+        
+        logger.info(f"Part picked up: {pickup_code}")
+        
+        return {
+            "success": True,
+            "message": "Pickup confirmed successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error confirming pickup: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/autoparts/reservations")
+async def get_reservations(current_user: User = Depends(get_current_user)):
+    """Get part reservations for autoparts shop"""
+    try:
+        if current_user.user_type != "autoparts":
+            raise HTTPException(status_code=403, detail="Only auto parts shops can view reservations")
+        
+        reservations = await db.part_reservations.find(
+            {"autoparts_id": current_user.id},
+            {"_id": 0}
+        ).sort("reserved_at", -1).to_list(100)
+        
+        # Enhance with quote and mechanic info
+        for res in reservations:
+            quote = await db.quotes.find_one({"id": res["quote_id"]}, {"_id": 0, "make": 1, "model": 1, "service": 1})
+            mechanic = await db.users.find_one({"id": res["mechanic_id"]}, {"_id": 0, "name": 1, "phone": 1})
+            part = await db.parts.find_one({"id": res["part_id"]}, {"_id": 0, "name": 1, "price": 1})
+            
+            if quote:
+                res["quote_info"] = quote
+            if mechanic:
+                res["mechanic_info"] = mechanic
+            if part:
+                res["part_info"] = part
+        
+        return {
+            "success": True,
+            "data": reservations,
+            "message": f"{len(reservations)} reservations found"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching reservations: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== MECHANIC ENDPOINTS =====
 
 @api_router.get("/mechanics")
