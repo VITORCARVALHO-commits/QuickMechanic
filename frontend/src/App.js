@@ -20,6 +20,7 @@ import { AutoPartsDashboard } from "./pages/AutoPartsDashboard";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
+import { OrderTracking } from "./pages/OrderTracking";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requireAuth = true }) => {
@@ -98,6 +99,14 @@ function App() {
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/become-mechanic" element={<BecomeMechanic />} />
+                <Route 
+                  path="/order/:orderId" 
+                  element={
+                    <ProtectedRoute>
+                      <OrderTracking />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />

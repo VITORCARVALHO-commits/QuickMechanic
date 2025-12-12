@@ -299,6 +299,16 @@ export const ClientDashboard = () => {
                       Waiting for mechanic quote
                     </div>
                   )}
+
+                  {/* Track Order Button */}
+                  <Button
+                    onClick={() => navigate(`/order/${quote.id}`)}
+                    variant="outline"
+                    className="border-[#1EC6C6] text-[#1EC6C6] hover:bg-[#1EC6C6]/10"
+                  >
+                    <FileText className="h-5 w-5 mr-2" />
+                    Track Order
+                  </Button>
                 </div>
               </Card>
             ))}
