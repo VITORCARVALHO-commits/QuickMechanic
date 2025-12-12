@@ -154,7 +154,6 @@ class OrderCreate(BaseModel):
 
 # Keep Quote for backward compatibility
 Quote = Order
-QuoteCreate = OrderCreate
 
 class QuoteResponse(BaseModel):
     success: bool
