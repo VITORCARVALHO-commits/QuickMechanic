@@ -17,9 +17,9 @@ load_dotenv(ROOT_DIR / '.env', override=False)
 
 # Import our models and services AFTER loading env
 from models import (
-    Vehicle, VehicleResponse, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
+    Vehicle, VehicleResponse, VehicleCreate, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
     User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate,
-    Part, PartCreate, PartReservation, PaymentSplit
+    Part, PartCreate, PartReservation, PaymentSplit, Order, OrderCreate
 )
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
@@ -1009,7 +1009,7 @@ async def confirm_pickup(pickup_code: str, current_user: User = Depends(get_curr
         if not reservation:
             raise HTTPException(status_code=404, detail="Invalid pickup code")
         
-        if reservation["status"] == "picked_up":
+        if reservation["status"] == "RETIRADO":
             raise HTTPException(status_code=400, detail="Part already picked up")
         
         # Update reservation
@@ -1017,16 +1017,21 @@ async def confirm_pickup(pickup_code: str, current_user: User = Depends(get_curr
             {"pickup_code": pickup_code},
             {
                 "$set": {
-                    "status": "picked_up",
+                    "status": "RETIRADO",
                     "picked_up_at": datetime.now(timezone.utc).isoformat()
                 }
             }
         )
         
-        # Update quote
-        await db.quotes.update_one(
+        # Update order
+        await db.orders.update_one(
             {"pickup_code": pickup_code},
-            {"$set": {"part_status": "picked_up"}}
+            {
+                "$set": {
+                    "status": "PECA_RETIRADA",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
         )
         
         logger.info(f"Part picked up: {pickup_code}")
@@ -1039,6 +1044,50 @@ async def confirm_pickup(pickup_code: str, current_user: User = Depends(get_curr
         raise
     except Exception as e:
         logger.error(f"Error confirming pickup: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/orders/{order_id}/start-service")
+async def start_service(order_id: str, current_user: User = Depends(get_current_user)):
+    """Mechanic starts service"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can start service")
+        
+        await db.orders.update_one(
+            {"id": order_id, "mechanic_id": current_user.id},
+            {
+                "$set": {
+                    "status": "SERVICO_EM_ANDAMENTO",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        return {"success": True, "message": "Service started"}
+    except Exception as e:
+        logger.error(f"Error starting service: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/orders/{order_id}/complete-service")
+async def complete_service(order_id: str, current_user: User = Depends(get_current_user)):
+    """Mechanic completes service"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can complete service")
+        
+        await db.orders.update_one(
+            {"id": order_id, "mechanic_id": current_user.id},
+            {
+                "$set": {
+                    "status": "SERVICO_FINALIZADO",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        return {"success": True, "message": "Service completed"}
+    except Exception as e:
+        logger.error(f"Error completing service: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/autoparts/reservations")
