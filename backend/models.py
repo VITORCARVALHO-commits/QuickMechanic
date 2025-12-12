@@ -269,3 +269,14 @@ class PaymentSplit(BaseModel):
     autoparts_amount: float
     platform_amount: float
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ===== NOTIFICATION MODEL =====
+class Notification(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    message: str
+    type: str = "info"  # info, success, warning, error
+    related_id: Optional[str] = None  # order_id, reservation_id, etc
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
