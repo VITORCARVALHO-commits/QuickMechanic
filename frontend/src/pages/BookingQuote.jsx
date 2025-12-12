@@ -431,9 +431,9 @@ export const BookingQuote = () => {
 
                 {/* Additional Notes */}
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Additional Notes (Optional)</label>
+                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Observações Adicionais (Opcional)</label>
                   <Textarea
-                    placeholder="Any specific details about the issue or requirements..."
+                    placeholder="Descreva detalhes específicos sobre o problema ou requisitos..."
                     value={bookingData.notes}
                     onChange={(e) => setBookingData({...bookingData, notes: e.target.value})}
                     className="min-h-[100px]"
