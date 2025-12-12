@@ -9,7 +9,7 @@ class UserCreate(BaseModel):
     password: str
     name: str
     phone: Optional[str] = None
-    user_type: str = "client"  # client, mechanic, admin, autoparts
+    user_type: str = "client"  # client, mechanic, admin
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -33,12 +33,6 @@ class User(BaseModel):
     years_experience: Optional[int] = None
     mobile_service: Optional[bool] = False
     workshop_service: Optional[bool] = False
-    
-    # AutoParts-specific fields
-    shop_name: Optional[str] = None
-    shop_address: Optional[str] = None
-    opening_hours: Optional[str] = None
-    postcode: Optional[str] = None
 
 class UserResponse(BaseModel):
     id: str
