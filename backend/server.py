@@ -19,12 +19,34 @@ load_dotenv(ROOT_DIR / '.env', override=False)
 from models import (
     Vehicle, VehicleResponse, VehicleCreate, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
     User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate,
-    Part, PartCreate, PartReservation, PaymentSplit, Order, OrderCreate
+    Part, PartCreate, PartReservation, PaymentSplit, Order, OrderCreate, Notification
 )
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
 from auth import hash_password, verify_password, create_access_token, decode_token
 from service_parts_map import get_parts_for_service, get_estimated_parts_cost
+
+# ===== NOTIFICATION HELPER =====
+async def create_notification(user_id: str, title: str, message: str, notification_type: str = "info", related_id: str = None):
+    """Create a notification for a user"""
+    try:
+        notification = Notification(
+            user_id=user_id,
+            title=title,
+            message=message,
+            type=notification_type,
+            related_id=related_id
+        )
+        
+        notif_dict = notification.model_dump()
+        notif_dict['created_at'] = notif_dict['created_at'].isoformat()
+        await db.notifications.insert_one(notif_dict)
+        
+        logger.info(f"Notification created for user {user_id}: {title}")
+        return notification
+    except Exception as e:
+        logger.error(f"Error creating notification: {str(e)}")
+        return None
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
