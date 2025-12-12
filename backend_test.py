@@ -165,8 +165,8 @@ class AutoPecaTester:
     def test_auth_login_client(self):
         """Test client login"""
         data = {
-            "email": "testclient@quickmechanic.com",
-            "password": "testpass123"
+            "email": "client@test.com",
+            "password": "test123"
         }
         
         response = self.make_request("POST", "/auth/login", data)
