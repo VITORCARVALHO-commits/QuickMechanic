@@ -99,8 +99,8 @@ export const BookingQuote = () => {
       }));
       
       toast({
-        title: "Login Required",
-        description: "Please login or create an account to continue",
+        title: "Login Necessário",
+        description: "Por favor, faça login ou crie uma conta para continuar",
       });
       
       navigate('/login', { state: { from: '/quote', vehicleData } });
