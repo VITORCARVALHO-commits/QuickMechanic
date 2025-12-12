@@ -411,7 +411,7 @@ export const BookingQuote = () => {
 
                 {/* Time Selection */}
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Preferred Time</label>
+                  <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">Horário Preferido</label>
                   <div className="grid grid-cols-5 gap-2">
                     {timeSlots.map(time => (
                       <button
