@@ -376,8 +376,8 @@ export const BookingQuote = () => {
                       }`}
                     >
                       <Building2 className="h-8 w-8 text-[#1EC6C6] mb-2" />
-                      <div className="font-bold text-[#0E1A2C]">Workshop</div>
-                      <div className="text-sm text-gray-600">Visit garage</div>
+                      <div className="font-bold text-[#0E1A2C]">Oficina</div>
+                      <div className="text-sm text-gray-600">Visite a oficina</div>
                     </button>
                   </div>
                 </div>
