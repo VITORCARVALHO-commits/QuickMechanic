@@ -482,15 +482,18 @@ async def update_quote_status(
 
 @api_router.post("/payments")
 async def create_payment(payment_data: PaymentCreate, current_user: User = Depends(get_current_user)):
-    """Process payment for a quote with platform commission calculation"""
+    """Process payment for a quote/order with platform commission calculation"""
     try:
-        # Verify quote exists and belongs to user
-        quote = await db.quotes.find_one({"id": payment_data.quote_id}, {"_id": 0})
+        # Try to find order first, then quote for backward compatibility
+        quote = await db.orders.find_one({"id": payment_data.quote_id}, {"_id": 0})
         if not quote:
-            raise HTTPException(status_code=404, detail="Quote not found")
+            quote = await db.quotes.find_one({"id": payment_data.quote_id}, {"_id": 0})
+        
+        if not quote:
+            raise HTTPException(status_code=404, detail="Order/Quote not found")
         
         if quote.get("client_id") != current_user.id:
-            raise HTTPException(status_code=403, detail="Not authorized to pay for this quote")
+            raise HTTPException(status_code=403, detail="Not authorized to pay for this order")
         
         # Calculate commission (Modelo Híbrido: £5 base + 10%)
         BASE_FEE = 5.0
@@ -582,7 +585,7 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         payment_dict['created_at'] = payment_dict['created_at'].isoformat()
         await db.payments.insert_one(payment_dict)
         
-        # Update quote
+        # Update order/quote
         update_data = {
             "status": new_status,
             "updated_at": datetime.now(timezone.utc).isoformat()
@@ -591,7 +594,10 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         if payment_data.payment_type == "prebooking":
             update_data["prebooking_paid"] = True
         
-        await db.quotes.update_one({"id": payment_data.quote_id}, {"$set": update_data})
+        # Try orders first, then quotes
+        result = await db.orders.update_one({"id": payment_data.quote_id}, {"$set": update_data})
+        if result.matched_count == 0:
+            await db.quotes.update_one({"id": payment_data.quote_id}, {"$set": update_data})
         
         # Update mechanic wallet if final payment
         if payment_data.payment_type == "final" and quote.get("mechanic_id"):
