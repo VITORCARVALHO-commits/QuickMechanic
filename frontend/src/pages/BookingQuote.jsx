@@ -538,15 +538,15 @@ export const BookingQuote = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-[#27AE60]" />
-                    <span className="text-sm text-gray-700">Verified mechanics only</span>
+                    <span className="text-sm text-gray-700">Apenas mecânicos verificados</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-[#27AE60]" />
-                    <span className="text-sm text-gray-700">Fixed price guarantee</span>
+                    <span className="text-sm text-gray-700">Garantia de preço fixo</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-[#27AE60]" />
-                    <span className="text-sm text-gray-700">Pay after completion</span>
+                    <span className="text-sm text-gray-700">Pagamento após conclusão</span>
                   </div>
                 </div>
               </Card>
