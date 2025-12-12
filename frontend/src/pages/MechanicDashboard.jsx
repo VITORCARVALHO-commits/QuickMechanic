@@ -153,12 +153,12 @@ export const MechanicDashboard = () => {
   };
 
   // Separate quotes into categories
-  const pendingQuotes = quotes.filter(q => q.status === 'pending' || q.status === 'AGUARDANDO_MECANICO');
+  const pendingQuotes = quotes.filter(q => q.status === 'pending');
   const myActiveJobs = quotes.filter(q => 
-    q.mechanic_id === user?.id && ['quoted', 'accepted', 'paid', 'in_progress', 'ACEITO', 'PECA_CONFIRMADA', 'SERVICO_EM_ANDAMENTO'].includes(q.status)
+    q.mechanic_id === user?.id && ['quoted', 'accepted', 'paid', 'in_progress'].includes(q.status)
   );
   const myCompletedJobs = quotes.filter(q => 
-    q.mechanic_id === user?.id && (q.status === 'completed' || q.status === 'SERVICO_FINALIZADO')
+    q.mechanic_id === user?.id && q.status === 'completed'
   );
 
   if (loading) {
@@ -367,22 +367,6 @@ export const MechanicDashboard = () => {
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                    {quote.status === 'ACEITO' && !quote.has_parts && (
-                      <Button
-                        onClick={() => handleSelectParts(quote)}
-                        className="bg-[#1EC6C6] hover:bg-[#1AB5B5]"
-                      >
-                        <Wrench className="h-5 w-5 mr-2" />
-                        Select Parts from AutoPeça
-                      </Button>
-                    )}
-                    {(quote.status === 'PECA_CONFIRMADA' || quote.status === 'PECA_RETIRADA') && quote.pickup_code && (
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-1">Pickup Code</div>
-                        <div className="text-2xl font-bold text-[#1EC6C6] font-mono">{quote.pickup_code}</div>
-                        <div className="text-xs text-gray-500 mt-1">Show this to AutoPeça</div>
-                      </div>
-                    )}
                     {quote.status === 'paid' && (
                       <Button
                         onClick={() => handleUpdateStatus(quote.id, 'in_progress')}
@@ -391,7 +375,7 @@ export const MechanicDashboard = () => {
                         Start Job
                       </Button>
                     )}
-                    {(quote.status === 'in_progress' || quote.status === 'SERVICO_EM_ANDAMENTO') && (
+                    {quote.status === 'in_progress' && (
                       <Button
                         onClick={() => handleUpdateStatus(quote.id, 'completed')}
                         className="bg-[#27AE60] hover:bg-[#229954]"
