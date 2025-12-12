@@ -87,7 +87,7 @@ export const Register = () => {
           {/* User Type Selection */}
           <div>
             <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">I am a...</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, user_type: 'client' })}
@@ -111,6 +111,20 @@ export const Register = () => {
               >
                 <Wrench className="h-6 w-6 text-[#1EC6C6] mx-auto mb-1" />
                 <div className="font-semibold text-sm">Mechanic</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, user_type: 'autoparts' })}
+                className={`p-4 border-2 rounded-lg transition-all ${
+                  formData.user_type === 'autoparts'
+                    ? 'border-[#1EC6C6] bg-[#1EC6C6]/5'
+                    : 'border-gray-200 hover:border-[#1EC6C6]/50'
+                }`}
+              >
+                <svg className="h-6 w-6 text-[#1EC6C6] mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <div className="font-semibold text-sm">AutoParts</div>
               </button>
             </div>
           </div>
