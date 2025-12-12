@@ -309,7 +309,6 @@ async def create_vehicle(vehicle_data: VehicleCreate, current_user: User = Depen
         
         vehicle_dict = vehicle.model_dump()
         vehicle_dict['created_at'] = vehicle_dict['created_at'].isoformat()
-        vehicle_dict['user_id'] = current_user.id
         
         await db.vehicles.insert_one(vehicle_dict)
         
