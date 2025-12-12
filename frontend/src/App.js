@@ -16,6 +16,7 @@ import { Register } from "./pages/Register";
 import { ClientDashboard } from "./pages/ClientDashboard";
 import { MechanicDashboard } from "./pages/MechanicDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { AutoPartsDashboard } from "./pages/AutoPartsDashboard";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
@@ -61,6 +62,10 @@ const DashboardRouter = () => {
 
   if (user.user_type === 'mechanic') {
     return <MechanicDashboard />;
+  }
+
+  if (user.user_type === 'autoparts') {
+    return <AutoPartsDashboard />;
   }
 
   return <ClientDashboard />;
