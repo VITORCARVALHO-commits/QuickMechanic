@@ -504,8 +504,8 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
                 "total_formatted": format_currency_brl(50.0)
             }
         else:
-            # Final payment - use Brazilian gateway calculation
-            commission_info = BrasilPaymentGateway.calculate_commission(payment_data.amount)
+            # Final payment - calculate commission
+            commission_info = calculate_commission(payment_data.amount)
             platform_fee = commission_info["commission"]
             mechanic_earnings = commission_info["mechanic_receives"]
             new_status = "paid"
