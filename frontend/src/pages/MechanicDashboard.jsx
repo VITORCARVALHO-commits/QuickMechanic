@@ -362,7 +362,7 @@ export const MechanicDashboard = () => {
                     </div>
                     <div className="flex items-center gap-2 text-gray-700">
                       <DollarSign className="h-5 w-5 text-[#1EC6C6]" />
-                      <span className="font-bold">£{quote.final_price}</span>
+                      <span className="font-bold">R$ {quote.final_price}</span>
                     </div>
                   </div>
 
