@@ -236,12 +236,12 @@ export const MechanicDashboard = () => {
   };
 
   // Separate quotes into categories
-  const pendingQuotes = quotes.filter(q => q.status === 'pending');
+  const pendingQuotes = quotes.filter(q => q.status === 'pending' || q.status === 'AGUARDANDO_MECANICO');
   const myActiveJobs = quotes.filter(q => 
-    q.mechanic_id === user?.id && ['quoted', 'accepted', 'paid', 'in_progress'].includes(q.status)
+    q.mechanic_id === user?.id && ['quoted', 'accepted', 'paid', 'in_progress', 'ACEITO', 'PECA_CONFIRMADA', 'SERVICO_EM_ANDAMENTO'].includes(q.status)
   );
   const myCompletedJobs = quotes.filter(q => 
-    q.mechanic_id === user?.id && q.status === 'completed'
+    q.mechanic_id === user?.id && (q.status === 'completed' || q.status === 'SERVICO_FINALIZADO')
   );
 
   if (loading) {
@@ -369,11 +369,11 @@ export const MechanicDashboard = () => {
                   <div className="flex items-center gap-3 pt-4 border-t">
                     <div className="flex-1">
                       <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">
-                        Your Quote (£)
+                        Labor Price (£)
                       </label>
                       <Input
                         type="number"
-                        placeholder="Enter price..."
+                        placeholder="Enter labor price..."
                         value={quotePrice[quote.id] || ''}
                         onChange={(e) => setQuotePrice({ ...quotePrice, [quote.id]: e.target.value })}
                         className="h-10"
@@ -394,7 +394,7 @@ export const MechanicDashboard = () => {
                       ) : (
                         <>
                           <Send className="h-5 w-5 mr-2" />
-                          Submit Quote
+                          Accept Order
                         </>
                       )}
                     </Button>
