@@ -626,20 +626,20 @@ export const BookingQuote = () => {
               <div className="w-16 h-16 bg-[#1EC6C6] rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="h-8 w-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">Confirm Pre-Booking</h2>
-              <p className="text-gray-600">Secure your booking with a £12 deposit</p>
+              <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">Confirmar Pré-Reserva</h2>
+              <p className="text-gray-600">Garanta sua reserva com um depósito de R$ 50</p>
             </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-yellow-600 mt-0.5" />
                 <div className="text-sm text-yellow-800">
-                  <p className="font-semibold mb-1">How it works:</p>
+                  <p className="font-semibold mb-1">Como funciona:</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Pay £12 now to confirm your booking</li>
-                    <li>This will be <strong>deducted from your final bill</strong></li>
-                    <li>If you cancel, the £12 is <strong>non-refundable</strong></li>
-                    <li>Prevents fake bookings</li>
+                    <li>Pague R$ 50 agora para confirmar sua reserva</li>
+                    <li>Será <strong>descontado da conta final</strong></li>
+                    <li>Se cancelar, os R$ 50 são <strong>não reembolsáveis</strong></li>
+                    <li>Evita reservas falsas</li>
                   </ul>
                 </div>
               </div>
@@ -647,8 +647,8 @@ export const BookingQuote = () => {
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center p-3 bg-[#F5F7FA] rounded-lg">
-                <span className="text-gray-700">Pre-booking Fee</span>
-                <span className="text-2xl font-bold text-[#1EC6C6]">£12.00</span>
+                <span className="text-gray-700">Taxa de Pré-Reserva</span>
+                <span className="text-2xl font-bold text-[#1EC6C6]">R$ 50,00</span>
               </div>
             </div>
 
@@ -674,7 +674,7 @@ export const BookingQuote = () => {
                 ) : (
                   <>
                     <CheckCircle className="h-5 w-5 mr-2" />
-                    Pay £12
+                    Pagar R$ 50
                   </>
                 )}
               </Button>
