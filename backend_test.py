@@ -189,8 +189,8 @@ class AutoPecaTester:
     def test_auth_login_mechanic(self):
         """Test mechanic login"""
         data = {
-            "email": "testmechanic@quickmechanic.com",
-            "password": "testpass123"
+            "email": "mechanic@test.com",
+            "password": "test123"
         }
         
         response = self.make_request("POST", "/auth/login", data)
@@ -208,6 +208,30 @@ class AutoPecaTester:
         else:
             error_msg = response.text if response else "No response"
             self.log_result("Mechanic Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            return False
+    
+    def test_auth_login_autoparts(self):
+        """Test AutoParts login"""
+        data = {
+            "email": "autoparts@test.com",
+            "password": "test123"
+        }
+        
+        response = self.make_request("POST", "/auth/login", data)
+        
+        if response and response.status_code == 200:
+            result = response.json()
+            if result.get("success") and result.get("token"):
+                self.autoparts_token = result["token"]
+                self.autoparts_user = result["user"]
+                self.log_result("AutoParts Login", True, "AutoParts login successful")
+                return True
+            else:
+                self.log_result("AutoParts Login", False, "Login failed", result)
+                return False
+        else:
+            error_msg = response.text if response else "No response"
+            self.log_result("AutoParts Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_me_client(self):
