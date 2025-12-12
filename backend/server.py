@@ -327,7 +327,7 @@ async def create_vehicle(vehicle_data: VehicleCreate, current_user: User = Depen
 async def get_my_vehicles(current_user: User = Depends(get_current_user)):
     """Get user's vehicles"""
     try:
-        vehicles = await db.vehicles.find({"user_id": current_user.id}, {"_id": 0}).to_list(100)
+        vehicles = await db.vehicles.find({"client_id": current_user.id}, {"_id": 0}).to_list(100)
         return {
             "success": True,
             "data": vehicles,
