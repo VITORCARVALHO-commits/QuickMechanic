@@ -445,7 +445,7 @@ export const BookingQuote = () => {
                   disabled={!bookingData.postcode || !bookingData.date || !bookingData.time}
                   className="w-full h-12 bg-[#1EC6C6] hover:bg-[#1AB5B5] text-white font-semibold"
                 >
-                  Continue to Summary
+                  Continuar para Resumo
                   <ChevronRight className="h-5 w-5 ml-2" />
                 </Button>
               </Card>
