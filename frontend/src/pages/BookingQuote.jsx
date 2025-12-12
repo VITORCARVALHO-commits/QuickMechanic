@@ -332,7 +332,7 @@ export const BookingQuote = () => {
                             <h3 className="font-bold text-[#0E1A2C] mb-1">{service.name.en}</h3>
                             <div className="flex items-center gap-2">
                               <span className="text-xl font-bold text-[#1EC6C6]">R$ {service.basePrice}</span>
-                              <span className="text-sm text-gray-500">estimated</span>
+                              <span className="text-sm text-gray-500">estimado</span>
                             </div>
                           </div>
                           {isSelected && (
