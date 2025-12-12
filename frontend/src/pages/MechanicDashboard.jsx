@@ -22,10 +22,6 @@ export const MechanicDashboard = () => {
   const [quotePrice, setQuotePrice] = useState({});
   const [travelFee, setTravelFee] = useState({});
   const [wallet, setWallet] = useState(null);
-  const [showPartsModal, setShowPartsModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [availableParts, setAvailableParts] = useState([]);
-  const [selectedPart, setSelectedPart] = useState(null);
 
   useEffect(() => {
     loadQuotes();
