@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-QuickMechanic Backend API Test Suite
-Tests all backend endpoints for the complete application flow
+QuickMechanic Backend API Test Suite - AutoPeça Feature Testing
+Tests the complete AutoPeça (Auto Parts Store) three-sided marketplace implementation
 """
 
 import requests
@@ -12,15 +12,20 @@ from datetime import datetime
 # Get backend URL from environment
 BACKEND_URL = "https://triplebuild-hub.preview.emergentagent.com/api"
 
-class QuickMechanicTester:
+class AutoPecaTester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.client_token = None
         self.mechanic_token = None
+        self.autoparts_token = None
         self.client_user = None
         self.mechanic_user = None
-        self.test_quote_id = None
-        self.test_payment_id = None
+        self.autoparts_user = None
+        self.test_vehicle_id = None
+        self.test_order_id = None
+        self.test_part_id = None
+        self.test_reservation_id = None
+        self.pickup_code = None
         self.results = []
         
     def log_result(self, test_name, success, message, details=None):
