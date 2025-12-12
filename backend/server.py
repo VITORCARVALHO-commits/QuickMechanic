@@ -79,7 +79,7 @@ async def get_current_user_optional(authorization: Optional[str] = Header(None))
             return None
         
         return User(**user)
-    except:
+    except Exception:
         return None
 
 
