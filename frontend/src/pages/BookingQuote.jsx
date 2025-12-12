@@ -170,27 +170,10 @@ export const BookingQuote = () => {
       const quoteResult = await orderResponse.json();
 
       if (quoteResult.success) {
-        // Process pre-booking payment (£12)
-        const paymentResult = await createPayment({
-          quote_id: quoteResult.data.id,
-          amount: 50,
-          payment_method: 'mock',
-          payment_type: 'prebooking'
-        });
-
-        if (paymentResult.success) {
-          toast({
-            title: "✅ Pré-Reserva Confirmada!",
-            description: "R$ 50 pagos. Você receberá propostas de mecânicos em breve.",
-          });
-
-          // Clear pending booking
-          localStorage.removeItem('pendingBooking');
-
-          setTimeout(() => {
-            navigate('/dashboard');
-          }, 1500);
-        }
+        // Save order ID and show PIX payment
+        setCurrentOrderId(quoteResult.data.id);
+        setShowPrebookingModal(false);
+        setShowPixPayment(true);
       }
     } catch (error) {
       console.error('Booking error:', error);
