@@ -265,8 +265,8 @@ export const BookingQuote = () => {
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#0E1A2C]">Vehicle Confirmed</h2>
-                  <p className="text-sm text-gray-600">Registration: {vehicleData.plate}</p>
+                  <h2 className="text-xl font-bold text-[#0E1A2C]">Veículo Confirmado</h2>
+                  <p className="text-sm text-gray-600">Placa: {vehicleData.plate}</p>
                 </div>
               </div>
 
