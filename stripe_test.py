@@ -47,14 +47,14 @@ class StripeIntegrationTester:
         
         try:
             if method == "GET":
-                response = requests.get(url, headers=headers, timeout=60)
+                response = requests.get(url, headers=headers, timeout=15)
             elif method == "POST":
                 if data:
-                    response = requests.post(url, json=data, headers=headers, timeout=60)
+                    response = requests.post(url, json=data, headers=headers, timeout=15)
                 else:
-                    response = requests.post(url, headers=headers, timeout=60)
+                    response = requests.post(url, headers=headers, timeout=15)
             elif method == "PATCH":
-                response = requests.patch(url, json=data, headers=headers, timeout=60)
+                response = requests.patch(url, json=data, headers=headers, timeout=15)
             else:
                 raise ValueError(f"Unsupported method: {method}")
             
