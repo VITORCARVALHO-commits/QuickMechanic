@@ -333,26 +333,37 @@ async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get
 
 @api_router.get("/quotes/my-quotes")
 async def get_my_quotes(current_user: User = Depends(get_current_user)):
-    """Get quotes for the current user (client or mechanic)"""
+    """Get quotes/orders for the current user (client or mechanic)"""
     try:
         if current_user.user_type == "client":
-            # Get quotes created by this client
+            # Get orders created by this client
+            orders = await db.orders.find({"client_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+            # Also get legacy quotes for backward compatibility
             quotes = await db.quotes.find({"client_id": current_user.id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+            all_quotes = orders + quotes
         elif current_user.user_type == "mechanic":
-            # Get quotes assigned to this mechanic OR pending quotes
+            # Get orders assigned to this mechanic OR pending orders
+            orders = await db.orders.find({
+                "$or": [
+                    {"mechanic_id": current_user.id},
+                    {"status": "AGUARDANDO_MECANICO"}
+                ]
+            }, {"_id": 0}).sort("created_at", -1).to_list(100)
+            # Also get legacy quotes for backward compatibility
             quotes = await db.quotes.find({
                 "$or": [
                     {"mechanic_id": current_user.id},
                     {"status": "pending"}
                 ]
             }, {"_id": 0}).sort("created_at", -1).to_list(100)
+            all_quotes = orders + quotes
         else:
-            quotes = []
+            all_quotes = []
         
         return {
             "success": True,
-            "data": [Quote(**quote) for quote in quotes],
-            "message": f"{len(quotes)} quotes found"
+            "data": all_quotes,
+            "message": f"{len(all_quotes)} quotes found"
         }
     except Exception as e:
         logger.error(f"Error fetching user quotes: {str(e)}")
@@ -1066,6 +1077,39 @@ async def confirm_pickup(pickup_code: str, current_user: User = Depends(get_curr
         logger.error(f"Error confirming pickup: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/orders/{order_id}/accept")
+async def accept_order(order_id: str, labor_price: dict, current_user: User = Depends(get_current_user)):
+    """Mechanic accepts order and sets labor price"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can accept orders")
+        
+        order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Update order with mechanic info
+        update_fields = {
+            "mechanic_id": current_user.id,
+            "labor_price": labor_price.get("labor_price"),
+            "status": "ACEITO",
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": update_fields}
+        )
+        
+        logger.info(f"Order {order_id} accepted by mechanic {current_user.id}")
+        
+        return {"success": True, "message": "Order accepted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error accepting order: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/orders/{order_id}/start-service")
 async def start_service(order_id: str, current_user: User = Depends(get_current_user)):
     """Mechanic starts service"""
@@ -1122,14 +1166,19 @@ async def get_reservations(current_user: User = Depends(get_current_user)):
             {"_id": 0}
         ).sort("reserved_at", -1).to_list(100)
         
-        # Enhance with quote and mechanic info
+        # Enhance with order and mechanic info
         for res in reservations:
-            quote = await db.quotes.find_one({"id": res["quote_id"]}, {"_id": 0, "make": 1, "model": 1, "service": 1})
+            # Try orders collection first, then fall back to quotes
+            order = await db.orders.find_one({"id": res.get("order_id")}, {"_id": 0, "make": 1, "model": 1, "service": 1})
+            if not order:
+                # Fallback to quotes for backward compatibility
+                order = await db.quotes.find_one({"id": res.get("quote_id", res.get("order_id"))}, {"_id": 0, "make": 1, "model": 1, "service": 1})
+            
             mechanic = await db.users.find_one({"id": res["mechanic_id"]}, {"_id": 0, "name": 1, "phone": 1})
             part = await db.parts.find_one({"id": res["part_id"]}, {"_id": 0, "name": 1, "price": 1})
             
-            if quote:
-                res["quote_info"] = quote
+            if order:
+                res["quote_info"] = order
             if mechanic:
                 res["mechanic_info"] = mechanic
             if part:
