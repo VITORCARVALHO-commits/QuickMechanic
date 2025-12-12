@@ -9,7 +9,7 @@ class UserCreate(BaseModel):
     password: str
     name: str
     phone: Optional[str] = None
-    user_type: str = "client"  # client, mechanic, admin
+    user_type: str = "client"  # client, mechanic, admin, autoparts
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -33,6 +33,12 @@ class User(BaseModel):
     years_experience: Optional[int] = None
     mobile_service: Optional[bool] = False
     workshop_service: Optional[bool] = False
+    
+    # AutoParts-specific fields
+    shop_name: Optional[str] = None
+    shop_address: Optional[str] = None
+    opening_hours: Optional[str] = None
+    postcode: Optional[str] = None
 
 class UserResponse(BaseModel):
     id: str
@@ -110,6 +116,15 @@ class Quote(BaseModel):
     travel_fee: Optional[float] = 0.0  # Taxa de deslocamento negociável
     prebooking_paid: bool = False  # Se pagou os £12 de pre-booking
     prebooking_amount: float = 12.0  # Valor fixo de pre-booking
+    
+    # Parts-related fields
+    needs_parts: bool = False
+    part_id: Optional[str] = None
+    autoparts_id: Optional[str] = None
+    part_price: Optional[float] = None
+    pickup_code: Optional[str] = None
+    part_status: Optional[str] = None  # reserved, picked_up, completed
+    
     status: str = "pending"  # pending, prebooked, quoted, accepted, paid, in_progress, completed, cancelled
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -159,3 +174,49 @@ class PayoutRequest(BaseModel):
     status: str = "pending"  # pending, approved, paid, rejected
     requested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     processed_at: Optional[datetime] = None
+
+# ===== AUTOPARTS MODELS =====
+class Part(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    autoparts_id: str
+    name: str
+    description: Optional[str] = None
+    price: float
+    stock: int = 0
+    car_make: Optional[str] = None  # Compatible car brand
+    car_model: Optional[str] = None  # Compatible car model
+    service_type: Optional[str] = None  # What service this part is for
+    part_number: Optional[str] = None
+    is_available: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PartCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    stock: int
+    car_make: Optional[str] = None
+    car_model: Optional[str] = None
+    service_type: Optional[str] = None
+    part_number: Optional[str] = None
+
+class PartReservation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    quote_id: str
+    part_id: str
+    autoparts_id: str
+    mechanic_id: str
+    pickup_code: str
+    status: str = "reserved"  # reserved, picked_up, cancelled
+    reserved_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    picked_up_at: Optional[datetime] = None
+    expires_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # 24h expiry
+
+class PaymentSplit(BaseModel):
+    payment_id: str
+    quote_id: str
+    total_amount: float
+    mechanic_amount: float
+    autoparts_amount: float
+    platform_amount: float
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
