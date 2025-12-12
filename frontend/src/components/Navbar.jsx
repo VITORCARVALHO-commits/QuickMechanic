@@ -4,6 +4,7 @@ import { Wrench, Menu, X, User, LogOut } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { NotificationBell } from './NotificationBell';
 import { Button } from './ui/button';
 
 export const Navbar = () => {
@@ -42,6 +43,7 @@ export const Navbar = () => {
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
+            <NotificationBell />
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard">
