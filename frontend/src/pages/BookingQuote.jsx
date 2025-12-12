@@ -208,10 +208,10 @@ export const BookingQuote = () => {
       <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
         <Card className="p-8 max-w-md text-center">
           <AlertCircle className="h-16 w-16 text-[#E84141] mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">No Vehicle Data</h2>
-          <p className="text-gray-600 mb-6">Please search for a vehicle first.</p>
+          <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">Sem Dados do Veículo</h2>
+          <p className="text-gray-600 mb-6">Por favor, pesquise um veículo primeiro.</p>
           <Button onClick={() => navigate('/')} className="bg-[#1EC6C6] hover:bg-[#1AB5B5]">
-            Back to Home
+            Voltar à Página Inicial
           </Button>
         </Card>
       </div>
