@@ -36,6 +36,8 @@ export const BookingQuote = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showPrebookingModal, setShowPrebookingModal] = useState(false);
+  const [showPixPayment, setShowPixPayment] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
 
   // Service icons mapping
   const serviceIcons = {
