@@ -481,12 +481,10 @@ class AutoPecaTester:
             self.log_result("Mechanic Pre-reserve Part", False, "Missing required tokens/IDs")
             return False
         
-        data = {
-            "order_id": self.test_order_id,
-            "part_id": self.test_part_id
-        }
+        # Send as query parameters
+        params = f"?order_id={self.test_order_id}&part_id={self.test_part_id}"
         
-        response = self.make_request("POST", "/parts/prereserve", data, token=self.mechanic_token)
+        response = self.make_request("POST", f"/parts/prereserve{params}", token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
