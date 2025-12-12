@@ -73,6 +73,37 @@ export const BookingQuote = () => {
     setCurrentStep(2);
   };
 
+  const handlePixPaymentComplete = async () => {
+    try {
+      // Process payment
+      const paymentResult = await createPayment({
+        quote_id: currentOrderId,
+        amount: 50,
+        payment_method: 'pix',
+        payment_type: 'prebooking'
+      });
+
+      if (paymentResult.success) {
+        toast({
+          title: "✅ Pré-Reserva Confirmada!",
+          description: "R$ 50 pagos via PIX. Você receberá propostas de mecânicos em breve.",
+        });
+
+        localStorage.removeItem('pendingBooking');
+
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao processar pagamento",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleConfirmBooking = async () => {
     // Check if user is authenticated
     if (!isAuthenticated) {
