@@ -32,10 +32,12 @@ export const BookingQuote = () => {
     date: null,
     time: '',
     notes: '',
-    travelFee: 0
+    travelFee: 0,
+    hasParts: null // null = not answered, true = has parts, false = needs parts
   });
   const [loading, setLoading] = useState(false);
   const [showPrebookingModal, setShowPrebookingModal] = useState(false);
+  const [showPartsQuestion, setShowPartsQuestion] = useState(false);
 
   // Service icons mapping
   const serviceIcons = {
@@ -99,6 +101,12 @@ export const BookingQuote = () => {
       return;
     }
 
+    // Check if parts question answered
+    if (bookingData.hasParts === null) {
+      setShowPartsQuestion(true);
+      return;
+    }
+
     // Show pre-booking modal
     setShowPrebookingModal(true);
   };
@@ -124,8 +132,49 @@ export const BookingQuote = () => {
         location_type: bookingData.locationType
       };
 
-      // Create quote
-      const quoteResult = await createQuote(quotePayload);
+      // Add vehicle_id to payload (need to create vehicle first)
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+      
+      // Create vehicle record
+      const vehicleResponse = await fetch(`${API_URL}/api/vehicles`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          plate: vehicleData?.plate || plateSearch,
+          make: vehicleData?.make || '',
+          model: vehicleData?.model || 'Unknown',
+          year: vehicleData?.year || ''
+        })
+      });
+      
+      const vehicleResult = await vehicleResponse.json();
+      
+      // Create order with has_parts flag
+      const orderPayload = {
+        vehicle_id: vehicleResult.data.id,
+        service: selectedService.id,
+        location: bookingData.postcode,
+        description: bookingData.notes,
+        date: bookingData.date?.toISOString().split('T')[0],
+        time: bookingData.time,
+        location_type: bookingData.locationType,
+        has_parts: bookingData.hasParts || false
+      };
+
+      const orderResponse = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const quoteResult = await orderResponse.json();
 
       if (quoteResult.success) {
         // Process pre-booking payment (£12)
