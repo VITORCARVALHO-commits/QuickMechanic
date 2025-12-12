@@ -283,14 +283,14 @@ export const BookingQuote = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { label: 'Year', value: vehicleData.year },
-                    { label: 'Colour', value: vehicleData.color },
-                    { label: 'Fuel', value: vehicleData.fuel },
-                    { label: 'Body Type', value: vehicleData.category },
-                    { label: 'Engine', value: vehicleData.engine_size || 'N/A' },
-                    { label: 'Power', value: vehicleData.power || 'N/A' },
+                    { label: 'Ano', value: vehicleData.year },
+                    { label: 'Cor', value: vehicleData.color },
+                    { label: 'Combustível', value: vehicleData.fuel },
+                    { label: 'Tipo', value: vehicleData.category },
+                    { label: 'Motor', value: vehicleData.engine_size || 'N/A' },
+                    { label: 'Potência', value: vehicleData.power || 'N/A' },
                     { label: 'CO2', value: vehicleData.co2 || 'N/A' },
-                    { label: 'Doors', value: vehicleData.doors || 'N/A' }
+                    { label: 'Portas', value: vehicleData.doors || 'N/A' }
                   ].map((item, idx) => (
                     <div key={idx} className="p-2 bg-[#F5F7FA] rounded">
                       <div className="text-xs text-gray-500">{item.label}</div>
