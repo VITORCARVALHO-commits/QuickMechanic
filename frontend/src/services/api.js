@@ -53,7 +53,7 @@ export const getCurrentUser = async () => {
 
 export const searchVehicleByPlate = async (plate) => {
   try {
-    const response = await axios.get(`${API}/vehicle/plate/${plate}`);
+    const response = await axios.get(`${API}/vehicle/${plate}`);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar veículo:', error);
