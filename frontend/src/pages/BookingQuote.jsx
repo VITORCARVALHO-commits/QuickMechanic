@@ -597,35 +597,6 @@ export const BookingQuote = () => {
                 </div>
               </Card>
 
-              {/* Suggested Parts Info */}
-              {suggestedParts && suggestedParts.suggested_parts.length > 0 && (
-                <Card className="p-4 bg-blue-50 border-blue-200">
-                  <h4 className="font-bold text-[#0E1A2C] mb-3 flex items-center gap-2">
-                    <Package className="h-5 w-5 text-[#1EC6C6]" />
-                    Typical Parts Needed
-                  </h4>
-                  <div className="space-y-2 mb-3">
-                    {suggestedParts.suggested_parts.slice(0, 3).map((part, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-sm">
-                        <span className="text-gray-700">
-                          {part.name}
-                          {part.required && <span className="text-red-500 ml-1">*</span>}
-                        </span>
-                        <span className="font-semibold text-[#1EC6C6]">£{part.typical_price.toFixed(2)}</span>
-                      </div>
-                    ))}
-                    {suggestedParts.suggested_parts.length > 3 && (
-                      <div className="text-xs text-gray-500 italic">
-                        +{suggestedParts.suggested_parts.length - 3} more parts
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-600 border-t pt-2">
-                    <span className="text-red-500">*</span> Required parts • Total: £{suggestedParts.estimated_parts_cost.toFixed(2)}
-                  </div>
-                </Card>
-              )}
-
               {/* Trust Indicators */}
               <Card className="p-4">
                 <div className="space-y-3">
