@@ -420,26 +420,29 @@ class AutoPecaTester:
             self.log_result("Create Order Needing Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_get_client_quotes(self):
-        """Test getting client's quotes"""
-        if not self.client_token:
-            self.log_result("Get Client Quotes", False, "No client token available")
+    def test_mechanic_accept_order(self):
+        """Test mechanic accepting order with labor price"""
+        if not self.mechanic_token or not self.test_order_id:
+            self.log_result("Mechanic Accept Order", False, "No mechanic token or order ID available")
             return False
         
-        response = self.make_request("GET", "/quotes/my-quotes", token=self.client_token)
+        data = {
+            "labor_price": 65.00
+        }
+        
+        response = self.make_request("POST", f"/orders/{self.test_order_id}/accept", data, token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success"):
-                quotes = result.get("data", [])
-                self.log_result("Get Client Quotes", True, f"Retrieved {len(quotes)} client quotes")
+                self.log_result("Mechanic Accept Order", True, "Order accepted with labor price")
                 return True
             else:
-                self.log_result("Get Client Quotes", False, "Failed to get client quotes", result)
+                self.log_result("Mechanic Accept Order", False, "Order acceptance failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Get Client Quotes", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Accept Order", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_get_mechanic_quotes(self):
