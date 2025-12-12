@@ -475,35 +475,36 @@ class AutoPecaTester:
             self.log_result("Search Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_mechanic_submit_quote(self):
-        """Test mechanic submitting quote price"""
-        if not self.mechanic_token or not self.test_quote_id:
-            self.log_result("Mechanic Submit Quote", False, "No mechanic token or quote ID available")
+    def test_mechanic_prereserve_part(self):
+        """Test mechanic pre-reserving a part"""
+        if not self.mechanic_token or not self.test_order_id or not self.test_part_id:
+            self.log_result("Mechanic Pre-reserve Part", False, "Missing required tokens/IDs")
             return False
         
         data = {
-            "status": "quoted",
-            "final_price": 75.00
+            "order_id": self.test_order_id,
+            "part_id": self.test_part_id
         }
         
-        response = self.make_request("PATCH", f"/quotes/{self.test_quote_id}/status", data, token=self.mechanic_token)
+        response = self.make_request("POST", "/parts/prereserve", data, token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("data"):
-                quote = result["data"]
-                if quote.get("status") == "quoted" and quote.get("final_price") == 75.00:
-                    self.log_result("Mechanic Submit Quote", True, "Quote price submitted successfully")
+                reservation_data = result["data"]
+                self.test_reservation_id = reservation_data.get("reservation_id")
+                if reservation_data.get("status") == "PENDENTE_CONFIRMACAO":
+                    self.log_result("Mechanic Pre-reserve Part", True, "Part pre-reserved successfully")
                     return True
                 else:
-                    self.log_result("Mechanic Submit Quote", False, "Quote not updated correctly", result)
+                    self.log_result("Mechanic Pre-reserve Part", False, f"Unexpected status: {reservation_data.get('status')}")
                     return False
             else:
-                self.log_result("Mechanic Submit Quote", False, "Quote update failed", result)
+                self.log_result("Mechanic Pre-reserve Part", False, "Pre-reservation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Submit Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Pre-reserve Part", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_client_accept_quote(self):
