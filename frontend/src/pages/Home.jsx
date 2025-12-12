@@ -246,7 +246,7 @@ export const Home = () => {
                 <div className="max-w-md mx-auto space-y-4">
                   <div className="space-y-2">
                     <Input 
-                      placeholder="YOUR CAR REG"
+                      placeholder="ABC1234 ou ABC1D23"
                       value={plateInput}
                       onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
                       className="h-16 text-center text-2xl font-bold tracking-wider"
@@ -257,7 +257,7 @@ export const Home = () => {
                     {isSearchingPlate && (
                       <div className="flex items-center justify-center gap-2 text-[#1EC6C6]">
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        <span className="text-sm">Searching...</span>
+                        <span className="text-sm">Buscando...</span>
                       </div>
                     )}
                   </div>
@@ -277,10 +277,10 @@ export const Home = () => {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-xl font-bold text-[#0E1A2C]">Vehicle Found</h3>
-                          <span className="text-xl">🇬🇧</span>
+                          <h3 className="text-xl font-bold text-[#0E1A2C]">Veículo Encontrado</h3>
+                          <span className="text-xl">🇧🇷</span>
                         </div>
-                        <p className="text-sm text-gray-600">Registration: {vehicleFound.plate}</p>
+                        <p className="text-sm text-gray-600">Placa: {vehicleFound.plate}</p>
                       </div>
                     </div>
                     <Button 
