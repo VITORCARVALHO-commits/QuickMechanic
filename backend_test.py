@@ -611,34 +611,25 @@ class AutoPecaTester:
             self.log_result("Mechanic Start Service", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_mechanic_start_job(self):
-        """Test mechanic starting job"""
-        if not self.mechanic_token or not self.test_quote_id:
-            self.log_result("Mechanic Start Job", False, "No mechanic token or quote ID available")
+    def test_mechanic_complete_service(self):
+        """Test mechanic completing service"""
+        if not self.mechanic_token or not self.test_order_id:
+            self.log_result("Mechanic Complete Service", False, "No mechanic token or order ID available")
             return False
         
-        data = {
-            "status": "in_progress"
-        }
-        
-        response = self.make_request("PATCH", f"/quotes/{self.test_quote_id}/status", data, token=self.mechanic_token)
+        response = self.make_request("POST", f"/orders/{self.test_order_id}/complete-service", token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                quote = result["data"]
-                if quote.get("status") == "in_progress":
-                    self.log_result("Mechanic Start Job", True, "Job started successfully")
-                    return True
-                else:
-                    self.log_result("Mechanic Start Job", False, "Job status not updated", result)
-                    return False
+            if result.get("success"):
+                self.log_result("Mechanic Complete Service", True, "Service completed successfully")
+                return True
             else:
-                self.log_result("Mechanic Start Job", False, "Job start failed", result)
+                self.log_result("Mechanic Complete Service", False, "Service completion failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Start Job", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Complete Service", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_mechanic_complete_job(self):
