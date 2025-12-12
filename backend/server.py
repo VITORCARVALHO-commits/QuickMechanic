@@ -1028,6 +1028,15 @@ async def confirm_reservation(
                 {"$inc": {"stock": -1}}
             )
             
+            # Notify mechanic
+            await create_notification(
+                user_id=reservation["mechanic_id"],
+                title="Part Ready for Pickup!",
+                message=f"Your part reservation has been confirmed. Pickup code: {pickup_code}",
+                notification_type="success",
+                related_id=reservation["order_id"]
+            )
+            
             logger.info(f"Reservation confirmed: {pickup_code}")
             
             return {
@@ -1144,6 +1153,15 @@ async def accept_order(order_id: str, labor_price: dict, current_user: User = De
         await db.orders.update_one(
             {"id": order_id},
             {"$set": update_fields}
+        )
+        
+        # Create notification for client
+        await create_notification(
+            user_id=order["client_id"],
+            title="Order Accepted!",
+            message=f"A mechanic has accepted your order for {order['make']} {order['model']}. Labor price: £{labor_price.get('labor_price')}",
+            notification_type="success",
+            related_id=order_id
         )
         
         logger.info(f"Order {order_id} accepted by mechanic {current_user.id}")
