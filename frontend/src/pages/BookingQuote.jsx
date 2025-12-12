@@ -12,7 +12,7 @@ import {
   Car, CheckCircle, Clock, MapPin, Calendar as CalendarIcon,
   Wrench, Shield, ChevronRight, AlertCircle, Loader2,
   Home, Building2, Droplet, Disc, Gauge, Battery,
-  Zap, Wind, Cog, FileText, CreditCard, Info
+  Zap, Wind, Cog, FileText, CreditCard, Info, Package
 } from 'lucide-react';
 import { serviceTypes } from '../utils/mockData';
 import { createQuote, createPayment } from '../services/api';
