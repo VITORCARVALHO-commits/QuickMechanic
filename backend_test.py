@@ -55,7 +55,10 @@ class AutoPecaTester:
             if method == "GET":
                 response = requests.get(url, headers=headers, timeout=60)
             elif method == "POST":
-                response = requests.post(url, json=data, headers=headers, timeout=60)
+                if data:
+                    response = requests.post(url, json=data, headers=headers, timeout=60)
+                else:
+                    response = requests.post(url, headers=headers, timeout=60)
             elif method == "PATCH":
                 response = requests.patch(url, json=data, headers=headers, timeout=60)
             else:
