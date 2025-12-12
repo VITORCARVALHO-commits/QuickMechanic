@@ -683,13 +683,14 @@ export const BookingQuote = () => {
         </div>
       )}
 
-      {/* PIX Payment Modal */}
-      {showPixPayment && (
+      {/* Stripe Payment Modal */}
+      {showStripePayment && currentOrderId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <PaymentPIX
+          <StripeCheckout
+            orderId={currentOrderId}
             amount={50}
-            onPaymentComplete={handlePixPaymentComplete}
-            onCancel={() => setShowPixPayment(false)}
+            onSuccess={handleStripeSuccess}
+            onCancel={() => setShowStripePayment(false)}
           />
         </div>
       )}
