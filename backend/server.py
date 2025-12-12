@@ -24,6 +24,7 @@ from models import (
 from vehicle_mock_db import search_vehicle_by_plate
 from dvla_service import search_vehicle_with_fallback
 from auth import hash_password, verify_password, create_access_token, decode_token
+from service_parts_map import get_parts_for_service, get_estimated_parts_cost
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -853,6 +854,28 @@ async def search_parts(
         }
     except Exception as e:
         logger.error(f"Error searching parts: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/parts/suggestions/{service_type}")
+async def get_part_suggestions(service_type: str):
+    """Get suggested parts for a service type"""
+    try:
+        suggested_parts = get_parts_for_service(service_type)
+        estimated_cost = get_estimated_parts_cost(service_type)
+        
+        return {
+            "success": True,
+            "data": {
+                "service_type": service_type,
+                "suggested_parts": suggested_parts,
+                "estimated_parts_cost": estimated_cost,
+                "total_parts_count": len(suggested_parts),
+                "required_parts_count": len([p for p in suggested_parts if p.get("required", False)])
+            },
+            "message": f"{len(suggested_parts)} suggested parts for {service_type}"
+        }
+    except Exception as e:
+        logger.error(f"Error getting part suggestions: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/parts/prereserve")
