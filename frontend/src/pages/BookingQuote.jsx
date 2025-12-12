@@ -347,7 +347,7 @@ export const BookingQuote = () => {
                           <div className="flex-1">
                             <h3 className="font-bold text-[#0E1A2C] mb-1">{service.name.en}</h3>
                             <div className="flex items-center gap-2">
-                              <span className="text-xl font-bold text-[#1EC6C6]">£{service.basePrice}</span>
+                              <span className="text-xl font-bold text-[#1EC6C6]">R$ {service.basePrice}</span>
                               <span className="text-sm text-gray-500">estimated</span>
                             </div>
                           </div>
@@ -477,7 +477,7 @@ export const BookingQuote = () => {
                     <CreditCard className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#0E1A2C] mb-2">Confirm Pre-Booking</h2>
-                  <p className="text-gray-600">Secure your booking with a £12 deposit</p>
+                  <p className="text-gray-600">Garanta sua reserva com depósito de R$ 50</p>
                 </div>
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
@@ -498,7 +498,7 @@ export const BookingQuote = () => {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center p-3 bg-[#F5F7FA] rounded-lg">
                     <span className="text-gray-700">Pre-booking Fee</span>
-                    <span className="text-2xl font-bold text-[#1EC6C6]">£12.00</span>
+                    <span className="text-2xl font-bold text-[#1EC6C6]">R$ 50,00</span>
                   </div>
                 </div>
 
@@ -567,7 +567,7 @@ export const BookingQuote = () => {
                     <div className="border-t pt-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-gray-700">Labour</span>
-                        <span className="font-semibold">£{selectedService.basePrice}</span>
+                        <span className="font-semibold">R$ {selectedService.basePrice}</span>
                       </div>
                       <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
                         <span>Parts</span>
@@ -575,7 +575,7 @@ export const BookingQuote = () => {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-[#0E1A2C]">Estimated Total</span>
-                        <span className="text-3xl font-bold text-[#1EC6C6]">£{selectedService.basePrice}</span>
+                        <span className="text-3xl font-bold text-[#1EC6C6]">R$ {selectedService.basePrice}</span>
                       </div>
                     </div>
                   </div>
