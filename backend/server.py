@@ -24,7 +24,6 @@ from models import (
 from vehicle_mock_db import search_vehicle_by_plate
 from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
-from payment_brasil import BrasilPaymentGateway, format_currency_brl
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 # MongoDB connection
