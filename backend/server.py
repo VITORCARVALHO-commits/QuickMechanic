@@ -35,6 +35,24 @@ db = client[os.environ['DB_NAME']]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Payment helper functions
+def format_currency_brl(value: float) -> str:
+    """Format value in Brazilian Real"""
+    return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+def calculate_commission(amount: float) -> dict:
+    """Calculate platform commission: R$ 20 fixed + 10%"""
+    commission = 20.0 + (amount * 0.10)
+    mechanic_receives = amount - commission
+    return {
+        "total": amount,
+        "commission": commission,
+        "mechanic_receives": mechanic_receives,
+        "commission_formatted": format_currency_brl(commission),
+        "mechanic_receives_formatted": format_currency_brl(mechanic_receives),
+        "total_formatted": format_currency_brl(amount)
+    }
+
 # Create the main app
 app = FastAPI()
 
