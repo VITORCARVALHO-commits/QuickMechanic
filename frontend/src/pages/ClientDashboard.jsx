@@ -262,7 +262,7 @@ export const ClientDashboard = () => {
                       {quote.status === 'quoted' ? 'Final Quote' : 'Estimated Price'}
                     </div>
                     <div className="text-3xl font-bold text-[#1EC6C6]">
-                      £{quote.final_price || quote.estimated_price || '---'}
+                      R$ {quote.final_price || quote.estimated_price || '---'}
                     </div>
                   </div>
 
@@ -300,15 +300,7 @@ export const ClientDashboard = () => {
                     </div>
                   )}
 
-                  {/* Track Order Button */}
-                  <Button
-                    onClick={() => navigate(`/order/${quote.id}`)}
-                    variant="outline"
-                    className="border-[#1EC6C6] text-[#1EC6C6] hover:bg-[#1EC6C6]/10"
-                  >
-                    <FileText className="h-5 w-5 mr-2" />
-                    Track Order
-                  </Button>
+                  {/* Removed Track Order - AutoPeça feature */}
                 </div>
               </Card>
             ))}
