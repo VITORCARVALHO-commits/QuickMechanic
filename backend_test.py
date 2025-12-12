@@ -694,53 +694,63 @@ class AutoPecaTester:
             self.log_result("Error Handling - Unauthorized Access", False, f"Expected 403, got {response.status_code if response else 'No response'}")
     
     def run_all_tests(self):
-        """Run all tests in sequence"""
-        print("🚀 Starting QuickMechanic Backend API Tests")
-        print("=" * 60)
+        """Run all AutoPeça feature tests in sequence"""
+        print("🚀 Starting AutoPeça Feature Backend API Tests")
+        print("=" * 70)
         
         # Authentication Flow Tests
         print("\n📝 Testing Authentication Flow...")
         self.test_auth_register_client()
         self.test_auth_register_mechanic()
+        self.test_auth_register_autoparts()
         self.test_auth_login_client()
         self.test_auth_login_mechanic()
+        self.test_auth_login_autoparts()
         self.test_auth_me_client()
         self.test_auth_me_mechanic()
         
-        # Vehicle Search Tests
-        print("\n🚗 Testing Vehicle Search...")
+        # Vehicle Setup
+        print("\n🚗 Testing Vehicle Setup...")
         self.test_vehicle_search()
+        self.test_create_vehicle()
         
-        # Quote Creation Flow Tests
-        print("\n💰 Testing Quote Creation Flow...")
-        self.test_create_quote()
-        self.test_get_client_quotes()
+        # AutoPeça Catalog Setup
+        print("\n🏪 Testing AutoPeça Catalog...")
+        self.test_add_parts_to_catalog()
         
-        # Mechanic Quote Flow Tests
-        print("\n🔧 Testing Mechanic Quote Flow...")
-        self.test_get_mechanic_quotes()
-        self.test_mechanic_submit_quote()
+        # Order Creation Flow (Client needs parts)
+        print("\n📋 Testing Order Creation Flow...")
+        self.test_create_order_needing_parts()
         
-        # Payment Flow Tests
-        print("\n💳 Testing Payment Flow...")
-        self.test_client_accept_quote()
-        self.test_process_payment()
-        self.test_get_payments()
-        self.test_verify_quote_paid_status()
+        # Mechanic Flow
+        print("\n🔧 Testing Mechanic Flow...")
+        self.test_mechanic_accept_order()
+        self.test_search_parts()
+        self.test_mechanic_prereserve_part()
         
-        # Job Management Tests
-        print("\n⚙️ Testing Job Management...")
-        self.test_mechanic_start_job()
-        self.test_mechanic_complete_job()
+        # AutoPeça Flow
+        print("\n🏪 Testing AutoPeça Flow...")
+        self.test_autoparts_view_reservations()
+        self.test_autoparts_confirm_reservation()
+        self.test_autoparts_confirm_pickup()
+        
+        # Service Completion Flow
+        print("\n⚙️ Testing Service Completion...")
+        self.test_mechanic_start_service()
+        self.test_mechanic_complete_service()
+        
+        # Verification Tests
+        print("\n✅ Testing Status Verification...")
+        self.test_verify_order_status_transitions()
         
         # Error Handling Tests
         print("\n🚨 Testing Error Handling...")
         self.test_error_handling()
         
         # Summary
-        print("\n" + "=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
+        print("\n" + "=" * 70)
+        print("📊 AUTOPECA FEATURE TEST SUMMARY")
+        print("=" * 70)
         
         passed = sum(1 for r in self.results if r["success"])
         failed = len(self.results) - passed
@@ -755,6 +765,17 @@ class AutoPecaTester:
             for result in self.results:
                 if not result["success"]:
                     print(f"   ❌ {result['test']}: {result['message']}")
+        
+        print("\n🎯 KEY FEATURES TESTED:")
+        print("   • AutoPeça user registration and authentication")
+        print("   • Parts catalog management")
+        print("   • Order creation with has_parts=false")
+        print("   • Mechanic order acceptance and part search")
+        print("   • Part pre-reservation workflow")
+        print("   • AutoPeça reservation confirmation")
+        print("   • Pickup code generation and validation")
+        print("   • Complete service workflow")
+        print("   • Status transitions verification")
         
         return passed, failed
 
