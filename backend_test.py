@@ -445,26 +445,34 @@ class AutoPecaTester:
             self.log_result("Mechanic Accept Order", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_get_mechanic_quotes(self):
-        """Test getting mechanic's available quotes"""
+    def test_search_parts(self):
+        """Test mechanic searching for compatible parts"""
         if not self.mechanic_token:
-            self.log_result("Get Mechanic Quotes", False, "No mechanic token available")
+            self.log_result("Search Parts", False, "No mechanic token available")
             return False
         
-        response = self.make_request("GET", "/quotes/my-quotes", token=self.mechanic_token)
+        # Search for oil change parts for Volkswagen Golf
+        params = "?car_make=Volkswagen&car_model=Golf&service_type=oil_change"
+        response = self.make_request("GET", f"/parts/search{params}")
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success"):
-                quotes = result.get("data", [])
-                self.log_result("Get Mechanic Quotes", True, f"Retrieved {len(quotes)} mechanic quotes")
-                return True
+            if result.get("success") and result.get("data"):
+                parts = result["data"]
+                if len(parts) > 0:
+                    # Update test_part_id with a part from search results
+                    self.test_part_id = parts[0]["id"]
+                    self.log_result("Search Parts", True, f"Found {len(parts)} compatible parts")
+                    return True
+                else:
+                    self.log_result("Search Parts", False, "No parts found for search criteria")
+                    return False
             else:
-                self.log_result("Get Mechanic Quotes", False, "Failed to get mechanic quotes", result)
+                self.log_result("Search Parts", False, "Parts search failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Get Mechanic Quotes", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Search Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_mechanic_submit_quote(self):
