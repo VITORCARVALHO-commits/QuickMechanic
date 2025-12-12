@@ -22,7 +22,7 @@ export const Services = () => {
         pt: 'Troca de óleo do motor com filtro. Inclui verificação de níveis.',
         en: 'Engine oil change with filter. Includes level check.'
       },
-      price: 'R$ 150',
+      price: 'R$ 180',
       duration: '30 min',
       popular: true
     },
@@ -34,7 +34,7 @@ export const Services = () => {
         pt: 'Inspeção, ajuste ou troca de pastilhas e discos de freio.',
         en: 'Inspection, adjustment or replacement of brake pads and discs.'
       },
-      price: 'R$ 300',
+      price: 'R$ 450',
       duration: '1-2 horas',
       popular: true
     },
@@ -46,7 +46,7 @@ export const Services = () => {
         pt: 'Reparo e substituição de componentes da suspensão.',
         en: 'Repair and replacement of suspension components.'
       },
-      price: 'R$ 450',
+      price: 'R$ 650',
       duration: '2-3 horas',
       popular: false
     },
@@ -58,7 +58,7 @@ export const Services = () => {
         pt: 'Diagnóstico eletrônico completo com scanner automotivo.',
         en: 'Complete electronic diagnostic with automotive scanner.'
       },
-      price: 'R$ 200',
+      price: 'R$ 120',
       duration: '1 hora',
       popular: true
     },
@@ -70,7 +70,7 @@ export const Services = () => {
         pt: 'Revisão completa com verificação de todos os sistemas.',
         en: 'Complete inspection with all systems check.'
       },
-      price: 'R$ 350',
+      price: 'R$ 500',
       duration: '2 horas',
       popular: true
     },
@@ -82,7 +82,7 @@ export const Services = () => {
         pt: 'Teste, recarga ou substituição de bateria.',
         en: 'Test, recharge or battery replacement.'
       },
-      price: 'R$ 250',
+      price: 'R$ 350',
       duration: '30 min',
       popular: false
     },
@@ -94,7 +94,7 @@ export const Services = () => {
         pt: 'Manutenção, recarga de gás e reparo do sistema.',
         en: 'Maintenance, gas recharge and system repair.'
       },
-      price: 'R$ 280',
+      price: 'R$ 400',
       duration: '1-2 horas',
       popular: false
     },
@@ -106,7 +106,7 @@ export const Services = () => {
         pt: 'Reparo e manutenção de transmissão manual ou automática.',
         en: 'Repair and maintenance of manual or automatic transmission.'
       },
-      price: 'R$ 800',
+      price: 'R$ 1.200',
       duration: '3-4 horas',
       popular: false
     },
