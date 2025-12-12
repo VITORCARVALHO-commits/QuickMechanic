@@ -304,8 +304,8 @@ export const BookingQuote = () => {
             {/* Step 2: Service Selection */}
             {currentStep >= 1 && (
               <Card className="p-6">
-                <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">Select Your Service</h2>
-                <p className="text-gray-600 mb-6">Choose the service you need for your vehicle</p>
+                <h2 className="text-2xl font-bold text-[#0E1A2C] mb-4">Selecione Seu Serviço</h2>
+                <p className="text-gray-600 mb-6">Escolha o serviço necessário para seu veículo</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   {serviceTypes.map((service) => {
