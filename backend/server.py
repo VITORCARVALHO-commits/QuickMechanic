@@ -952,6 +952,15 @@ async def prereserve_part(
             }
         )
         
+        # Notify AutoPeça
+        await create_notification(
+            user_id=part["autoparts_id"],
+            title="New Part Reservation Request",
+            message=f"A mechanic wants to reserve: {part['name']} (£{part['price']}). Please confirm or refuse.",
+            notification_type="info",
+            related_id=order_id
+        )
+        
         logger.info(f"Part pre-reserved (pending confirmation): {part_id} for order {order_id}")
         
         return {
