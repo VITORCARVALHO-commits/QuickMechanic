@@ -107,6 +107,44 @@ export const AutoPartsDashboard = () => {
     }
   };
 
+  const handleConfirmReservation = async (reservationId, confirm) => {
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`${API_URL}/api/autoparts/confirm-reservation/${reservationId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ confirm })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: confirm ? `Reservation confirmed! Code: ${data.data?.pickup_code}` : "Reservation refused"
+        });
+        loadData();
+      } else {
+        toast({
+          title: "Error",
+          description: data.detail || "Failed to process reservation",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process reservation",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleConfirmPickup = async () => {
     if (!pickupCode.trim()) {
       toast({
@@ -169,10 +207,10 @@ export const AutoPartsDashboard = () => {
   }
 
   const totalRevenue = reservations
-    .filter(r => r.status === 'picked_up')
+    .filter(r => r.status === 'RETIRADO')
     .reduce((sum, r) => sum + (r.part_info?.price || 0), 0);
   
-  const pendingReservations = reservations.filter(r => r.status === 'reserved').length;
+  const pendingReservations = reservations.filter(r => r.status === 'PENDENTE_CONFIRMACAO').length;
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
