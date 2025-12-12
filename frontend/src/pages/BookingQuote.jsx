@@ -38,6 +38,7 @@ export const BookingQuote = () => {
   const [loading, setLoading] = useState(false);
   const [showPrebookingModal, setShowPrebookingModal] = useState(false);
   const [showPartsQuestion, setShowPartsQuestion] = useState(false);
+  const [suggestedParts, setSuggestedParts] = useState(null);
 
   // Service icons mapping
   const serviceIcons = {
@@ -67,9 +68,22 @@ export const BookingQuote = () => {
     return Icon;
   };
 
-  const handleServiceSelect = (service) => {
+  const handleServiceSelect = async (service) => {
     setSelectedService(service);
     setBookingData({ ...bookingData, serviceType: service.id });
+    
+    // Load suggested parts for this service
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${API_URL}/api/parts/suggestions/${service.id}`);
+      const data = await response.json();
+      if (data.success) {
+        setSuggestedParts(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load part suggestions:', error);
+    }
+    
     setCurrentStep(2);
   };
 
@@ -500,9 +514,14 @@ export const BookingQuote = () => {
                     className="w-full p-4 border-2 border-[#1EC6C6] bg-[#1EC6C6]/10 rounded-xl hover:bg-[#1EC6C6]/20 transition-all text-left"
                   >
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex-1">
                         <div className="font-bold text-[#0E1A2C] mb-1">No, I need parts</div>
                         <div className="text-sm text-gray-600">Mechanic will source parts from AutoPeças</div>
+                        {suggestedParts && suggestedParts.estimated_parts_cost > 0 && (
+                          <div className="text-xs text-[#1EC6C6] mt-1">
+                            Estimated parts cost: £{suggestedParts.estimated_parts_cost.toFixed(2)}
+                          </div>
+                        )}
                       </div>
                       <Wrench className="h-6 w-6 text-[#1EC6C6]" />
                     </div>
