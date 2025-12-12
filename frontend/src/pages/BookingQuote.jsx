@@ -385,10 +385,10 @@ export const BookingQuote = () => {
                 {/* Postcode */}
                 <div className="mb-6">
                   <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">
-                    {bookingData.locationType === 'mobile' ? 'Your Postcode' : 'Workshop Postcode'}
+                    {bookingData.locationType === 'mobile' ? 'Seu CEP' : 'CEP da Oficina'}
                   </label>
                   <Input
-                    placeholder="e.g. SW1A 1AA"
+                    placeholder="ex: 01310-100"
                     value={bookingData.postcode}
                     onChange={(e) => setBookingData({...bookingData, postcode: e.target.value.toUpperCase()})}
                     className="h-12 text-lg"
