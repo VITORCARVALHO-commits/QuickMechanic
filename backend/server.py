@@ -576,23 +576,11 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         logger.error(f"Error processing payment: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.post("/payments/pix/generate")
-async def generate_pix(payment_data: dict, current_user: User = Depends(get_current_user)):
-    """Generate PIX payment code"""
-    try:
-        amount = payment_data.get("amount")
-        description = payment_data.get("description", "QuickMechanic Payment")
-        
-        pix_response = BrasilPaymentGateway.process_pix_payment(amount, description)
-        
-        return {
-            "success": True,
-            "data": pix_response,
-            "message": "Código PIX gerado com sucesso"
-        }
-    except Exception as e:
-        logger.error(f"Error generating PIX: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+# PIX endpoint removed - now using Stripe for all payments
+# @api_router.post("/payments/pix/generate")
+# async def generate_pix(payment_data: dict, current_user: User = Depends(get_current_user)):
+#     """Generate PIX payment code"""
+#     # Deprecated: Use Stripe checkout instead
 
 # ===== MECHANIC ENDPOINTS =====
 
