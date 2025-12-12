@@ -294,43 +294,130 @@ class AutoPecaTester:
             self.log_result("Vehicle Search", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_create_quote(self):
-        """Test quote creation as authenticated client"""
+    def test_create_vehicle(self):
+        """Test vehicle creation for client"""
         if not self.client_token:
-            self.log_result("Create Quote", False, "No client token available")
+            self.log_result("Create Vehicle", False, "No client token available")
             return False
         
         data = {
             "plate": "VO11WRE",
-            "make": "volkswagen",
+            "make": "Volkswagen",
             "model": "Golf",
             "year": "2011",
             "color": "Blue",
-            "fuel": "Petrol",
-            "version": "1.4 TSI",
-            "category": "Hatchback",
-            "service": "oil_change",
-            "location": "SW1A 1AA",
-            "description": "Regular oil change service needed",
-            "date": "2024-01-15",
-            "time": "10:00",
-            "location_type": "mobile"
+            "fuel": "Petrol"
         }
         
-        response = self.make_request("POST", "/quotes", data, token=self.client_token)
+        response = self.make_request("POST", "/vehicles", data, token=self.client_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("data"):
-                self.test_quote_id = result["data"]["id"]
-                self.log_result("Create Quote", True, "Quote created successfully")
+                self.test_vehicle_id = result["data"]["id"]
+                self.log_result("Create Vehicle", True, "Vehicle created successfully")
                 return True
             else:
-                self.log_result("Create Quote", False, "Quote creation failed", result)
+                self.log_result("Create Vehicle", False, "Vehicle creation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Create Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Create Vehicle", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            return False
+    
+    def test_add_parts_to_catalog(self):
+        """Test AutoParts adding parts to catalog"""
+        if not self.autoparts_token:
+            self.log_result("Add Parts to Catalog", False, "No autoparts token available")
+            return False
+        
+        parts = [
+            {
+                "name": "Brake Pads - Front Set",
+                "description": "High quality ceramic brake pads for front wheels",
+                "price": 45.99,
+                "stock": 10,
+                "car_make": "Volkswagen",
+                "car_model": "Golf",
+                "service_type": "brakes",
+                "part_number": "BP-VW-GOLF-001"
+            },
+            {
+                "name": "Oil Filter",
+                "description": "Premium oil filter for engine maintenance",
+                "price": 12.50,
+                "stock": 25,
+                "car_make": "Volkswagen",
+                "car_model": "Golf",
+                "service_type": "oil_change",
+                "part_number": "OF-VW-GOLF-001"
+            },
+            {
+                "name": "Air Filter",
+                "description": "High-flow air filter for better engine performance",
+                "price": 18.75,
+                "stock": 15,
+                "car_make": "Volkswagen",
+                "car_model": "Golf",
+                "service_type": "maintenance",
+                "part_number": "AF-VW-GOLF-001"
+            }
+        ]
+        
+        success_count = 0
+        for part_data in parts:
+            response = self.make_request("POST", "/autoparts/parts", part_data, token=self.autoparts_token)
+            
+            if response and response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    if not self.test_part_id:  # Store first part ID for later tests
+                        self.test_part_id = result["data"]["id"]
+                    success_count += 1
+        
+        if success_count == len(parts):
+            self.log_result("Add Parts to Catalog", True, f"Successfully added {success_count} parts to catalog")
+            return True
+        else:
+            self.log_result("Add Parts to Catalog", False, f"Only added {success_count}/{len(parts)} parts")
+            return False
+    
+    def test_create_order_needing_parts(self):
+        """Test client creating order with has_parts=false (needs parts)"""
+        if not self.client_token or not self.test_vehicle_id:
+            self.log_result("Create Order Needing Parts", False, "No client token or vehicle ID available")
+            return False
+        
+        data = {
+            "vehicle_id": self.test_vehicle_id,
+            "service": "oil_change",
+            "location": "SW1A 1AA, London",
+            "description": "Need oil change service with parts",
+            "date": "2024-01-15",
+            "time": "10:00",
+            "location_type": "mobile",
+            "has_parts": False  # Client needs parts
+        }
+        
+        response = self.make_request("POST", "/orders", data, token=self.client_token)
+        
+        if response and response.status_code == 200:
+            result = response.json()
+            if result.get("success") and result.get("data"):
+                order = result["data"]
+                self.test_order_id = order["id"]
+                if order.get("status") == "AGUARDANDO_MECANICO" and order.get("has_parts") == False:
+                    self.log_result("Create Order Needing Parts", True, "Order created with correct status")
+                    return True
+                else:
+                    self.log_result("Create Order Needing Parts", False, f"Order status: {order.get('status')}, has_parts: {order.get('has_parts')}")
+                    return False
+            else:
+                self.log_result("Create Order Needing Parts", False, "Order creation failed", result)
+                return False
+        else:
+            error_msg = response.text if response else "No response"
+            self.log_result("Create Order Needing Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_get_client_quotes(self):
