@@ -218,13 +218,23 @@ class StripeIntegrationTester:
                 return False
         elif response and response.status_code == 500:
             # Check if it's a Stripe API key issue (expected in testing environment)
-            error_text = response.text
-            if "Invalid API Key" in error_text or "Stripe" in error_text:
-                self.log_result("Stripe Checkout", True, "Stripe endpoint working (API key issue expected in test env)")
-                return True
-            else:
-                self.log_result("Stripe Checkout", False, f"Unexpected server error: {error_text}")
-                return False
+            try:
+                error_result = response.json()
+                error_detail = error_result.get("detail", "")
+                if "Invalid API Key" in error_detail or "Stripe" in error_detail:
+                    self.log_result("Stripe Checkout", True, "Stripe endpoint working (API key issue expected in test env)")
+                    return True
+                else:
+                    self.log_result("Stripe Checkout", False, f"Unexpected server error: {error_detail}")
+                    return False
+            except:
+                error_text = response.text
+                if "Invalid API Key" in error_text or "Stripe" in error_text:
+                    self.log_result("Stripe Checkout", True, "Stripe endpoint working (API key issue expected in test env)")
+                    return True
+                else:
+                    self.log_result("Stripe Checkout", False, f"Unexpected server error: {error_text}")
+                    return False
         else:
             error_msg = response.text if response else "No response"
             self.log_result("Stripe Checkout", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
