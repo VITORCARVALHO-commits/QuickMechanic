@@ -225,10 +225,10 @@ export const BookingQuote = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between max-w-3xl mx-auto">
             {[
-              { num: 1, label: 'Vehicle' },
-              { num: 2, label: 'Service' },
-              { num: 3, label: 'Schedule' },
-              { num: 4, label: 'Confirm' }
+              { num: 1, label: 'Veículo' },
+              { num: 2, label: 'Serviço' },
+              { num: 3, label: 'Agendar' },
+              { num: 4, label: 'Confirmar' }
             ].map((step, index) => (
               <React.Fragment key={step.num}>
                 <div className="flex flex-col items-center">
