@@ -109,8 +109,8 @@ export const BookingQuote = () => {
 
     if (!bookingData.postcode || !bookingData.date || !bookingData.time) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Informação Faltando",
+        description: "Por favor, preencha todos os campos obrigatórios.",
         variant: "destructive"
       });
       return;
