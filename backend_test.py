@@ -565,26 +565,29 @@ class AutoPecaTester:
             self.log_result("AutoParts Confirm Reservation", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_get_payments(self):
-        """Test getting payment history"""
-        if not self.client_token:
-            self.log_result("Get Payments", False, "No client token available")
+    def test_autoparts_confirm_pickup(self):
+        """Test AutoParts confirming part pickup using pickup code"""
+        if not self.autoparts_token or not self.pickup_code:
+            self.log_result("AutoParts Confirm Pickup", False, "No autoparts token or pickup code available")
             return False
         
-        response = self.make_request("GET", "/payments/my-payments", token=self.client_token)
+        data = {
+            "pickup_code": self.pickup_code
+        }
+        
+        response = self.make_request("POST", "/autoparts/confirm-pickup", data, token=self.autoparts_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success"):
-                payments = result.get("data", [])
-                self.log_result("Get Payments", True, f"Retrieved {len(payments)} payments")
+                self.log_result("AutoParts Confirm Pickup", True, "Part pickup confirmed successfully")
                 return True
             else:
-                self.log_result("Get Payments", False, "Failed to get payments", result)
+                self.log_result("AutoParts Confirm Pickup", False, "Pickup confirmation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Get Payments", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("AutoParts Confirm Pickup", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_verify_quote_paid_status(self):
