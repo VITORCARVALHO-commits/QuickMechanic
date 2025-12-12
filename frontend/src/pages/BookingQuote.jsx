@@ -185,10 +185,10 @@ export const BookingQuote = () => {
       const quoteResult = await orderResponse.json();
 
       if (quoteResult.success) {
-        // Save order ID and show PIX payment
+        // Save order ID and show Stripe payment
         setCurrentOrderId(quoteResult.data.id);
         setShowPrebookingModal(false);
-        setShowPixPayment(true);
+        setShowStripePayment(true);
       }
     } catch (error) {
       console.error('Booking error:', error);
