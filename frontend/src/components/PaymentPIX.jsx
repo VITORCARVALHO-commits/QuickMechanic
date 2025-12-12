@@ -13,6 +13,7 @@ export const PaymentPIX = ({ amount, onPaymentComplete, onCancel }) => {
 
   useEffect(() => {
     generatePIX();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
