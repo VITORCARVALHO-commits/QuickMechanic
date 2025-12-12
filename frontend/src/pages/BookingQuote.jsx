@@ -460,41 +460,41 @@ export const BookingQuote = () => {
               {/* Price Summary */}
               {selectedService && (
                 <Card className="p-6 bg-gradient-to-br from-[#1EC6C6]/5 to-white border-2 border-[#1EC6C6]/20">
-                  <h3 className="text-lg font-bold text-[#0E1A2C] mb-4">Booking Summary</h3>
+                  <h3 className="text-lg font-bold text-[#0E1A2C] mb-4">Resumo da Reserva</h3>
 
                   <div className="space-y-4">
                     <div>
-                      <div className="text-sm text-gray-600">Service</div>
+                      <div className="text-sm text-gray-600">Serviço</div>
                       <div className="font-bold text-[#0E1A2C]">{selectedService.name.en}</div>
                     </div>
 
                     {bookingData.postcode && (
                       <div>
-                        <div className="text-sm text-gray-600">Location</div>
+                        <div className="text-sm text-gray-600">Local</div>
                         <div className="font-bold text-[#0E1A2C]">{bookingData.postcode}</div>
                       </div>
                     )}
 
                     {bookingData.date && (
                       <div>
-                        <div className="text-sm text-gray-600">Date & Time</div>
+                        <div className="text-sm text-gray-600">Data & Horário</div>
                         <div className="font-bold text-[#0E1A2C]">
-                          {bookingData.date.toLocaleDateString('en-GB')} at {bookingData.time}
+                          {bookingData.date.toLocaleDateString('pt-BR')} às {bookingData.time}
                         </div>
                       </div>
                     )}
 
                     <div className="border-t pt-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700">Labour</span>
+                        <span className="text-gray-700">Mão de Obra</span>
                         <span className="font-semibold">R$ {selectedService.basePrice}</span>
                       </div>
                       <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
-                        <span>Parts</span>
-                        <span>If required</span>
+                        <span>Peças</span>
+                        <span>Se necessário</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-[#0E1A2C]">Estimated Total</span>
+                        <span className="text-lg font-bold text-[#0E1A2C]">Total Estimado</span>
                         <span className="text-3xl font-bold text-[#1EC6C6]">R$ {selectedService.basePrice}</span>
                       </div>
                     </div>
