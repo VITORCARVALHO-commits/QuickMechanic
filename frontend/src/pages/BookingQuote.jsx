@@ -171,7 +171,7 @@ export const BookingQuote = () => {
         // Process pre-booking payment (£12)
         const paymentResult = await createPayment({
           quote_id: quoteResult.data.id,
-          amount: 12,
+          amount: 50,
           payment_method: 'mock',
           payment_type: 'prebooking'
         });
