@@ -32,13 +32,10 @@ export const BookingQuote = () => {
     date: null,
     time: '',
     notes: '',
-    travelFee: 0,
-    hasParts: null // null = not answered, true = has parts, false = needs parts
+    travelFee: 0
   });
   const [loading, setLoading] = useState(false);
   const [showPrebookingModal, setShowPrebookingModal] = useState(false);
-  const [showPartsQuestion, setShowPartsQuestion] = useState(false);
-  const [suggestedParts, setSuggestedParts] = useState(null);
 
   // Service icons mapping
   const serviceIcons = {
@@ -68,22 +65,9 @@ export const BookingQuote = () => {
     return Icon;
   };
 
-  const handleServiceSelect = async (service) => {
+  const handleServiceSelect = (service) => {
     setSelectedService(service);
     setBookingData({ ...bookingData, serviceType: service.id });
-    
-    // Load suggested parts for this service
-    try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${API_URL}/api/parts/suggestions/${service.id}`);
-      const data = await response.json();
-      if (data.success) {
-        setSuggestedParts(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to load part suggestions:', error);
-    }
-    
     setCurrentStep(2);
   };
 
@@ -112,12 +96,6 @@ export const BookingQuote = () => {
         description: "Please fill in all required fields.",
         variant: "destructive"
       });
-      return;
-    }
-
-    // Check if parts question answered
-    if (bookingData.hasParts === null) {
-      setShowPartsQuestion(true);
       return;
     }
 
@@ -175,8 +153,7 @@ export const BookingQuote = () => {
         description: bookingData.notes,
         date: bookingData.date?.toISOString().split('T')[0],
         time: bookingData.time,
-        location_type: bookingData.locationType,
-        has_parts: bookingData.hasParts || false
+        location_type: bookingData.locationType
       };
 
       const orderResponse = await fetch(`${API_URL}/api/orders`, {
