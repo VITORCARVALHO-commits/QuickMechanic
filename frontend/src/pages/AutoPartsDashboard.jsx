@@ -534,7 +534,7 @@ export const AutoPartsDashboard = () => {
                 </Button>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Instructions:</strong> Ask the mechanic for their pickup code and enter it above to confirm that they've collected the part.
+                    <strong>Instructions:</strong> Ask the mechanic for their pickup code and enter it above to confirm that they&apos;ve collected the part.
                   </p>
                 </div>
               </div>
