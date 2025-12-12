@@ -1346,6 +1346,74 @@ async def get_admin_stats(admin: User = Depends(require_admin)):
         logger.error(f"Error fetching stats: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== NOTIFICATION ENDPOINTS =====
+
+@api_router.get("/notifications")
+async def get_notifications(current_user: User = Depends(get_current_user)):
+    """Get notifications for current user"""
+    try:
+        notifications = await db.notifications.find(
+            {"user_id": current_user.id},
+            {"_id": 0}
+        ).sort("created_at", -1).limit(50).to_list(50)
+        
+        unread_count = await db.notifications.count_documents({
+            "user_id": current_user.id,
+            "read": False
+        })
+        
+        return {
+            "success": True,
+            "data": notifications,
+            "unread_count": unread_count,
+            "message": f"{len(notifications)} notifications found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching notifications: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.patch("/notifications/{notification_id}/read")
+async def mark_notification_read(
+    notification_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Mark notification as read"""
+    try:
+        result = await db.notifications.update_one(
+            {"id": notification_id, "user_id": current_user.id},
+            {"$set": {"read": True}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Notification not found")
+        
+        return {
+            "success": True,
+            "message": "Notification marked as read"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error marking notification as read: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/notifications/mark-all-read")
+async def mark_all_notifications_read(current_user: User = Depends(get_current_user)):
+    """Mark all notifications as read"""
+    try:
+        result = await db.notifications.update_many(
+            {"user_id": current_user.id, "read": False},
+            {"$set": {"read": True}}
+        )
+        
+        return {
+            "success": True,
+            "message": f"{result.modified_count} notifications marked as read"
+        }
+    except Exception as e:
+        logger.error(f"Error marking all notifications as read: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
