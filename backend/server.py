@@ -22,7 +22,7 @@ from models import (
     Order, OrderCreate
 )
 from vehicle_mock_db import search_vehicle_by_plate
-from dvla_service import search_vehicle_with_fallback
+from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
 
 # MongoDB connection
@@ -217,26 +217,45 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 @api_router.get("/vehicle/{plate}")
 async def get_vehicle_info(plate: str, current_user: Optional[User] = Depends(get_current_user_optional)):
-    """Search vehicle by UK plate"""
+    """Search vehicle by Brazilian plate"""
     try:
-        logger.info(f"Vehicle search requested for plate: {plate}")
+        logger.info(f"Busca de veículo para placa: {plate}")
         
-        # Try DVLA API first, then fallback to mock
-        vehicle_data = await search_vehicle_with_fallback(plate)
+        # Valida formato da placa brasileira
+        if not validate_brasil_plate(plate):
+            raise HTTPException(
+                status_code=400, 
+                detail="Formato de placa inválido. Use ABC1234 ou ABC1D23"
+            )
+        
+        # Consulta API brasileira
+        vehicle_data = await search_brasil_placa(plate)
         
         if vehicle_data:
+            vehicle = Vehicle(**vehicle_data)
             return VehicleResponse(
                 success=True,
-                data=vehicle_data,
-                message="Vehicle found"
+                data=vehicle,
+                message="Veículo encontrado"
             )
         else:
-            raise HTTPException(status_code=404, detail="Vehicle not found")
+            # Fallback para mock se API falhar
+            logger.info(f"API falhou, tentando mock para {plate}")
+            mock_data = search_vehicle_by_plate(plate)
+            
+            if mock_data:
+                return VehicleResponse(
+                    success=True,
+                    data=mock_data,
+                    message="Veículo encontrado (mock)"
+                )
+            
+            raise HTTPException(status_code=404, detail="Veículo não encontrado")
             
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error searching vehicle: {str(e)}")
+        logger.error(f"Erro ao buscar veículo: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/vehicles")
