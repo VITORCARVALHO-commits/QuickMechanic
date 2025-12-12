@@ -24,6 +24,7 @@ from models import (
 from vehicle_mock_db import search_vehicle_by_plate
 from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
+from payment_brasil import BrasilPaymentGateway, format_currency_brl
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -472,20 +473,23 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         if quote.get("client_id") != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
-        # Calculate commission (R$ 20 base + 10%)
-        BASE_FEE = 20.0
-        COMMISSION_RATE = 0.10
-        
+        # Calculate commission using Brazilian gateway
         if payment_data.payment_type == "prebooking":
             # Pre-booking: R$ 50
             platform_fee = 50.0
             mechanic_earnings = 0.0
             new_status = "prebooked"
+            commission_info = {
+                "total": 50.0,
+                "commission": 50.0,
+                "mechanic_receives": 0.0,
+                "total_formatted": format_currency_brl(50.0)
+            }
         else:
-            # Final payment
-            total_amount = payment_data.amount
-            platform_fee = BASE_FEE + (total_amount * COMMISSION_RATE)
-            mechanic_earnings = total_amount - platform_fee
+            # Final payment - use Brazilian gateway calculation
+            commission_info = BrasilPaymentGateway.calculate_commission(payment_data.amount)
+            platform_fee = commission_info["commission"]
+            mechanic_earnings = commission_info["mechanic_receives"]
             new_status = "paid"
         
         # Create payment record
