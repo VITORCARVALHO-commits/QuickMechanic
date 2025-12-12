@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://mechanic-hub-43.preview.emergentagent.com/api"
+BACKEND_URL = "https://triplebuild-hub.preview.emergentagent.com/api"
 
 class QuickMechanicTester:
     def __init__(self):
