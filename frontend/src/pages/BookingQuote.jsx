@@ -364,8 +364,8 @@ export const BookingQuote = () => {
                       }`}
                     >
                       <Home className="h-8 w-8 text-[#1EC6C6] mb-2" />
-                      <div className="font-bold text-[#0E1A2C]">Mobile Service</div>
-                      <div className="text-sm text-gray-600">We come to you</div>
+                      <div className="font-bold text-[#0E1A2C]">Serviço Móvel</div>
+                      <div className="text-sm text-gray-600">Vamos até você</div>
                     </button>
                     <button
                       onClick={() => setBookingData({...bookingData, locationType: 'workshop'})}
