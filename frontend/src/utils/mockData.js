@@ -11,18 +11,18 @@ export const carMakes = [
   { id: 'renault', name: 'Renault', models: ['Kwid', 'Sandero', 'Duster', 'Oroch'] }
 ];
 
-// Preços baseados em valores de Londres (em £)
+// Preços baseados em valores do Brasil (em R$)
 export const serviceTypes = [
-  { id: 'oil_change', name: { pt: 'Oil & Filter Change', en: 'Oil & Filter Change' }, basePrice: 65, currency: '£' },
-  { id: 'brakes', name: { pt: 'Brake Service', en: 'Brake Service' }, basePrice: 180, currency: '£' },
-  { id: 'suspension', name: { pt: 'Suspension Repair', en: 'Suspension Repair' }, basePrice: 250, currency: '£' },
-  { id: 'diagnostic', name: { pt: 'Full Diagnostic', en: 'Full Diagnostic' }, basePrice: 85, currency: '£' },
-  { id: 'maintenance', name: { pt: 'Annual Service', en: 'Annual Service' }, basePrice: 150, currency: '£' },
-  { id: 'battery', name: { pt: 'Battery Replacement', en: 'Battery Replacement' }, basePrice: 120, currency: '£' },
-  { id: 'air_conditioning', name: { pt: 'Air Con Service', en: 'Air Con Service' }, basePrice: 95, currency: '£' },
-  { id: 'transmission', name: { pt: 'Gearbox Service', en: 'Gearbox Service' }, basePrice: 450, currency: '£' },
-  { id: 'engine', name: { pt: 'Engine Repair', en: 'Engine Repair' }, basePrice: 850, currency: '£' },
-  { id: 'electrical', name: { pt: 'Electrical Repair', en: 'Electrical Repair' }, basePrice: 140, currency: '£' },
+  { id: 'oil_change', name: { pt: 'Troca de Óleo', en: 'Oil & Filter Change' }, basePrice: 180, currency: 'R$' },
+  { id: 'brakes', name: { pt: 'Freios', en: 'Brake Service' }, basePrice: 450, currency: 'R$' },
+  { id: 'suspension', name: { pt: 'Suspensão', en: 'Suspension Repair' }, basePrice: 650, currency: 'R$' },
+  { id: 'diagnostic', name: { pt: 'Diagnóstico', en: 'Full Diagnostic' }, basePrice: 120, currency: 'R$' },
+  { id: 'maintenance', name: { pt: 'Manutenção', en: 'Annual Service' }, basePrice: 500, currency: 'R$' },
+  { id: 'battery', name: { pt: 'Bateria', en: 'Battery Replacement' }, basePrice: 350, currency: 'R$' },
+  { id: 'air_conditioning', name: { pt: 'Ar Condicionado', en: 'Air Con Service' }, basePrice: 400, currency: 'R$' },
+  { id: 'transmission', name: { pt: 'Transmissão', en: 'Gearbox Service' }, basePrice: 1200, currency: 'R$' },
+  { id: 'engine', name: { pt: 'Motor', en: 'Engine Repair' }, basePrice: 2500, currency: 'R$' },
+  { id: 'electrical', name: { pt: 'Elétrica', en: 'Electrical Repair' }, basePrice: 380, currency: 'R$' },
   { id: 'clutch', name: { pt: 'Clutch Replacement', en: 'Clutch Replacement' }, basePrice: 380, currency: '£' },
   { id: 'mot', name: { pt: 'MOT Test', en: 'MOT Test' }, basePrice: 55, currency: '£' },
   { id: 'tyres', name: { pt: 'Tyre Fitting', en: 'Tyre Fitting' }, basePrice: 80, currency: '£' },
