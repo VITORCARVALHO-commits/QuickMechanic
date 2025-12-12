@@ -99,9 +99,9 @@ Client pays → PAGAMENTO_CONFIRMADO
 4. Mechanic can select different part/store
 
 ### Test User Credentials
-- Client: client@test.com / test123
-- Mechanic: mechanic@test.com / test123
-- AutoPeça: Need to register new user with role "autoparts"
+- Client: client@test.com / test123 ✅ TESTED
+- Mechanic: mechanic@test.com / test123 ✅ TESTED
+- AutoPeça: autoparts@test.com / test123 ✅ TESTED & REGISTERED
 
 ### Known Limitations
 - ServicePartsMap (service → required parts) not yet implemented
