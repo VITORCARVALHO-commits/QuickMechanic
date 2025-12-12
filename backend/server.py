@@ -692,6 +692,48 @@ async def get_payout_history(current_user: User = Depends(get_current_user)):
         logger.error(f"Error fetching payouts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== VEHICLE ENDPOINTS =====
+
+@api_router.post("/vehicles")
+async def create_vehicle(vehicle_data: VehicleCreate, current_user: User = Depends(get_current_user)):
+    """Create a new vehicle for client"""
+    try:
+        from models import Vehicle as VehicleModel
+        
+        vehicle = VehicleModel(
+            client_id=current_user.id,
+            **vehicle_data.model_dump()
+        )
+        
+        vehicle_dict = vehicle.model_dump()
+        vehicle_dict['created_at'] = vehicle_dict['created_at'].isoformat()
+        await db.vehicles.insert_one(vehicle_dict)
+        
+        logger.info(f"Vehicle created: {vehicle.plate} for client {current_user.id}")
+        
+        return {
+            "success": True,
+            "data": vehicle,
+            "message": "Vehicle registered successfully"
+        }
+    except Exception as e:
+        logger.error(f"Error creating vehicle: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/vehicles")
+async def get_my_vehicles(current_user: User = Depends(get_current_user)):
+    """Get all vehicles for current user"""
+    try:
+        vehicles = await db.vehicles.find({"client_id": current_user.id}, {"_id": 0}).to_list(100)
+        return {
+            "success": True,
+            "data": vehicles,
+            "message": f"{len(vehicles)} vehicles found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching vehicles: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== AUTOPARTS ENDPOINTS =====
 
 @api_router.post("/autoparts/parts")
@@ -782,13 +824,13 @@ async def search_parts(
         logger.error(f"Error searching parts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.post("/parts/reserve")
-async def reserve_part(
-    quote_id: str,
+@api_router.post("/parts/prereserve")
+async def prereserve_part(
+    order_id: str,
     part_id: str,
     current_user: User = Depends(get_current_user)
 ):
-    """Reserve a part for a quote (Mechanic only)"""
+    """Pre-reserve a part (Mechanic only) - Waits for autoparts confirmation"""
     try:
         if current_user.user_type != "mechanic":
             raise HTTPException(status_code=403, detail="Only mechanics can reserve parts")
@@ -801,21 +843,16 @@ async def reserve_part(
         if part["stock"] <= 0:
             raise HTTPException(status_code=400, detail="Part out of stock")
         
-        # Generate pickup code
-        import random
-        import string
-        pickup_code = "QM-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        
-        # Create reservation
+        # Create pre-reservation (PENDENTE_CONFIRMACAO)
         from models import PartReservation
         from datetime import timedelta
         
         reservation = PartReservation(
-            quote_id=quote_id,
+            order_id=order_id,
             part_id=part_id,
             autoparts_id=part["autoparts_id"],
             mechanic_id=current_user.id,
-            pickup_code=pickup_code,
+            status="PENDENTE_CONFIRMACAO",
             expires_at=datetime.now(timezone.utc) + timedelta(hours=24)
         )
         
@@ -824,43 +861,137 @@ async def reserve_part(
         res_dict['expires_at'] = res_dict['expires_at'].isoformat()
         await db.part_reservations.insert_one(res_dict)
         
-        # Update quote
-        await db.quotes.update_one(
-            {"id": quote_id},
+        # Update order status
+        await db.orders.update_one(
+            {"id": order_id},
             {
                 "$set": {
                     "needs_parts": True,
                     "part_id": part_id,
                     "autoparts_id": part["autoparts_id"],
                     "part_price": part["price"],
-                    "pickup_code": pickup_code,
-                    "part_status": "reserved",
+                    "status": "AGUARDANDO_RESERVA_PECA",
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }
             }
         )
         
-        # Decrease stock
-        await db.parts.update_one(
-            {"id": part_id},
-            {"$inc": {"stock": -1}}
-        )
-        
-        logger.info(f"Part reserved: {pickup_code} for quote {quote_id}")
+        logger.info(f"Part pre-reserved (pending confirmation): {part_id} for order {order_id}")
         
         return {
             "success": True,
             "data": {
-                "pickup_code": pickup_code,
+                "reservation_id": reservation.id,
                 "part": part,
-                "expires_at": reservation.expires_at.isoformat()
+                "status": "PENDENTE_CONFIRMACAO"
             },
-            "message": "Part reserved successfully"
+            "message": "Part pre-reserved. Waiting for autoparts confirmation."
         }
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error reserving part: {str(e)}")
+        logger.error(f"Error pre-reserving part: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/autoparts/confirm-reservation/{reservation_id}")
+async def confirm_reservation(
+    reservation_id: str,
+    confirm: bool = True,
+    refusal_reason: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Confirm or refuse a part reservation (AutoParts only)"""
+    try:
+        if current_user.user_type != "autoparts":
+            raise HTTPException(status_code=403, detail="Only auto parts shops can confirm reservations")
+        
+        reservation = await db.part_reservations.find_one(
+            {"id": reservation_id, "autoparts_id": current_user.id},
+            {"_id": 0}
+        )
+        
+        if not reservation:
+            raise HTTPException(status_code=404, detail="Reservation not found")
+        
+        if reservation["status"] != "PENDENTE_CONFIRMACAO":
+            raise HTTPException(status_code=400, detail="Reservation already processed")
+        
+        if confirm:
+            # Generate pickup code
+            import random
+            import string
+            pickup_code = "QM-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            
+            # Update reservation
+            await db.part_reservations.update_one(
+                {"id": reservation_id},
+                {
+                    "$set": {
+                        "status": "PRONTO_PARA_RETIRADA",
+                        "pickup_code": pickup_code,
+                        "confirmed_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Update order
+            await db.orders.update_one(
+                {"id": reservation["order_id"]},
+                {
+                    "$set": {
+                        "status": "PECA_CONFIRMADA",
+                        "pickup_code": pickup_code,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Decrease stock
+            await db.parts.update_one(
+                {"id": reservation["part_id"]},
+                {"$inc": {"stock": -1}}
+            )
+            
+            logger.info(f"Reservation confirmed: {pickup_code}")
+            
+            return {
+                "success": True,
+                "data": {"pickup_code": pickup_code},
+                "message": "Reservation confirmed! Pickup code generated."
+            }
+        else:
+            # Refuse reservation
+            await db.part_reservations.update_one(
+                {"id": reservation_id},
+                {
+                    "$set": {
+                        "status": "RECUSADO",
+                        "refusal_reason": refusal_reason or "Not available"
+                    }
+                }
+            )
+            
+            # Update order back to ACEITO so mechanic can choose another shop
+            await db.orders.update_one(
+                {"id": reservation["order_id"]},
+                {
+                    "$set": {
+                        "status": "ACEITO",
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            logger.info(f"Reservation refused: {reservation_id}")
+            
+            return {
+                "success": True,
+                "message": "Reservation refused. Mechanic will be notified."
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error confirming reservation: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/autoparts/confirm-pickup")
