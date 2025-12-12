@@ -69,9 +69,9 @@ class AutoPecaTester:
     def test_auth_register_client(self):
         """Test client registration"""
         data = {
-            "email": "testclient@quickmechanic.com",
-            "password": "testpass123",
-            "name": "Test Client",
+            "email": "client@test.com",
+            "password": "test123",
+            "name": "John Smith",
             "phone": "+44 7700 900123",
             "user_type": "client"
         }
