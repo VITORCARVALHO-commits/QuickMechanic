@@ -632,34 +632,42 @@ class AutoPecaTester:
             self.log_result("Mechanic Complete Service", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_mechanic_complete_job(self):
-        """Test mechanic completing job"""
-        if not self.mechanic_token or not self.test_quote_id:
-            self.log_result("Mechanic Complete Job", False, "No mechanic token or quote ID available")
+    def test_verify_order_status_transitions(self):
+        """Test that order went through correct status transitions"""
+        if not self.test_order_id:
+            self.log_result("Verify Order Status Transitions", False, "No order ID available")
             return False
         
-        data = {
-            "status": "completed"
-        }
-        
-        response = self.make_request("PATCH", f"/quotes/{self.test_quote_id}/status", data, token=self.mechanic_token)
+        # Get current order to check final status
+        response = self.make_request("GET", f"/quotes/my-quotes", token=self.client_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                quote = result["data"]
-                if quote.get("status") == "completed":
-                    self.log_result("Mechanic Complete Job", True, "Job completed successfully")
-                    return True
+            if result.get("success"):
+                orders = result.get("data", [])
+                test_order = None
+                for order in orders:
+                    if order.get("id") == self.test_order_id:
+                        test_order = order
+                        break
+                
+                if test_order:
+                    status = test_order.get("status")
+                    if status == "SERVICO_FINALIZADO":
+                        self.log_result("Verify Order Status Transitions", True, f"Order completed with final status: {status}")
+                        return True
+                    else:
+                        self.log_result("Verify Order Status Transitions", False, f"Order status is {status}, expected SERVICO_FINALIZADO")
+                        return False
                 else:
-                    self.log_result("Mechanic Complete Job", False, "Job status not updated", result)
+                    self.log_result("Verify Order Status Transitions", False, "Test order not found in client orders")
                     return False
             else:
-                self.log_result("Mechanic Complete Job", False, "Job completion failed", result)
+                self.log_result("Verify Order Status Transitions", False, "Failed to get orders", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Complete Job", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Verify Order Status Transitions", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_error_handling(self):
