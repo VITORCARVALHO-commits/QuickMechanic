@@ -178,8 +178,8 @@ export const BookingQuote = () => {
 
         if (paymentResult.success) {
           toast({
-            title: "✅ Pre-booking Confirmed!",
-            description: "£12 paid. You'll receive quotes from mechanics soon.",
+            title: "✅ Pré-Reserva Confirmada!",
+            description: "R$ 50 pagos. Você receberá propostas de mecânicos em breve.",
           });
 
           // Clear pending booking
