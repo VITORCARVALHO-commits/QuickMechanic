@@ -193,8 +193,8 @@ export const BookingQuote = () => {
     } catch (error) {
       console.error('Booking error:', error);
       toast({
-        title: "Error",
-        description: "Failed to process pre-booking. Please try again.",
+        title: "Erro",
+        description: "Falha ao processar pré-reserva. Por favor, tente novamente.",
         variant: "destructive"
       });
     } finally {
