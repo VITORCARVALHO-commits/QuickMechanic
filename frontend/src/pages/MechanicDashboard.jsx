@@ -220,7 +220,7 @@ export const MechanicDashboard = () => {
           />
           <StatCard
             title="Total Earnings"
-            value={`£${myCompletedJobs.reduce((sum, q) => sum + (q.final_price || 0), 0).toFixed(2)}`}
+            value={`R$ ${myCompletedJobs.reduce((sum, q) => sum + (q.final_price || 0), 0).toFixed(2)}`}
             icon={DollarSign}
             color="bg-[#1EC6C6]"
             trend="up"
@@ -286,7 +286,7 @@ export const MechanicDashboard = () => {
                   <div className="flex items-center gap-3 pt-4 border-t">
                     <div className="flex-1">
                       <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">
-                        Labor Price (£)
+                        Preço da Mão de Obra (R$)
                       </label>
                       <Input
                         type="number"
@@ -408,7 +408,7 @@ export const MechanicDashboard = () => {
                       <p className="text-sm text-gray-600">{quote.location}</p>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-[#27AE60]">£{quote.final_price}</div>
+                      <div className="font-bold text-[#27AE60]">R$ {quote.final_price}</div>
                       <div className="text-xs text-gray-500">
                         {new Date(quote.updated_at).toLocaleDateString()}
                       </div>
