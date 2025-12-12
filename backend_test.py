@@ -534,37 +534,35 @@ class AutoPecaTester:
             self.log_result("AutoParts View Reservations", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_process_payment(self):
-        """Test payment processing"""
-        if not self.client_token or not self.test_quote_id:
-            self.log_result("Process Payment", False, "No client token or quote ID available")
+    def test_autoparts_confirm_reservation(self):
+        """Test AutoParts confirming reservation and generating pickup code"""
+        if not self.autoparts_token or not self.test_reservation_id:
+            self.log_result("AutoParts Confirm Reservation", False, "No autoparts token or reservation ID available")
             return False
         
         data = {
-            "quote_id": self.test_quote_id,
-            "amount": 75.00,
-            "payment_method": "mock"
+            "confirm": True
         }
         
-        response = self.make_request("POST", "/payments", data, token=self.client_token)
+        response = self.make_request("POST", f"/autoparts/confirm-reservation/{self.test_reservation_id}", data, token=self.autoparts_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("data"):
-                payment = result["data"]
-                self.test_payment_id = payment.get("id")
-                if payment.get("status") == "completed":
-                    self.log_result("Process Payment", True, "Payment processed successfully")
+                pickup_data = result["data"]
+                self.pickup_code = pickup_data.get("pickup_code")
+                if self.pickup_code and self.pickup_code.startswith("QM-"):
+                    self.log_result("AutoParts Confirm Reservation", True, f"Reservation confirmed, pickup code: {self.pickup_code}")
                     return True
                 else:
-                    self.log_result("Process Payment", False, "Payment not completed", result)
+                    self.log_result("AutoParts Confirm Reservation", False, "No pickup code generated")
                     return False
             else:
-                self.log_result("Process Payment", False, "Payment processing failed", result)
+                self.log_result("AutoParts Confirm Reservation", False, "Reservation confirmation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Process Payment", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("AutoParts Confirm Reservation", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_get_payments(self):
