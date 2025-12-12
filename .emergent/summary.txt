@@ -1,73 +1,60 @@
 <analysis>**original_problem_statement:**
-The user wants to expand the existing QuickMechanic car repair platform. The initial project involved creating a full-stack application for clients to book services from mechanics. The latest, and most significant, request is to introduce a third user profile: **AUTOPEÇA (Auto Parts Store)**. This transforms the platform into a three-sided marketplace.
+The user initially requested a major feature expansion to add an AUTOPEÇA (Auto Parts Store) user role, turning the platform into a three-sided marketplace. However, midway through the implementation, the user pivoted, requesting to revert all AUTOPEÇA changes and refocus the project.
 
-**PRODUCT REQUIREMENTS:**
-The goal is to implement a complete, end-to-end workflow where:
-1.  A client requests a service and specifies if they have the required parts.
-2.  If parts are needed, a mechanic accepts the job and selects a part from a registered  on the platform.
-3.  The  receives a reservation request and must confirm it.
-4.  Upon confirmation, a unique **withdrawal code** is generated for the mechanic.
-5.  The mechanic picks up the part from the store using the code, without making a payment.
-6.  After the service is complete, the client makes a single payment to the platform.
-7.  The platform automatically **splits the payment** between the mechanic (for labor) and the  (for the part), while retaining a commission.
-8.  The entire process must be tracked with specific, detailed statuses for orders and part reservations.
+The new, current goal is to adapt the original Client-Mechanic application for the **Brazilian market**. This involves:
+1.  **Reverting** all code related to the  feature.
+2.  **Localizing** the application for Brazil: changing currency from GBP (£) to BRL (R$), updating all service prices, and using Brazilian Portuguese.
+3.  **Replacing** the UK (DVLA) license plate lookup with a Brazilian API () provided by the user.
+4.  **Integrating a live payment gateway (Stripe)** using the user's provided live API keys to handle payments in BRL.
 
 **User's preferred language**: Portuguese (Portugal)
 
 **what currently exists?**
-A functional full-stack MVP (React/FastAPI) with two main user roles (Client and Mechanic). Key features include:
--   **Authentication:** JWT-based login/registration for Clients, Mechanics, and an Admin role.
--   **Core Booking Flow:** UK license plate lookup (DVLA API), service selection, quote requests, mechanic bidding, client approval, and a mock payment system.
--   **Dashboards:** Separate dashboards exist for Clients, Mechanics, and a basic Admin panel for statistics.
--   **Business Logic:** A commission model and a pre-booking fee system are in place.
--   **Scaffolding for New Feature:** The agent has begun implementing the  feature by adding backend models (, , ), new API endpoints, and a placeholder dashboard page on the frontend.
+The project has been successfully reverted to its original two-role (Client, Mechanic) architecture. All -related code has been removed from the backend (, ) and frontend. The application has been localized for Brazil, with prices and currency symbols updated to BRL. A new Brazilian license plate lookup API has been successfully integrated and tested. The agent has begun integrating Stripe for payments by setting up the user's LIVE API key in the backend and creating the necessary endpoints (, ). The frontend payment UI is not yet built.
 
 **Last working item**:
--   Last item agent was working: The agent was in the middle of a major feature implementation: adding the ** (Auto Parts Store)** profile and its entire associated workflow. The agent had just finished scaffolding the backend by adding new Pydantic models and API endpoints. The last specific actions were creating an endpoint for mechanics to confirm part withdrawal and adding logic to make the new  system compatible with the old  system.
+-   Last item agent was working: Implementing **Stripe payment integration** for the Brazilian market. The agent configured the backend  with the user's **live Stripe key**, created the payment intent and webhook endpoints, and installed the required dependencies. The next step is to build the frontend interface.
 -   Status: **IN PROGRESS**
 -   Agent Testing Done: N
--   Which testing method agent to use? **both** (This is a large feature requiring full frontend and backend testing)
+-   Which testing method agent to use? **both** (The frontend requires a new payment component and the backend webhook needs verification).
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   There are no outstanding bugs. The primary focus is the completion of the large, in-progress feature.
+-   There are no outstanding bugs. The user's last message (chechou e fins e pagamentos) is an instruction to check and finalize the payment integration.
 
 **In progress Task List**:
--   **Task 1: Complete the Auto Parts Store () Feature (P0)**
-    -   **Where to resume:** The backend has foundational models and endpoints. The immediate next step is to build the frontend UIs and connect them to the backend logic.
-        1.  **Client UI:** Modify the booking page to ask Do you have the part?.
-        2.  **Mechanic UI:** Build the interface for mechanics to view required parts, select an auto parts store from a list, and see the final Part Withdrawal Code.
-        3.  **Auto Parts UI:** Fully implement the  to allow stores to manage their parts inventory, view and confirm/reject new reservations, and validate withdrawal codes.
-        4.  **Backend Logic:** Flesh out all the new API endpoints with the business logic for status changes, payment splitting, and notifications between the three user types.
-    -   **What will be achieved with this?** A fully functional three-sided marketplace connecting clients, mechanics, and auto parts stores, with an automated reservation and payment split system, as per the user's detailed specification.
+-   **Task 1: Complete Stripe Integration (P0)**
+    -   **Where to resume:** The backend part is scaffolded. The next steps are all on the frontend.
+        1.  Create a new React component for the Stripe payment form (e.g., ).
+        2.  Integrate this new component into , replacing the now-defunct payment logic.
+        3.  The frontend must call the  endpoint to fetch a  from the backend.
+        4.  Use Stripe.js ( and ) to render the card element and handle payment submission.
+        5.  Implement success/error handling on the frontend based on the payment outcome.
+    -   **What will be achieved with this?** A complete, end-to-end booking flow with real, live payments processed via Stripe in BRL.
     -   **Status:** **IN PROGRESS**
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something:** No
 
 **Upcoming and Future Tasks**
-**Upcoming Tasks (Core Feature Completion):**
--   **P0: Client Flow:** Implement the Do you have the part? modal and a detailed order tracking page showing all official statuses.
--   **P0: Mechanic Flow:** Implement the UI for selecting an  and viewing the withdrawal code.
--   **P0:  Flow:** Build the full dashboard for inventory and reservation management.
--   **P1: Backend Logic:** Implement the automatic payment split and the status transition logic for  and .
--   **P1: :** Create the logic or database structure to map services (e.g., Brake Change) to required parts (e.g., Brake Pads).
+**Upcoming Tasks:**
+-   **P0: End-to-End Testing:** Once Stripe is integrated, conduct a full test of the user journey: vehicle lookup -> service selection -> booking -> payment.
+-   **P1: Cleanup Temporary Files:** Remove the files created for the PIX implementation (, ), as Stripe is now the chosen method.
 
-**Future Tasks (Post-MVP):**
--   **P2:** Integrate a real payment gateway (e.g., Stripe) to replace the mock system.
--   **P3:** Implement a real-time notification system (in-app or email) for all parties.
--   **P3:** Develop a rating and review system for mechanics and auto parts stores.
--   **P4:** Expand the Admin Backoffice to manage auto parts stores, parts, and split payments.
+**Future Tasks:**
+-   **P2:** Implement a real-time notification system for clients and mechanics.
+-   **P3:** Develop a rating and review system for mechanics.
+-   **P4:** The user has indicated they may want to re-introduce the  feature in a future update. The reverted code is backed up in .
 
 **Completed work in this session**
--   **Full MVP Completion:** Implemented a complete authentication system and the core booking/quoting flow between clients and mechanics.
--   **Advanced Business Logic:** Added a hybrid commission model and a £12 pre-booking fee system.
--   **UI/UX Enhancements:** Created functional dashboards for Clients, Mechanics, and Admins, and made the site fully bilingual (EN/PT).
--   ** Scaffolding:** Laid the backend and frontend groundwork for the new Auto Parts Store feature.
--   **Bug Fixes:** Resolved multiple critical frontend bugs, including blank screen issues in  and .
--   **Deployment Readiness:** Successfully ran a deployment health check, confirming the app was deployable before the new feature work began.
+-   **Project Reversion:** Successfully removed the entire Auto Parts Store feature from the frontend and backend, reverting to a Client-Mechanic only model.
+-   **Localization for Brazil:**
+    -   Converted all currency displays and calculations from GBP (£) to BRL (R$).
+    -   Updated all mock service prices and locations to reflect the Brazilian market.
+-   **Brazilian API Integration:** Replaced the UK DVLA API with the user-provided  API for vehicle lookups, including fixing a critical frontend bug in the API call path.
+-   **Stripe Backend Scaffolding:** Configured the backend with the user's **live Stripe key** and created the necessary API endpoints for payment processing.
 
 **Earlier issues found/mentioned but not fixed**
--   None. All previously identified issues were resolved.
+-   None. All identified issues were resolved.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -76,70 +63,68 @@ A functional full-stack MVP (React/FastAPI) with two main user roles (Client and
 
 
 **Key Technical Concepts**
--   **Frontend:** React, React Router, Axios, React Context (for Auth).
--   **Backend:** FastAPI, Pydantic.
--   **Database:** MongoDB.
--   **Architecture:** Full-stack with a three-sided marketplace model.
--   **External APIs:** DVLA Vehicle Enquiry Service.
+-   **Frontend:** React, React Router, Axios
+-   **Backend:** FastAPI, Pydantic
+-   **Database:** MongoDB
+-   **Architecture:** Full-stack, two-sided marketplace (Client/Mechanic).
+-   **External APIs:**
+    -    (Brazilian Vehicle Lookup)
+    -   Stripe (Payments)
 
 **key DB schema**
 -   **User:** 
--   **AutoPartsStore:** 
--   **Part:** 
--   **Order:** (Evolved from ) 
--   **PartReservation:** 
+-   **Quote:** 
+-   **Vehicle:** 
 
 **changes in tech stack**
--   None.
+-   **Added Backend:**  (for vehicle API), .
+-   **To be Added Frontend:** , .
 
 **All files of reference**
--   **Backend (Modified):** , 
--   **Frontend (New):** 
--   **Frontend (Modified):** , , , , , 
+-   **Primary files for next step:** , .
+-   **Files to be created:** A new Stripe payment component for the frontend.
+-   **Files to be deleted:** , .
 
-**Areas that need refactoring**
--   The  file has become monolithic and handles all API logic. It should be refactored by splitting routes into separate files (e.g., , ) for better maintainability.
+**Areas that need refactoring**:
+-   The  file remains large. After the current feature is complete, it should be broken down into smaller, domain-specific router files (e.g., , , ).
 
 **key api endpoints**
--   : Create an auto parts store.
--   : Add a part to a store's inventory.
--   : Create a part reservation for an order.
--   : Allows an auto parts store to confirm a reservation.
--   : Allows a store to confirm a mechanic has picked up a part.
--   : Updated to handle a 3-way payment split (Platform, Mechanic, Store).
+-   : Looks up a Brazilian vehicle plate.
+-   : Creates a new service booking quote.
+-   : Creates a Stripe payment intent (backend for the new flow).
+-   : Handles webhook events from Stripe (backend).
 
 **Critical Info for New Agent**
--   The user's last two detailed requests (messages #265 and #290) are the **single source of truth** for the new  feature. Adhere strictly to the specified pages, statuses, and workflows.
--   The project has shifted to a **three-sided marketplace model**. All logic must account for interactions between Clients, Mechanics, and Auto Parts Stores.
--   Use the **exact status names** provided by the user (e.g., , ).
--   The frontend UI for the entire auto parts flow (mechanic selecting a store, store confirming, etc.) needs to be built from scratch.
--   Consider refactoring the monolithic  file into smaller route modules to improve code organization.
+-   The user has provided a **LIVE Stripe key**. All payment-related development must be handled with extreme care. The key is stored in the  file.
+-   The primary goal is to complete the Stripe integration to make the booking flow functional end-to-end in the Brazilian market.
+-   All prices and currencies must be in BRL (R$). A final check for any lingering  symbols might be necessary.
+-   The user is hands-on and provides direct, sometimes technical, feedback and assets (like API keys).
 
 **documents created in this job**
--   No new documents were created. The previous analysis documents (, ) are now outdated by the new requirements.
+-   : A backup file containing the code for the reverted Auto Parts Store feature.
 
 **Last 10 User Messages and any pending user messages**
-The user has provided two extremely detailed sets of instructions to add the Auto Parts Store () user role and workflow. They specified the exact flow, required pages, database models, and official status names. They have given their approval for the agent's proposed plan and have repeatedly instructed the agent to complete the implementation.
+- The user confirmed the desire to revert the  feature, adapt the project for Brazil, provided a Brazilian license plate API and token, reported bugs during the adaptation, confirmed fixes, requested Stripe integration, and provided a **live Stripe key**.
+- The last pending request is , which translates to check and finish payments, confirming the agent should proceed with and complete the Stripe integration.
 
 **Project Health Check:**
--   **Broken:** The new Auto Parts Store feature is currently incomplete and non-functional. The pre-existing Client-Mechanic flow should be stable.
--   **Mocked:** The entire payment system is still a mock, although the logic now calculates a 3-way split.
+-   **Broken:** The core booking and payment flow is non-functional because the frontend has not been updated to work with the new Stripe backend.
+-   **Mocked:** No features are mocked. The project is using live APIs.
 
 **3rd Party Integrations**
--   **DVLA Vehicle Enquiry Service:** Active and working.
--   **Stripe:** Planned for future implementation to replace the mock payment system.
+-   ** (Vehicle Lookup):** Active and working. Requires a user-provided API token.
+-   **Stripe (Payments):** In progress. Requires a user-provided LIVE API Key.
 
 **Testing status**
--   Testing agent used after significant changes: YES (for the previous Client-Mechanic MVP).
--   Troubleshoot agent used after agent stuck in loop: NO
+-   Testing agent used after significant changes: Yes, which helped identify bugs.
+-   Troubleshoot agent used after agent stuck in loop: No.
 -   Test files created: []
--   Known regressions: None.
+-   Known regressions: The main booking flow is currently broken due to the incomplete payment integration.
 
 **Credentials to test flow:**
 -   **Client:**  / 
 -   **Mechanic:**  / 
 -   **Admin:**  / 
--   **Auto Parts Store:** A new user will need to be registered through the updated registration page to test this flow.
 
 **What agent forgot to execute**
--   The agent has not forgotten any tasks. It is currently in the middle of executing a very large and complex feature request from the user. The main pending work is building the entire frontend UI and connecting the business logic for the auto parts store workflow.</analysis>
+-   The agent did not forget any tasks but was in the middle of completing the Stripe integration. The temporary PIX-related files (, ) were created but not cleaned up after the switch to Stripe was decided.</analysis>
