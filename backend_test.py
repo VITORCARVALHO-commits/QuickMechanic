@@ -100,9 +100,9 @@ class AutoPecaTester:
     def test_auth_register_mechanic(self):
         """Test mechanic registration"""
         data = {
-            "email": "testmechanic@quickmechanic.com",
-            "password": "testpass123",
-            "name": "Test Mechanic",
+            "email": "mechanic@test.com",
+            "password": "test123",
+            "name": "Mike Johnson",
             "phone": "+44 7700 900456",
             "user_type": "mechanic"
         }
@@ -126,6 +126,40 @@ class AutoPecaTester:
         else:
             error_msg = response.text if response else "No response"
             self.log_result("Mechanic Registration", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            return False
+    
+    def test_auth_register_autoparts(self):
+        """Test AutoPeça registration"""
+        data = {
+            "email": "autoparts@test.com",
+            "password": "test123",
+            "name": "AutoParts London",
+            "phone": "+44 7700 900789",
+            "user_type": "autoparts",
+            "shop_name": "London Auto Parts",
+            "shop_address": "123 High Street, London",
+            "postcode": "SW1A 1AA"
+        }
+        
+        response = self.make_request("POST", "/auth/register", data)
+        
+        if response and response.status_code == 200:
+            result = response.json()
+            if result.get("success") and result.get("token"):
+                self.autoparts_token = result["token"]
+                self.autoparts_user = result["user"]
+                self.log_result("AutoParts Registration", True, "AutoParts registered successfully")
+                return True
+            else:
+                self.log_result("AutoParts Registration", False, "Registration failed", result)
+                return False
+        elif response and response.status_code == 400:
+            # User already exists, try to login instead
+            self.log_result("AutoParts Registration", True, "User already exists (expected in repeated tests)")
+            return True
+        else:
+            error_msg = response.text if response else "No response"
+            self.log_result("AutoParts Registration", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_login_client(self):
