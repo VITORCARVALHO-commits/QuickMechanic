@@ -295,6 +295,7 @@ async def create_vehicle(vehicle_data: VehicleCreate, current_user: User = Depen
         
         # Create new vehicle
         vehicle = Vehicle(
+            client_id=current_user.id,
             plate=vehicle_data.plate.upper(),
             make=vehicle_data.make or "",
             make_name=vehicle_data.make or "",
