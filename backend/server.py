@@ -564,23 +564,9 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
         
         logger.info(f"Payment processed: {payment.id}")
         
-        # If payment method is PIX, generate PIX code
-        pix_data = None
-        if payment_data.payment_method == "pix":
-            pix_response = BrasilPaymentGateway.process_pix_payment(
-                payment_data.amount,
-                f"QuickMechanic - Order {payment_data.quote_id}"
-            )
-            pix_data = {
-                "pix_code": pix_response["pix_code"],
-                "pix_qr": pix_response["pix_qr"],
-                "expires_in": pix_response["expires_in"]
-            }
-        
         return {
             "success": True,
             "data": payment,
-            "pix": pix_data,
             "commission_info": commission_info if payment_data.payment_type != "prebooking" else None,
             "message": "Pagamento processado com sucesso"
         }
