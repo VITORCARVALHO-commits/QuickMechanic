@@ -63,10 +63,6 @@ const DashboardRouter = () => {
     return <MechanicDashboard />;
   }
 
-  if (user.user_type === 'autoparts') {
-    return <AutoPartsDashboard />;
-  }
-
   return <ClientDashboard />;
 };
 
