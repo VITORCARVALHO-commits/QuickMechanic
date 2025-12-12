@@ -445,20 +445,30 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
             # Pre-booking: £12 fixo
             platform_fee = 12.0
             mechanic_earnings = 0.0
+            autoparts_earnings = 0.0
             new_status = "prebooked"
         else:
-            # Final payment
+            # Final payment with parts split
             total_amount = payment_data.amount
             travel_fee = quote.get("travel_fee", 0.0)
+            part_price = quote.get("part_price", 0.0)
             
             # Se já pagou pre-booking, desconta do total
             if quote.get("prebooking_paid"):
                 total_amount -= quote.get("prebooking_amount", 12.0)
             
-            # Comissão: £5 + 10% do valor do serviço (sem taxa de deslocamento)
-            service_amount = payment_data.amount - travel_fee
-            platform_fee = BASE_FEE + (service_amount * COMMISSION_RATE)
-            mechanic_earnings = payment_data.amount - platform_fee
+            # Labor amount (without parts and travel fee)
+            labor_amount = payment_data.amount - part_price - travel_fee
+            
+            # Platform commission only on labor
+            platform_fee = BASE_FEE + (labor_amount * COMMISSION_RATE)
+            
+            # Mechanic gets: labor + travel - platform commission
+            mechanic_earnings = labor_amount + travel_fee - platform_fee
+            
+            # AutoParts gets 100% of part price
+            autoparts_earnings = part_price
+            
             new_status = "paid"
         
         # Create payment record
@@ -472,6 +482,45 @@ async def create_payment(payment_data: PaymentCreate, current_user: User = Depen
             mechanic_earnings=mechanic_earnings,
             status="completed"
         )
+        
+        # Create payment split record
+        if payment_data.payment_type == "final" and autoparts_earnings > 0:
+            from models import PaymentSplit
+            split = PaymentSplit(
+                payment_id=payment.id,
+                quote_id=payment_data.quote_id,
+                total_amount=payment_data.amount,
+                mechanic_amount=mechanic_earnings,
+                autoparts_amount=autoparts_earnings,
+                platform_amount=platform_fee
+            )
+            split_dict = split.model_dump()
+            split_dict['created_at'] = split_dict['created_at'].isoformat()
+            await db.payment_splits.insert_one(split_dict)
+            
+            # Update autoparts wallet if part was used
+            if quote.get("autoparts_id"):
+                autoparts_wallet = await db.wallets.find_one({"mechanic_id": quote["autoparts_id"]}, {"_id": 0})
+                if autoparts_wallet:
+                    await db.wallets.update_one(
+                        {"mechanic_id": quote["autoparts_id"]},
+                        {
+                            "$inc": {
+                                "pending_balance": autoparts_earnings,
+                                "total_earned": autoparts_earnings
+                            }
+                        }
+                    )
+                else:
+                    from models import Wallet
+                    new_wallet = Wallet(
+                        mechanic_id=quote["autoparts_id"],
+                        pending_balance=autoparts_earnings,
+                        total_earned=autoparts_earnings
+                    )
+                    wallet_dict = new_wallet.model_dump()
+                    wallet_dict['updated_at'] = wallet_dict['updated_at'].isoformat()
+                    await db.wallets.insert_one(wallet_dict)
         
         # Save payment
         payment_dict = payment.model_dump()
