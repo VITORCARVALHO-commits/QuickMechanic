@@ -124,6 +124,26 @@ export const MechanicDashboard = () => {
           </Card>
         </div>
 
+        {/* Quick Actions */}
+        <div className="flex gap-4 mb-6">
+          <Button
+            onClick={() => navigate('/mechanic/agenda')}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Calendar className="h-5 w-5" />
+            Agenda
+          </Button>
+          <Button
+            onClick={() => navigate('/mechanic/earnings')}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <DollarSign className="h-5 w-5" />
+            Ganhos
+          </Button>
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
           <Button
