@@ -214,8 +214,8 @@ export const Home = () => {
                     <CheckCircle className="h-6 w-6 text-[#27AE60]" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#0E1A2C]">12 meses</div>
-                    <div className="text-sm text-gray-600">de garantia</div>
+                    <div className="text-lg font-bold text-[#0E1A2C]">Comodidade</div>
+                    <div className="text-sm text-gray-600">sem sair de casa e rapidez</div>
                   </div>
                 </div>
               </div>
