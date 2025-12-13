@@ -17,15 +17,13 @@ class QuickMechanicTester:
         self.base_url = BACKEND_URL
         self.client_token = None
         self.mechanic_token = None
-        self.autoparts_token = None
+        self.admin_token = None
         self.client_user = None
         self.mechanic_user = None
-        self.autoparts_user = None
+        self.admin_user = None
         self.test_vehicle_id = None
         self.test_order_id = None
-        self.test_part_id = None
-        self.test_reservation_id = None
-        self.pickup_code = None
+        self.test_quote_id = None
         self.results = []
         
     def log_result(self, test_name, success, message, details=None):
