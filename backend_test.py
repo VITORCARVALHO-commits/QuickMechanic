@@ -164,46 +164,33 @@ class QuickMechanicTester:
             self.log_result("Brazilian Vehicle Search", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_auth_me_client(self):
-        """Test get current user (client)"""
+    def test_create_vehicle(self):
+        """Test vehicle creation for client - P0 Critical"""
         if not self.client_token:
-            self.log_result("Client Auth Me", False, "No client token available")
+            self.log_result("Create Vehicle", False, "No client token available")
             return False
         
-        response = self.make_request("GET", "/auth/me", token=self.client_token)
+        data = {
+            "plate": "ABC1234",
+            "make": "Volkswagen",
+            "model": "Gol",
+            "year": "2020"
+        }
+        
+        response = self.make_request("POST", "/vehicles", data, token=self.client_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("user"):
-                self.log_result("Client Auth Me", True, "Client user info retrieved")
+            if result.get("success") and result.get("data"):
+                self.test_vehicle_id = result["data"]["id"]
+                self.log_result("Create Vehicle", True, "Vehicle created successfully")
                 return True
             else:
-                self.log_result("Client Auth Me", False, "Failed to get user info", result)
+                self.log_result("Create Vehicle", False, "Vehicle creation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Client Auth Me", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
-            return False
-    
-    def test_auth_me_mechanic(self):
-        """Test get current user (mechanic)"""
-        if not self.mechanic_token:
-            self.log_result("Mechanic Auth Me", False, "No mechanic token available")
-            return False
-        
-        response = self.make_request("GET", "/auth/me", token=self.mechanic_token)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if result.get("success") and result.get("user"):
-                self.log_result("Mechanic Auth Me", True, "Mechanic user info retrieved")
-                return True
-            else:
-                self.log_result("Mechanic Auth Me", False, "Failed to get user info", result)
-                return False
-        else:
-            error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Auth Me", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Create Vehicle", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_vehicle_search(self):
