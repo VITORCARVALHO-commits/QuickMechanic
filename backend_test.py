@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-QuickMechanic Backend API Test Suite - AutoPeça Feature Testing
-Tests the complete AutoPeça (Auto Parts Store) three-sided marketplace implementation
+QuickMechanic Backend API Test Suite - E2E Complete Testing
+Tests the complete QuickMechanic three-sided marketplace (Cliente, Mecânico, Admin)
 """
 
 import requests
@@ -12,7 +12,7 @@ from datetime import datetime
 # Get backend URL from environment
 BACKEND_URL = "https://fixconnect-12.preview.emergentagent.com/api"
 
-class AutoPecaTester:
+class QuickMechanicTester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.client_token = None
