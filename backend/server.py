@@ -1102,6 +1102,237 @@ async def mechanic_send_quote(
                 "$set": {
                     "status": "quoted",
                     "mechanic_id": current_user.id,
+
+# ===== MECHANIC AGENDA & SERVICE TRACKING =====
+
+@api_router.get("/mechanic/agenda")
+async def get_mechanic_agenda(date: str, current_user: User = Depends(get_current_user)):
+    """Get mechanic's orders for a specific date"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can access")
+        
+        orders = await db.quotes.find(
+            {"mechanic_id": current_user.id, "date": date},
+            {"_id": 0}
+        ).sort("time", 1).to_list(100)
+        
+        return {
+            "success": True,
+            "data": orders
+        }
+    except Exception as e:
+        logger.error(f"Error fetching agenda: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/mechanic/orders/{order_id}/start")
+async def start_service(order_id: str, current_user: User = Depends(get_current_user)):
+    """Start service timer"""
+    try:
+        order = await db.quotes.find_one({"id": order_id, "mechanic_id": current_user.id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        await db.quotes.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "in_progress",
+                    "started_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Create notification for client
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": order["client_id"],
+            "title": "Serviço Iniciado",
+            "message": f"O mecânico iniciou o serviço #{order_id[:8]}",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        logger.info(f"Service started for order {order_id}")
+        
+        return {
+            "success": True,
+            "message": "Service started"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error starting service: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/mechanic/orders/{order_id}/complete")
+async def complete_service(
+    order_id: str,
+    completion_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Complete service"""
+    try:
+        order = await db.quotes.find_one({"id": order_id, "mechanic_id": current_user.id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        await db.quotes.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "completed",
+                    "completed_at": datetime.now(timezone.utc).isoformat(),
+                    "duration_minutes": completion_data.get("duration_minutes", 0)
+                }
+            }
+        )
+        
+        # Create notification for client
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": order["client_id"],
+            "title": "Serviço Concluído!",
+            "message": f"Seu serviço #{order_id[:8]} foi concluído. Avalie o mecânico!",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        logger.info(f"Service completed for order {order_id}")
+        
+        return {
+            "success": True,
+            "message": "Service completed"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error completing service: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/mechanic/earnings")
+async def get_mechanic_earnings(current_user: User = Depends(get_current_user)):
+    """Get mechanic earnings summary"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can access")
+        
+        completed_orders = await db.quotes.find(
+            {"mechanic_id": current_user.id, "status": {"$in": ["completed", "reviewed"]}},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        total_earnings = sum(order.get("final_price", 0) for order in completed_orders)
+        platform_fee = total_earnings * 0.15  # 15% platform fee
+        net_earnings = total_earnings - platform_fee
+        
+        return {
+            "success": True,
+            "data": {
+                "total_orders": len(completed_orders),
+                "total_earnings": total_earnings,
+                "platform_fee": platform_fee,
+                "net_earnings": net_earnings,
+                "orders": completed_orders[-10:]  # Last 10 orders
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error fetching earnings: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== GEOLOCATION & MATCHING =====
+
+@api_router.post("/mechanics/nearby")
+async def find_nearby_mechanics(location_data: dict, current_user: User = Depends(get_current_user)):
+    """Find mechanics near client location"""
+    try:
+        from geolocation import find_nearby_mechanics
+        
+        client_lat = location_data.get("latitude")
+        client_lon = location_data.get("longitude")
+        max_distance = location_data.get("max_distance_km", 20)
+        
+        if not client_lat or not client_lon:
+            raise HTTPException(status_code=400, detail="Location required")
+        
+        mechanics = await find_nearby_mechanics(db, client_lat, client_lon, max_distance)
+        
+        return {
+            "success": True,
+            "data": mechanics,
+            "count": len(mechanics)
+        }
+    except Exception as e:
+        logger.error(f"Error finding mechanics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== ADMIN STATS & MANAGEMENT =====
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: User = Depends(require_admin)):
+    """Get platform statistics"""
+    try:
+        total_clients = await db.users.count_documents({"user_type": "client"})
+        active_mechanics = await db.users.count_documents({
+            "user_type": "mechanic",
+            "is_active": True,
+            "approval_status": "approved"
+        })
+        pending_mechanics = await db.users.count_documents({
+            "user_type": "mechanic",
+            "approval_status": "pending_approval"
+        })
+        
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        orders_today = await db.quotes.count_documents({
+            "created_at": {"$regex": f"^{today}"}
+        })
+        
+        active_orders = await db.quotes.count_documents({
+            "status": {"$in": ["pending", "quoted", "approved", "paid", "in_progress"]}
+        })
+        
+        # Revenue this month
+        month_start = datetime.now(timezone.utc).replace(day=1).isoformat()
+        completed_orders = await db.quotes.find(
+            {"status": {"$in": ["completed", "reviewed"]}, "created_at": {"$gte": month_start}},
+            {"_id": 0, "final_price": 1}
+        ).to_list(10000)
+        
+        revenue_month = sum(o.get("final_price", 0) for o in completed_orders) * 0.15  # 15% commission
+        
+        return {
+            "success": True,
+            "data": {
+                "total_clients": total_clients,
+                "active_mechanics": active_mechanics,
+                "pending_mechanics": pending_mechanics,
+                "orders_today": orders_today,
+                "active_orders": active_orders,
+                "revenue_month": revenue_month,
+                "open_disputes": 0,  # TODO: Implement disputes
+                "recent_activity": []
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error fetching stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/orders")
+async def get_all_orders(admin: User = Depends(require_admin)):
+    """Get all orders for admin"""
+    try:
+        orders = await db.quotes.find({}, {"_id": 0}).sort("created_at", -1).limit(100).to_list(100)
+        
+        return {
+            "success": True,
+            "data": orders
+        }
+    except Exception as e:
+        logger.error(f"Error fetching orders: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
                     "final_price": total_price,
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }
