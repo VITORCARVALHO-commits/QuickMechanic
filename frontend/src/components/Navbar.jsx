@@ -22,7 +22,7 @@ export const Navbar = () => {
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1EC6C6] to-[#0E1A2C] flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
               <Wrench className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#0E1A2C]">Quick<span className="text-[#1EC6C6]">Mechanic</span></span>
+            <span className="text-xl font-bold text-[#0E1A2C]">Click<span className="text-[#1EC6C6]">Mecanico</span></span>
           </Link>
 
           {/* Desktop Navigation */}
