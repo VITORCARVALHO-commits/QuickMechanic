@@ -440,6 +440,69 @@ async def get_my_quotes(current_user: User = Depends(get_current_user)):
         logger.error(f"Error fetching user quotes: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/quotes/{quote_id}")
+async def get_quote(quote_id: str, current_user: User = Depends(get_current_user)):
+    """Get quote by ID"""
+    try:
+        quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        return {
+            "success": True,
+            "data": Quote(**quote),
+            "message": "Quote found"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.patch("/quotes/{quote_id}")
+async def update_quote_status(
+    quote_id: str,
+    update_data: QuoteUpdateStatus,
+    current_user: User = Depends(get_current_user)
+):
+    """Update quote status"""
+    try:
+        quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        update_fields = {
+            "status": update_data.status,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # If mechanic is submitting a quote
+        if current_user.user_type == "mechanic" and update_data.final_price:
+            update_fields["mechanic_id"] = current_user.id
+            update_fields["final_price"] = update_data.final_price
+        
+        # Update in database
+        await db.quotes.update_one(
+            {"id": quote_id},
+            {"$set": update_fields}
+        )
+        
+        # Fetch updated quote
+        updated_quote = await db.quotes.find_one({"id": quote_id}, {"_id": 0})
+        
+        logger.info(f"Quote {quote_id} updated to status: {update_data.status}")
+        
+        return {
+            "success": True,
+            "data": Quote(**updated_quote),
+            "message": "Quote updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== PAYMENT ENDPOINTS =====
 
 @api_router.post("/payments")
