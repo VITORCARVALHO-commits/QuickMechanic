@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://quickmech-br.preview.emergentagent.com/api"
+BACKEND_URL = "https://fixconnect-12.preview.emergentagent.com/api"
 
 class StripeIntegrationTester:
     def __init__(self):
@@ -197,7 +197,7 @@ class StripeIntegrationTester:
         
         data = {
             "order_id": self.test_order_id,
-            "origin_url": "https://quickmech-br.preview.emergentagent.com"
+            "origin_url": "https://fixconnect-12.preview.emergentagent.com"
         }
         
         response = self.make_request("POST", "/stripe/checkout", data, token=self.client_token)

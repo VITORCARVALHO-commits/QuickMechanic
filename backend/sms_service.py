@@ -43,5 +43,5 @@ def sms_reminder_1h(client_name: str, client_phone: str, service: str, time: str
 
 def sms_service_completed(client_name: str, client_phone: str, order_id: str):
     """Notify service completed"""
-    message = f"Olá {client_name}! Seu serviço #{order_id} foi concluído. Avalie o mecânico: https://quickmech-br.preview.emergentagent.com/dashboard"
+    message = f"Olá {client_name}! Seu serviço #{order_id} foi concluído. Avalie o mecânico: https://fixconnect-12.preview.emergentagent.com/dashboard"
     return send_sms(client_phone, message)

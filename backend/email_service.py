@@ -44,7 +44,7 @@ def email_new_order_to_mechanic(mechanic_email: str, mechanic_name: str, order_i
         <li><strong>Local:</strong> {location}</li>
     </ul>
     <p>Acesse o dashboard para enviar seu orçamento.</p>
-    <a href="https://quickmech-br.preview.emergentagent.com/mechanic/dashboard" style="background:#1EC6C6;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Pedido</a>
+    <a href="https://fixconnect-12.preview.emergentagent.com/mechanic/dashboard" style="background:#1EC6C6;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Pedido</a>
     """
     return send_email(mechanic_email, subject, html)
 
@@ -59,7 +59,7 @@ def email_quote_to_client(client_email: str, client_name: str, order_id: str, me
         <li><strong>Valor:</strong> R$ {price:.2f}</li>
     </ul>
     <p>Acesse o dashboard para aprovar ou recusar.</p>
-    <a href="https://quickmech-br.preview.emergentagent.com/dashboard" style="background:#1EC6C6;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Orçamento</a>
+    <a href="https://fixconnect-12.preview.emergentagent.com/dashboard" style="background:#1EC6C6;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Orçamento</a>
     """
     return send_email(client_email, subject, html)
 
@@ -70,6 +70,6 @@ def email_payment_confirmed(mechanic_email: str, mechanic_name: str, order_id: s
     <h2>Ótima notícia, {mechanic_name}!</h2>
     <p>O pagamento do pedido <strong>#{order_id}</strong> foi confirmado.</p>
     <p>O serviço está agendado. Acesse o dashboard para ver detalhes.</p>
-    <a href="https://quickmech-br.preview.emergentagent.com/mechanic/dashboard" style="background:#27AE60;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Agenda</a>
+    <a href="https://fixconnect-12.preview.emergentagent.com/mechanic/dashboard" style="background:#27AE60;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Agenda</a>
     """
     return send_email(mechanic_email, subject, html)

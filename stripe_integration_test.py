@@ -8,7 +8,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://quickmech-br.preview.emergentagent.com/api"
+BACKEND_URL = "https://fixconnect-12.preview.emergentagent.com/api"
 
 def test_stripe_integration():
     """Test complete Stripe integration flow"""
@@ -98,7 +98,7 @@ def test_stripe_integration():
     print("\n5. Testing Stripe Checkout Endpoint...")
     stripe_data = {
         "order_id": order_id,
-        "origin_url": "https://quickmech-br.preview.emergentagent.com"
+        "origin_url": "https://fixconnect-12.preview.emergentagent.com"
     }
     try:
         response = requests.post(f"{BACKEND_URL}/stripe/checkout", json=stripe_data, headers=headers, timeout=15)
