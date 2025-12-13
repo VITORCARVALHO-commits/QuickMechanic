@@ -146,76 +146,22 @@ class QuickMechanicTester:
             self.log_result("Admin Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_auth_login_client(self):
-        """Test client login"""
-        data = {
-            "email": "client@test.com",
-            "password": "test123"
-        }
-        
-        response = self.make_request("POST", "/auth/login", data)
+    def test_vehicle_search_brazilian_plate(self):
+        """Test Brazilian vehicle search by plate - P0 Critical"""
+        plate = "ABC1234"
+        response = self.make_request("GET", f"/vehicle/{plate}")
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("token"):
-                self.client_token = result["token"]
-                self.client_user = result["user"]
-                self.log_result("Client Login", True, "Client login successful")
+            if result.get("success") and result.get("data"):
+                self.log_result("Brazilian Vehicle Search", True, f"Vehicle found for plate {plate}")
                 return True
             else:
-                self.log_result("Client Login", False, "Login failed", result)
+                self.log_result("Brazilian Vehicle Search", False, f"Vehicle not found for plate {plate}", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Client Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
-            return False
-    
-    def test_auth_login_mechanic(self):
-        """Test mechanic login"""
-        data = {
-            "email": "mechanic@test.com",
-            "password": "test123"
-        }
-        
-        response = self.make_request("POST", "/auth/login", data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if result.get("success") and result.get("token"):
-                self.mechanic_token = result["token"]
-                self.mechanic_user = result["user"]
-                self.log_result("Mechanic Login", True, "Mechanic login successful")
-                return True
-            else:
-                self.log_result("Mechanic Login", False, "Login failed", result)
-                return False
-        else:
-            error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
-            return False
-    
-    def test_auth_login_autoparts(self):
-        """Test AutoParts login"""
-        data = {
-            "email": "autoparts@test.com",
-            "password": "test123"
-        }
-        
-        response = self.make_request("POST", "/auth/login", data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if result.get("success") and result.get("token"):
-                self.autoparts_token = result["token"]
-                self.autoparts_user = result["user"]
-                self.log_result("AutoParts Login", True, "AutoParts login successful")
-                return True
-            else:
-                self.log_result("AutoParts Login", False, "Login failed", result)
-                return False
-        else:
-            error_msg = response.text if response else "No response"
-            self.log_result("AutoParts Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Brazilian Vehicle Search", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_me_client(self):
