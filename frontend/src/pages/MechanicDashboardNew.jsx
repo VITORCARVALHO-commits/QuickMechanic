@@ -235,7 +235,7 @@ export const MechanicDashboard = () => {
             <EnhancedCard className="p-12 text-center" hover={false}>
               <CheckCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">Você ainda não tem pedidos</p>
-            </Card>
+            </EnhancedCard>
           )}
         </div>
       </div>
