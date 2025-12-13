@@ -18,6 +18,7 @@ import { MechanicDashboard } from "./pages/MechanicDashboardNew";
 import { AdminDashboard } from "./pages/AdminDashboardNew";
 import { AdminMechanicsApproval } from "./pages/AdminMechanicsApproval";
 import { MechanicAgenda } from "./pages/MechanicAgenda";
+import { MechanicEarnings } from "./pages/MechanicEarnings";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
