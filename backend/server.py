@@ -19,12 +19,13 @@ load_dotenv(ROOT_DIR / '.env', override=False)
 from models import (
     Vehicle, VehicleResponse, VehicleCreate, Quote, QuoteCreate, QuoteResponse, QuoteUpdateStatus,
     User, UserCreate, UserLogin, UserResponse, Payment, PaymentCreate,
-    Order, OrderCreate
+    Order, OrderCreate, Review, ReviewCreate, MechanicQuote, MechanicQuoteCreate
 )
 from vehicle_mock_db import search_vehicle_by_plate
 from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+from email_service import email_new_order_to_mechanic, email_quote_to_client, email_payment_confirmed
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
