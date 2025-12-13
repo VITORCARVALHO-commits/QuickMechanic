@@ -16,7 +16,7 @@ export const Footer = () => {
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1EC6C6] to-[#FF9F1C] flex items-center justify-center">
                 <Wrench className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold">Quick<span className="text-[#1EC6C6]">Mechanic</span></span>
+              <span className="text-xl font-bold">Click<span className="text-[#1EC6C6]">Mecanico</span></span>
             </div>
             <p className="text-gray-400 text-sm">
               {t('home.hero.description')}
@@ -94,7 +94,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; 2025 QuickMechanic. Todos os direitos reservados.</p>
+          <p>&copy; 2025 ClickMecanico. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>
