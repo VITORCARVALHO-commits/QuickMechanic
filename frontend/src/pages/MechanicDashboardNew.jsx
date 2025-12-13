@@ -156,7 +156,7 @@ export const MechanicDashboard = () => {
         {/* Orders List */}
         <div className="space-y-4">
           {activeTab === 'new' && availableOrders.map((order) => (
-            <Card key={order.id} className="p-6">
+            <EnhancedCard key={order.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-[#0E1A2C]">Pedido #{order.id.slice(0,8)}</h3>
