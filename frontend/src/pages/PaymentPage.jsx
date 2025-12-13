@@ -88,7 +88,7 @@ export const PaymentPage = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-xl font-bold text-[#0E1A2C]">Total:</span>
                   <span className="text-3xl font-bold text-[#1EC6C6]">
-                    £{quote.final_price || quote.estimated_price}
+                    R$ {quote.final_price || quote.estimated_price}
                   </span>
                 </div>
               </div>
