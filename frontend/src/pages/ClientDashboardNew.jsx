@@ -128,8 +128,14 @@ export const ClientDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-[#1EC6C6]" />
+      <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0E1A2C]">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="mb-8">
+            <div className="skeleton h-8 w-48 mb-2"></div>
+            <div className="skeleton h-4 w-32"></div>
+          </div>
+          <SkeletonList count={3} />
+        </div>
       </div>
     );
   }
