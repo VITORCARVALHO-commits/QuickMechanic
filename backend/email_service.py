@@ -6,7 +6,7 @@ from sendgrid.helpers.mail import Mail
 logger = logging.getLogger(__name__)
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-FROM_EMAIL = os.environ.get('SENDGRID_FROM_EMAIL', 'noreply@quickmechanic.com')
+FROM_EMAIL = os.environ.get('SENDGRID_FROM_EMAIL', 'noreply@clickmecanico.com')
 
 def send_email(to_email: str, subject: str, html_content: str):
     """Send email via SendGrid"""
