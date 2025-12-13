@@ -18,57 +18,71 @@
 3. [x] End-to-End: Complete Booking Flow with Stripe Payment ⚠️ (Authentication Issues)
 4. [x] Brazilian Localization: BRL currency configured ✅
 
-## Backend Test Results - COMPLETED ✅
+## E2E Backend Test Results - PARTIALLY WORKING ⚠️
 
-### Authentication Flow
+### P0 Critical Tests - Client Flow (4/5 PASSING)
 - ✅ **Client Login**: Successfully authenticated with client@test.com / test123
-- ✅ **JWT Token**: Token generation and validation working correctly
-- ✅ **Authorization**: Protected endpoints properly secured
-
-### Brazilian Vehicle API
-- ✅ **Plate Format Support**: ABC1234 format working correctly
-- ✅ **Vehicle Data**: Successfully retrieves vehicle information
-- ✅ **API Integration**: Brazilian vehicle lookup service operational
-
-### Vehicle & Order Management
+- ✅ **Brazilian Vehicle Search**: Vehicle found for plate ABC1234
 - ✅ **Vehicle Creation**: POST /api/vehicles working correctly
 - ✅ **Order Creation**: POST /api/orders working correctly
-- ✅ **Data Persistence**: Vehicle and order data properly stored
-- ✅ **User Association**: Vehicles correctly linked to authenticated users
+- ❌ **Get Client Quotes**: GET /api/quotes/my-quotes failing (timeout/connection issues)
 
-### Stripe Payment Integration
-- ✅ **Checkout Endpoint**: POST /api/stripe/checkout accessible and properly structured
-- ✅ **Status Endpoint**: GET /api/stripe/status/{session_id} working correctly
-- ✅ **Webhook Endpoint**: POST /api/webhook/stripe accessible
-- ✅ **Error Handling**: Proper HTTP status codes and error messages
-- ✅ **Security**: Authentication required for payment endpoints
-- ✅ **BRL Currency**: Configured for R$ 50.00 prebooking amount
+### P0 Critical Tests - Mechanic Flow (4/5 PASSING)
+- ✅ **Mechanic Login**: Successfully authenticated with mechanic@test.com / test123
+- ✅ **Available Orders**: GET /api/mechanic/available-orders working (found 6 orders)
+- ✅ **Send Quote**: POST /api/mechanic/quotes/{order_id} working correctly
+- ❌ **My Quotes**: GET /api/quotes/my-quotes failing (timeout/connection issues)
+- ✅ **Agenda**: GET /api/mechanic/agenda working (found 1 order for 2024-12-20)
+- ✅ **Earnings**: GET /api/mechanic/earnings working (R$ 0 total earnings)
 
-### Currency & Localization
-- ✅ **Brazilian Real (BRL)**: Currency properly configured in code
-- ✅ **Prebooking Amount**: R$ 50.00 (5000 cents) correctly set
-- ✅ **Currency Formatting**: Brazilian Real formatting function implemented
+### Quote Management Flow (1/1 PASSING)
+- ✅ **Client Approve Quote**: POST /api/quotes/{order_id}/approve working correctly
 
-### API Key Status
-- ⚠️ **Stripe API Key**: Invalid in test environment (expected)
-- ✅ **Error Handling**: Proper handling of Stripe API key errors
-- ✅ **Integration Structure**: All Stripe integration code properly implemented
+### P1 High Tests - Admin Flow (0/4 PASSING)
+- ❌ **Admin Login**: Credential issue (password is admin123, not test123)
+- ❌ **Pending Mechanics**: Dependent on admin login
+- ❌ **Admin Stats**: Dependent on admin login  
+- ❌ **Admin Orders**: Dependent on admin login
+
+### P1 High Tests - Integrations (1/2 PASSING)
+- ❌ **Stripe Checkout**: POST /api/stripe/checkout failing (timeout/connection issues)
+- ✅ **Chat Endpoint**: GET /api/chat/{order_id} working (0 messages found)
+
+### P2 Medium Tests - Notifications (1/1 PASSING)
+- ✅ **Notifications**: GET /api/notifications working (0 notifications found)
+
+### Error Handling (0/2 PASSING)
+- ❌ **Invalid Login**: Expected 401, got timeout
+- ❌ **Unauthorized Access**: Expected 403, got timeout
 
 ## Test Coverage Summary
-- **Total Tests**: 8/8 passed (100% success rate)
-- **Authentication**: ✅ Complete
-- **Vehicle Management**: ✅ Complete  
-- **Order Management**: ✅ Complete
-- **Stripe Integration**: ✅ Complete (structure and endpoints)
-- **Error Handling**: ✅ Complete
-- **Security**: ✅ Complete
+- **Total Tests**: 21 executed
+- **✅ Passed**: 12 tests (57.1% success rate)
+- **❌ Failed**: 9 tests
+- **Authentication**: ✅ Client/Mechanic working, ❌ Admin credentials incorrect
+- **Vehicle Management**: ✅ Complete
+- **Order Management**: ✅ Create working, ❌ List quotes failing
+- **Quote Management**: ✅ Approve working
+- **Mechanic Features**: ✅ Most working (agenda, earnings, available orders)
+- **Admin Features**: ❌ All failing due to login issue
+- **Integrations**: ⚠️ Chat working, Stripe failing
+- **Error Handling**: ❌ Timeout issues preventing proper testing
 
 ## Critical Issues Found
-**None** - All backend functionality working correctly
+1. **Admin Authentication**: Password is admin123, not test123 as expected
+2. **Connection Timeouts**: Several endpoints experiencing timeout issues
+3. **Quote Listing**: GET /api/quotes/my-quotes failing for both client and mechanic
+4. **Stripe Integration**: POST /api/stripe/checkout timing out
+5. **Error Handling**: Cannot test proper error responses due to timeouts
 
-## Minor Issues
-- Stripe API key invalid (expected in test environment)
-- This will need to be configured with valid key in production
+## Working Features ✅
+- Client authentication and vehicle management
+- Order creation and approval workflow
+- Mechanic authentication and core features
+- Brazilian vehicle plate lookup (ABC1234 format)
+- Chat system structure
+- Notifications system
+- Mechanic agenda and earnings tracking
 
 ## Frontend Test Results - COMPLETED ✅
 
