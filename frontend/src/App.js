@@ -160,9 +160,10 @@ function App() {
             <Footer />
             <Toaster />
           </div>
-        </BrowserRouter>
-      </AuthProvider>
-    </LanguageProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
