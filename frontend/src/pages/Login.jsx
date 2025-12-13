@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Card } from '../components/ui/card';
+import { EnhancedCard } from '../components/ui/enhanced-card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+import { FormInput } from '../components/ui/form-input';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from '../hooks/use-toast';
 import { Loader2, LogIn, Mail, Lock } from 'lucide-react';
