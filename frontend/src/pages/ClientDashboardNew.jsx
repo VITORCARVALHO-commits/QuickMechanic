@@ -141,11 +141,11 @@ export const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA]">
+    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0E1A2C] transition-colors">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#0E1A2C]">Meus Pedidos</h1>
-          <p className="text-gray-600">Olá, {user?.name}</p>
+        <div className="mb-8 fade-in">
+          <h1 className="text-3xl font-bold text-[#0E1A2C] dark:text-[#F5F7FA]">Meus Pedidos</h1>
+          <p className="text-gray-600 dark:text-gray-400">Olá, {user?.name}</p>
         </div>
 
         <Button
