@@ -33,7 +33,7 @@ export const translations = {
         selectService: 'Selecione o serviço'
       },
       features: {
-        title: 'Por que escolher QuickMechanic?',
+        title: 'Por que escolher ClickMecanico?',
         feature1: {
           title: 'Preço Justo e Transparente',
           desc: 'Sem surpresas. Você sabe o preço antes de agendar.'
@@ -76,7 +76,7 @@ export const translations = {
           details: 'Aceite a cotação que você mais gosta e pague o valor restante com segurança. O mecânico vem ao seu local ou você visita a oficina dele. Só pague quando estiver 100% satisfeito com o serviço!'
         },
         benefits: {
-          title: 'Por que escolher QuickMechanic?',
+          title: 'Por que escolher ClickMecanico?',
           subtitle: 'Benefícios que fazem a diferença',
           guarantee: {
             title: 'Comodidade e Rapidez',
@@ -220,7 +220,7 @@ export const translations = {
         selectService: 'Select service'
       },
       features: {
-        title: 'Why choose QuickMechanic?',
+        title: 'Why choose ClickMecanico?',
         feature1: {
           title: 'Fair & Transparent Pricing',
           desc: 'No surprises. You know the price before booking.'
@@ -263,7 +263,7 @@ export const translations = {
           details: 'Accept the quote you like best and pay the remaining amount securely. The mechanic comes to your location or you visit their workshop. Only pay when you\'re 100% satisfied with the service!'
         },
         benefits: {
-          title: 'Why Choose QuickMechanic?',
+          title: 'Why Choose ClickMecanico?',
           subtitle: 'Benefits that make the difference',
           guarantee: {
             title: 'Convenience & Speed',
