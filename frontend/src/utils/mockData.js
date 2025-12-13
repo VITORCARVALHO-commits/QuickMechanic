@@ -23,10 +23,10 @@ export const serviceTypes = [
   { id: 'transmission', name: { pt: 'Transmissão', en: 'Gearbox Service' }, basePrice: 1200, currency: 'R$' },
   { id: 'engine', name: { pt: 'Motor', en: 'Engine Repair' }, basePrice: 2500, currency: 'R$' },
   { id: 'electrical', name: { pt: 'Elétrica', en: 'Electrical Repair' }, basePrice: 380, currency: 'R$' },
-  { id: 'clutch', name: { pt: 'Clutch Replacement', en: 'Clutch Replacement' }, basePrice: 380, currency: '£' },
-  { id: 'mot', name: { pt: 'MOT Test', en: 'MOT Test' }, basePrice: 55, currency: '£' },
-  { id: 'tyres', name: { pt: 'Tyre Fitting', en: 'Tyre Fitting' }, basePrice: 80, currency: '£' },
-  { id: 'exhaust', name: { pt: 'Exhaust Repair', en: 'Exhaust Repair' }, basePrice: 160, currency: '£' }
+  { id: 'clutch', name: { pt: 'Troca de Embreagem', en: 'Clutch Replacement' }, basePrice: 1500, currency: 'R$' },
+  { id: 'inspection', name: { pt: 'Vistoria Completa', en: 'Full Inspection' }, basePrice: 200, currency: 'R$' },
+  { id: 'tyres', name: { pt: 'Montagem de Pneus', en: 'Tyre Fitting' }, basePrice: 300, currency: 'R$' },
+  { id: 'exhaust', name: { pt: 'Reparo de Escapamento', en: 'Exhaust Repair' }, basePrice: 600, currency: 'R$' }
 ];
 
 export const mockMechanics = [
