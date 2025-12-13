@@ -19,6 +19,8 @@ import { AdminDashboard } from "./pages/AdminDashboardNew";
 import { AdminMechanicsApproval } from "./pages/AdminMechanicsApproval";
 import { MechanicAgenda } from "./pages/MechanicAgenda";
 import { MechanicEarnings } from "./pages/MechanicEarnings";
+import { GoogleCallback } from "./pages/GoogleCallback";
+import { AdminDisputes } from "./pages/AdminDisputes";
 import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
