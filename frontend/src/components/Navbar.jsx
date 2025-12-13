@@ -43,6 +43,7 @@ export const Navbar = () => {
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
+            {isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard">
