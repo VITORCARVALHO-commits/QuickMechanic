@@ -10,6 +10,7 @@ import { Car, MapPin, Clock, CheckCircle, Loader2, DollarSign, AlertCircle, Cale
 
 export const MechanicDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('new');
   const [availableOrders, setAvailableOrders] = useState([]);
   const [myOrders, setMyOrders] = useState([]);
