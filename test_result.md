@@ -233,7 +233,87 @@
 - Portuguese language interface
 - Brazilian Real (R$) currency formatting
 
-## Latest Testing Results - Stripe Payment Flow (13/12/2024)
+## Latest Testing Results - Pre-Booking Flow Navigation Fix (19/12/2024)
+
+### ❌ CRITICAL ISSUE FOUND - PRE-BOOKING DATA RESTORATION NOT WORKING
+**Testing Date**: 19/12/2024  
+**Focus**: Testing the corrected pre-booking flow that should preserve data after login
+
+### Test Results Summary
+
+#### ✅ SCENARIO 1 - NON-AUTHENTICATED USER (PARTIAL SUCCESS)
+**Steps Tested:**
+1. ✅ **Homepage Vehicle Search**: ABC1234 plate search working perfectly
+2. ✅ **Vehicle Found**: VW SANTANA CG 1986 data retrieved successfully  
+3. ✅ **Navigation to Quote**: "Continue to Booking" button works
+4. ❌ **CRITICAL FAILURE**: Quote page shows "Sem Dados do Veículo" (No Vehicle Data)
+5. ❌ **Data Loss**: Vehicle data lost during navigation from home to quote page
+6. ✅ **Login Redirect**: Login page accessible
+7. ✅ **Authentication**: client@test.com / test123 login successful
+8. ❌ **CRITICAL FAILURE**: Login redirects to /dashboard instead of /quote
+9. ❌ **No Data Restoration**: No "Dados Restaurados" toast message
+10. ❌ **localStorage Issue**: No pendingBooking data found in localStorage
+
+#### ✅ SCENARIO 2 - AUTHENTICATED USER (WORKING BETTER)
+**Steps Tested:**
+1. ✅ **Pre-Authentication**: Successfully logged in as client@test.com / test123
+2. ✅ **Homepage Access**: User authenticated (John Smith visible in navbar)
+3. ✅ **Vehicle Search**: ABC1234 plate search working
+4. ✅ **Vehicle Found**: VW SANTANA CG data retrieved
+5. ✅ **Navigation Success**: Successfully navigated to /quote
+6. ✅ **CRITICAL SUCCESS**: Vehicle data preserved for authenticated users
+7. ✅ **Service Display**: Services visible with BRL pricing (R$ 180, R$ 450, etc.)
+8. ✅ **No Login Prompt**: Authenticated users can proceed without login interruption
+
+### Critical Issues Identified
+
+#### 1. ❌ **Data Loss During Navigation (Non-Authenticated)**
+- **Issue**: Vehicle data lost when navigating from homepage to /quote
+- **Expected**: Data should be preserved via React Router state
+- **Actual**: Quote page shows "Sem Dados do Veículo" error
+- **Impact**: CRITICAL - Breaks the entire pre-booking flow
+
+#### 2. ❌ **Login Redirect Not Working**
+- **Issue**: After login, user redirected to /dashboard instead of /quote
+- **Expected**: Should return to /quote with preserved vehicle data
+- **Actual**: Goes to dashboard, losing booking context
+- **Impact**: CRITICAL - Data restoration cannot work if user doesn't return to quote page
+
+#### 3. ❌ **localStorage Data Not Saved**
+- **Issue**: No pendingBooking data found in localStorage
+- **Expected**: Booking data should be saved before login redirect
+- **Actual**: localStorage empty, no data to restore
+- **Impact**: CRITICAL - No data available for restoration after login
+
+#### 4. ❌ **Data Restoration Logic Not Triggered**
+- **Issue**: No "Dados Restaurados" toast message appears
+- **Expected**: useEffect should detect authentication and restore data
+- **Actual**: Restoration logic not executing
+- **Impact**: CRITICAL - Even if data was saved, it's not being restored
+
+### Working Features ✅
+- **Vehicle Search API**: Brazilian plate lookup (ABC1234) working perfectly
+- **Authentication System**: Login/logout functioning correctly
+- **Authenticated User Flow**: Data preservation works for already-logged-in users
+- **Service Display**: All services showing with correct BRL pricing
+- **UI Localization**: Portuguese interface working correctly
+
+### Root Cause Analysis
+The "fix" mentioned in the review request is **NOT WORKING**. The core issues are:
+
+1. **React Router State Loss**: Vehicle data not properly passed via location.state
+2. **Login Flow Broken**: Not returning to /quote after authentication
+3. **localStorage Logic Missing**: Data not being saved before login redirect
+4. **Restoration Logic Broken**: useEffect not detecting authentication state changes
+
+### Recommendations for Main Agent
+1. **HIGH PRIORITY**: Fix React Router state passing from Home to BookingQuote
+2. **HIGH PRIORITY**: Fix login redirect to return to /quote instead of /dashboard
+3. **HIGH PRIORITY**: Implement proper localStorage saving before login redirect
+4. **HIGH PRIORITY**: Debug useEffect in BookingQuote for data restoration
+5. **MEDIUM PRIORITY**: Add better error handling and user feedback
+
+## Previous Testing Results - Stripe Payment Flow (13/12/2024)
 
 ### ✅ STRIPE INTEGRATION FIXED - CRITICAL SUCCESS
 - **ISSUE RESOLVED**: Changed Stripe API key from `sk_live_*******vG0F` (invalid) to `sk_test_emergent` (valid test key)
