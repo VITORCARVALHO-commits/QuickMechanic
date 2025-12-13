@@ -82,11 +82,16 @@ socket_app = socketio.ASGIApp(sio, app)
 from scheduler import start_scheduler
 start_scheduler()
 
-# ===== HEALTH CHECK ENDPOINT (for Kubernetes) =====
+# ===== HEALTH CHECK ENDPOINTS (for Kubernetes) =====
 @app.get("/health")
 async def health_check_root():
     """Health check endpoint for Kubernetes liveness/readiness probes"""
     return {"status": "healthy", "service": "clickmecanico-api"}
+
+@app.get("/")
+async def root_endpoint():
+    """Root endpoint for basic connectivity check"""
+    return {"status": "ok", "message": "ClickMecanico API is running"}
 
 # ===== AUTH DEPENDENCY =====
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
