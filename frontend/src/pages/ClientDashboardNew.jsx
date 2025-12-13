@@ -229,7 +229,7 @@ export const ClientDashboard = () => {
                   ✅ Serviço avaliado
                 </div>
               )}
-            </Card>
+            </EnhancedCard>
           ))}
 
           {orders.length === 0 && (
