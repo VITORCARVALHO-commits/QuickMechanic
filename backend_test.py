@@ -269,29 +269,34 @@ class QuickMechanicTester:
             self.log_result("Mechanic Available Orders", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_mechanic_accept_order(self):
-        """Test mechanic accepting order with labor price"""
+    def test_mechanic_send_quote(self):
+        """Test mechanic sending quote for order - P0 Critical"""
         if not self.mechanic_token or not self.test_order_id:
-            self.log_result("Mechanic Accept Order", False, "No mechanic token or order ID available")
+            self.log_result("Mechanic Send Quote", False, "No mechanic token or order ID available")
             return False
         
         data = {
-            "labor_price": 65.00
+            "labor_price": 120.00,
+            "parts_price": 80.00,
+            "estimated_time": "2 horas",
+            "notes": "Troca de óleo completa com filtro",
+            "warranty": "6 meses"
         }
         
-        response = self.make_request("POST", f"/orders/{self.test_order_id}/accept", data, token=self.mechanic_token)
+        response = self.make_request("POST", f"/mechanic/quotes/{self.test_order_id}", data, token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success"):
-                self.log_result("Mechanic Accept Order", True, "Order accepted with labor price")
+                self.test_quote_id = result.get("data", {}).get("id")
+                self.log_result("Mechanic Send Quote", True, "Quote sent successfully")
                 return True
             else:
-                self.log_result("Mechanic Accept Order", False, "Order acceptance failed", result)
+                self.log_result("Mechanic Send Quote", False, "Quote sending failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Accept Order", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Send Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_search_parts(self):
