@@ -1318,6 +1318,11 @@ async def get_admin_stats(admin: User = Depends(require_admin)):
                 "revenue_month": revenue_month,
                 "open_disputes": 0,  # TODO: Implement disputes
                 "recent_activity": []
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error fetching stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ===== GOOGLE OAUTH =====
 
