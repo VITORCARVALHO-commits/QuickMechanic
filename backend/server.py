@@ -82,6 +82,12 @@ socket_app = socketio.ASGIApp(sio, app)
 from scheduler import start_scheduler
 start_scheduler()
 
+# ===== HEALTH CHECK ENDPOINT (for Kubernetes) =====
+@app.get("/health")
+async def health_check_root():
+    """Health check endpoint for Kubernetes liveness/readiness probes"""
+    return {"status": "healthy", "service": "clickmecanico-api"}
+
 # ===== AUTH DEPENDENCY =====
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Get current authenticated user from JWT token"""
