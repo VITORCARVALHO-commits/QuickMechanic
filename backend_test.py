@@ -119,38 +119,31 @@ class QuickMechanicTester:
             self.log_result("Mechanic Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_auth_register_autoparts(self):
-        """Test AutoPeça registration"""
+    def test_admin_login(self):
+        """Test admin authentication - P1 High"""
         data = {
-            "email": "autoparts@test.com",
-            "password": "test123",
-            "name": "AutoParts London",
-            "phone": "+44 7700 900789",
-            "user_type": "autoparts",
-            "shop_name": "London Auto Parts",
-            "shop_address": "123 High Street, London",
-            "postcode": "SW1A 1AA"
+            "email": "admin@quickmechanic.com",
+            "password": "test123"
         }
         
-        response = self.make_request("POST", "/auth/register", data)
+        response = self.make_request("POST", "/auth/login", data)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("token"):
-                self.autoparts_token = result["token"]
-                self.autoparts_user = result["user"]
-                self.log_result("AutoParts Registration", True, "AutoParts registered successfully")
+                self.admin_token = result["token"]
+                self.admin_user = result["user"]
+                if result.get("user", {}).get("user_type") == "admin":
+                    self.log_result("Admin Login", True, "Admin authenticated successfully")
+                else:
+                    self.log_result("Admin Login", False, f"User type is {result.get('user', {}).get('user_type')}, expected admin")
                 return True
             else:
-                self.log_result("AutoParts Registration", False, "Registration failed", result)
+                self.log_result("Admin Login", False, "Login failed", result)
                 return False
-        elif response and response.status_code == 400:
-            # User already exists, try to login instead
-            self.log_result("AutoParts Registration", True, "User already exists (expected in repeated tests)")
-            return True
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("AutoParts Registration", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Admin Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_login_client(self):
