@@ -884,6 +884,338 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {str(e)}")
         return {"success": False, "error": str(e)}
 
+
+# ===== MECHANIC QUOTE ENDPOINTS =====
+
+@api_router.post("/mechanic/quotes/{order_id}")
+async def mechanic_send_quote(
+    order_id: str,
+    quote_data: MechanicQuoteCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Mechanic sends quote for an order"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can send quotes")
+        
+        # Get order
+        order = await db.quotes.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Calculate total
+        total_price = quote_data.labor_price + (quote_data.parts_price or 0)
+        
+        # Create quote
+        quote = MechanicQuote(
+            order_id=order_id,
+            mechanic_id=current_user.id,
+            labor_price=quote_data.labor_price,
+            parts_price=quote_data.parts_price or 0,
+            total_price=total_price,
+            estimated_time=quote_data.estimated_time,
+            notes=quote_data.notes,
+            warranty=quote_data.warranty
+        )
+        
+        quote_dict = quote.model_dump()
+        quote_dict['created_at'] = quote_dict['created_at'].isoformat()
+        
+        # Save quote
+        await db.mechanic_quotes.insert_one(quote_dict)
+        
+        # Update order status and add mechanic
+        await db.quotes.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "quoted",
+                    "mechanic_id": current_user.id,
+                    "final_price": total_price,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Send email to client
+        client = await db.users.find_one({"id": order["client_id"]}, {"_id": 0})
+        if client:
+            email_quote_to_client(
+                client['email'],
+                client['name'],
+                order_id,
+                current_user.name,
+                total_price
+            )
+        
+        logger.info(f"Mechanic {current_user.id} sent quote for order {order_id}")
+        
+        return {
+            "success": True,
+            "data": quote,
+            "message": "Orçamento enviado com sucesso"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sending quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/mechanic/available-orders")
+async def get_available_orders(current_user: User = Depends(get_current_user)):
+    """Get orders available for mechanic (pending status)"""
+    try:
+        if current_user.user_type != "mechanic":
+            raise HTTPException(status_code=403, detail="Only mechanics can access")
+        
+        # Get pending orders
+        orders = await db.quotes.find(
+            {"status": "pending"},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+        
+        return {
+            "success": True,
+            "data": orders,
+            "message": f"{len(orders)} orders available"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching orders: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== CLIENT QUOTE APPROVAL =====
+
+@api_router.post("/quotes/{order_id}/approve")
+async def approve_quote(order_id: str, current_user: User = Depends(get_current_user)):
+    """Client approves mechanic quote"""
+    try:
+        order = await db.quotes.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["client_id"] != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        if order["status"] != "quoted":
+            raise HTTPException(status_code=400, detail="Order not in quoted status")
+        
+        # Update status to approved (waiting payment)
+        await db.quotes.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "approved",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        logger.info(f"Client approved quote for order {order_id}")
+        
+        return {
+            "success": True,
+            "message": "Orçamento aprovado. Prossiga para pagamento."
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error approving quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/quotes/{order_id}/reject")
+async def reject_quote(order_id: str, current_user: User = Depends(get_current_user)):
+    """Client rejects mechanic quote"""
+    try:
+        order = await db.quotes.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["client_id"] != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Update status back to pending
+        await db.quotes.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "pending",
+                    "mechanic_id": None,
+                    "final_price": None,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        logger.info(f"Client rejected quote for order {order_id}")
+        
+        return {
+            "success": True,
+            "message": "Orçamento recusado"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error rejecting quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== REVIEW ENDPOINTS =====
+
+@api_router.post("/reviews")
+async def create_review(review_data: ReviewCreate, current_user: User = Depends(get_current_user)):
+    """Create review for mechanic after service"""
+    try:
+        # Get order
+        order = await db.quotes.find_one({"id": review_data.order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["client_id"] != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        if order["status"] != "completed":
+            raise HTTPException(status_code=400, detail="Order not completed yet")
+        
+        # Check if already reviewed
+        existing = await db.reviews.find_one({"order_id": review_data.order_id})
+        if existing:
+            raise HTTPException(status_code=400, detail="Order already reviewed")
+        
+        # Create review
+        review = Review(
+            order_id=review_data.order_id,
+            client_id=current_user.id,
+            mechanic_id=review_data.mechanic_id,
+            rating=review_data.rating,
+            comment=review_data.comment
+        )
+        
+        review_dict = review.model_dump()
+        review_dict['created_at'] = review_dict['created_at'].isoformat()
+        
+        await db.reviews.insert_one(review_dict)
+        
+        # Update mechanic rating
+        mechanic_reviews = await db.reviews.find({"mechanic_id": review_data.mechanic_id}, {"_id": 0}).to_list(1000)
+        avg_rating = sum(r['rating'] for r in mechanic_reviews) / len(mechanic_reviews)
+        
+        await db.users.update_one(
+            {"id": review_data.mechanic_id},
+            {
+                "$set": {
+                    "rating": round(avg_rating, 1),
+                    "review_count": len(mechanic_reviews)
+                }
+            }
+        )
+        
+        # Update order status
+        await db.quotes.update_one(
+            {"id": review_data.order_id},
+            {"$set": {"status": "reviewed"}}
+        )
+        
+        logger.info(f"Review created for order {review_data.order_id}")
+        
+        return {
+            "success": True,
+            "data": review,
+            "message": "Avaliação enviada com sucesso"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating review: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/mechanics/{mechanic_id}/reviews")
+async def get_mechanic_reviews(mechanic_id: str):
+    """Get reviews for a mechanic"""
+    try:
+        reviews = await db.reviews.find({"mechanic_id": mechanic_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        
+        # Get client names
+        for review in reviews:
+            client = await db.users.find_one({"id": review["client_id"]}, {"_id": 0, "name": 1})
+            review["client_name"] = client["name"] if client else "Cliente"
+        
+        return {
+            "success": True,
+            "data": reviews,
+            "message": f"{len(reviews)} reviews found"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching reviews: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== ADMIN MECHANIC APPROVAL =====
+
+@api_router.get("/admin/mechanics/pending")
+async def get_pending_mechanics(admin: User = Depends(require_admin)):
+    """Get mechanics pending approval"""
+    try:
+        mechanics = await db.users.find(
+            {"user_type": "mechanic", "approval_status": "pending_approval"},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(100)
+        
+        return {
+            "success": True,
+            "data": mechanics,
+            "message": f"{len(mechanics)} pending mechanics"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching pending mechanics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/admin/mechanics/{mechanic_id}/approve")
+async def approve_mechanic(mechanic_id: str, admin: User = Depends(require_admin)):
+    """Approve mechanic"""
+    try:
+        result = await db.users.update_one(
+            {"id": mechanic_id, "user_type": "mechanic"},
+            {"$set": {"approval_status": "approved", "is_active": True}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Mechanic not found")
+        
+        logger.info(f"Admin {admin.id} approved mechanic {mechanic_id}")
+        
+        return {
+            "success": True,
+            "message": "Mechanic approved"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error approving mechanic: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/admin/mechanics/{mechanic_id}/reject")
+async def reject_mechanic(mechanic_id: str, admin: User = Depends(require_admin)):
+    """Reject mechanic"""
+    try:
+        result = await db.users.update_one(
+            {"id": mechanic_id, "user_type": "mechanic"},
+            {"$set": {"approval_status": "rejected", "is_active": False}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Mechanic not found")
+        
+        logger.info(f"Admin {admin.id} rejected mechanic {mechanic_id}")
+        
+        return {
+            "success": True,
+            "message": "Mechanic rejected"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error rejecting mechanic: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Root endpoint
 @api_router.get("/")
 async def root():
