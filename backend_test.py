@@ -91,35 +91,32 @@ class QuickMechanicTester:
             self.log_result("Client Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_auth_register_mechanic(self):
-        """Test mechanic registration"""
+    def test_mechanic_login(self):
+        """Test mechanic authentication - P0 Critical"""
         data = {
             "email": "mechanic@test.com",
-            "password": "test123",
-            "name": "Mike Johnson",
-            "phone": "+44 7700 900456",
-            "user_type": "mechanic"
+            "password": "test123"
         }
         
-        response = self.make_request("POST", "/auth/register", data)
+        response = self.make_request("POST", "/auth/login", data)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("token"):
                 self.mechanic_token = result["token"]
                 self.mechanic_user = result["user"]
-                self.log_result("Mechanic Registration", True, "Mechanic registered successfully")
+                # Check if mechanic is approved
+                if result.get("user", {}).get("approval_status") == "approved":
+                    self.log_result("Mechanic Login", True, "Mechanic authenticated and approved")
+                else:
+                    self.log_result("Mechanic Login", True, f"Mechanic authenticated but status: {result.get('user', {}).get('approval_status', 'unknown')}")
                 return True
             else:
-                self.log_result("Mechanic Registration", False, "Registration failed", result)
+                self.log_result("Mechanic Login", False, "Login failed", result)
                 return False
-        elif response and response.status_code == 400:
-            # User already exists, try to login instead
-            self.log_result("Mechanic Registration", True, "User already exists (expected in repeated tests)")
-            return True
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Mechanic Registration", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_register_autoparts(self):
