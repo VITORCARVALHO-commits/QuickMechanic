@@ -97,33 +97,24 @@ export const MechanicDashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Novos Pedidos</p>
-                <p className="text-3xl font-bold text-[#1EC6C6]">{availableOrders.length}</p>
-              </div>
-              <AlertCircle className="h-12 w-12 text-[#1EC6C6]" />
-            </div>
-          </Card>
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Meus Pedidos</p>
-                <p className="text-3xl font-bold text-[#27AE60]">{myOrders.length}</p>
-              </div>
-              <CheckCircle className="h-12 w-12 text-[#27AE60]" />
-            </div>
-          </Card>
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Rating</p>
-                <p className="text-3xl font-bold text-yellow-500">{user?.rating || '-'} ⭐</p>
-              </div>
-              <DollarSign className="h-12 w-12 text-yellow-500" />
-            </div>
-          </Card>
+          <StatCard
+            title="Novos Pedidos"
+            value={availableOrders.length}
+            icon={AlertCircle}
+            color="primary"
+          />
+          <StatCard
+            title="Meus Pedidos"
+            value={myOrders.length}
+            icon={CheckCircle}
+            color="success"
+          />
+          <StatCard
+            title="Rating"
+            value={`${user?.rating || '-'} ⭐`}
+            icon={DollarSign}
+            color="warning"
+          />
         </div>
 
         {/* Quick Actions */}
