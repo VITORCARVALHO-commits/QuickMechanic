@@ -40,6 +40,36 @@ export const BookingQuote = () => {
   const [showStripePayment, setShowStripePayment] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null);
 
+  // Restore pending booking data after login
+  useEffect(() => {
+    const pendingBooking = localStorage.getItem('pendingBooking');
+    if (pendingBooking && isAuthenticated) {
+      try {
+        const { bookingData: savedBookingData, selectedService: savedService } = JSON.parse(pendingBooking);
+        
+        if (savedBookingData) {
+          setBookingData({
+            ...bookingData,
+            ...savedBookingData,
+            date: savedBookingData.date ? new Date(savedBookingData.date) : null
+          });
+        }
+        
+        if (savedService) {
+          setSelectedService(savedService);
+          setCurrentStep(2); // Go directly to step 2 if service was selected
+        }
+        
+        toast({
+          title: "Dados Restaurados",
+          description: "Seus dados foram recuperados. Continue de onde parou!",
+        });
+      } catch (error) {
+        console.error('Error restoring booking data:', error);
+      }
+    }
+  }, [isAuthenticated]);
+
   // Service icons mapping
   const serviceIcons = {
     'oil_change': Droplet,
