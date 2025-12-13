@@ -247,42 +247,26 @@ class QuickMechanicTester:
             self.log_result("Get Client Quotes", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_create_order_needing_parts(self):
-        """Test client creating order with has_parts=false (needs parts)"""
-        if not self.client_token or not self.test_vehicle_id:
-            self.log_result("Create Order Needing Parts", False, "No client token or vehicle ID available")
+    def test_mechanic_available_orders(self):
+        """Test mechanic getting available orders - P0 Critical"""
+        if not self.mechanic_token:
+            self.log_result("Mechanic Available Orders", False, "No mechanic token available")
             return False
         
-        data = {
-            "vehicle_id": self.test_vehicle_id,
-            "service": "oil_change",
-            "location": "SW1A 1AA, London",
-            "description": "Need oil change service with parts",
-            "date": "2024-01-15",
-            "time": "10:00",
-            "location_type": "mobile",
-            "has_parts": False  # Client needs parts
-        }
-        
-        response = self.make_request("POST", "/orders", data, token=self.client_token)
+        response = self.make_request("GET", "/mechanic/available-orders", token=self.mechanic_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                order = result["data"]
-                self.test_order_id = order["id"]
-                if order.get("status") == "AGUARDANDO_MECANICO" and order.get("has_parts") == False:
-                    self.log_result("Create Order Needing Parts", True, "Order created with correct status")
-                    return True
-                else:
-                    self.log_result("Create Order Needing Parts", False, f"Order status: {order.get('status')}, has_parts: {order.get('has_parts')}")
-                    return False
+            if result.get("success"):
+                orders = result.get("data", [])
+                self.log_result("Mechanic Available Orders", True, f"Found {len(orders)} available orders")
+                return True
             else:
-                self.log_result("Create Order Needing Parts", False, "Order creation failed", result)
+                self.log_result("Mechanic Available Orders", False, "Failed to get available orders", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Create Order Needing Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Mechanic Available Orders", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_mechanic_accept_order(self):
