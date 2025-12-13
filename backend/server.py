@@ -78,6 +78,10 @@ from socket_manager import sio
 import socketio
 socket_app = socketio.ASGIApp(sio, app)
 
+# Initialize scheduler
+from scheduler import start_scheduler
+start_scheduler()
+
 # ===== AUTH DEPENDENCY =====
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Get current authenticated user from JWT token"""
