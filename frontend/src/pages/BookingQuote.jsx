@@ -47,8 +47,15 @@ export const BookingQuote = () => {
     const pendingBooking = localStorage.getItem('pendingBooking');
     if (pendingBooking && isAuthenticated) {
       try {
-        const { bookingData: savedBookingData, selectedService: savedService } = JSON.parse(pendingBooking);
+        const { vehicleData: savedVehicleData, bookingData: savedBookingData, selectedService: savedService } = JSON.parse(pendingBooking);
         
+        // Restore vehicle data
+        if (savedVehicleData) {
+          setVehicleData(savedVehicleData);
+          setPlateSearch(savedVehicleData.plate);
+        }
+        
+        // Restore booking data
         if (savedBookingData) {
           setBookingData({
             ...bookingData,
@@ -57,13 +64,14 @@ export const BookingQuote = () => {
           });
         }
         
+        // Restore selected service
         if (savedService) {
           setSelectedService(savedService);
           setCurrentStep(2); // Go directly to step 2 if service was selected
         }
         
         toast({
-          title: "Dados Restaurados",
+          title: "✅ Dados Restaurados",
           description: "Seus dados foram recuperados. Continue de onde parou!",
         });
       } catch (error) {
