@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
 import "./styles/improvements.css";
+import "./styles/dark-mode.css";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
