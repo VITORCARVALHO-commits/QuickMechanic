@@ -15,7 +15,7 @@ export const translations = {
       hero: {
         title: 'Reparo Automotivo Confiável',
         subtitle: 'Na Sua Porta',
-        description: 'Orçamento instantâneo. Mecânicos verificados. Garantia de 12 meses.',
+        description: 'Orçamento instantâneo. Mecânicos verificados. Comodidade sem sair de casa.',
         cta: 'Obter Orçamento Grátis'
       },
       quote: {
@@ -43,8 +43,8 @@ export const translations = {
           desc: 'Todos os profissionais são certificados e avaliados.'
         },
         feature3: {
-          title: 'Garantia de 12 Meses',
-          desc: 'Serviço e peças garantidos por um ano.'
+          title: 'Comodidade e Rapidez',
+          desc: 'Atendimento rápido sem precisar sair de casa.'
         },
         feature4: {
           title: 'Atendimento na Sua Casa',
