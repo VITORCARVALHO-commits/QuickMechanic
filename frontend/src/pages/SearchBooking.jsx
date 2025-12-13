@@ -22,11 +22,11 @@ export const SearchBooking = () => {
   const quoteData = location.state?.quoteData || {};
 
   useEffect(() => {
-    // Simulate AI price calculation (London-based pricing in £)
+    // Simulate AI price calculation (Brazilian pricing in R$)
     setTimeout(() => {
       const service = serviceTypes.find(s => s.id === quoteData.service);
-      const basePrice = service?.basePrice || 100;
-      const variation = Math.floor(Math.random() * 30) + 10; // London variation
+      const basePrice = service?.basePrice || 500;
+      const variation = Math.floor(Math.random() * 100) + 50; // Brazilian variation
       setEstimatedPrice(basePrice + variation);
       
       // Filter mechanics by service
@@ -107,8 +107,8 @@ export const SearchBooking = () => {
             </div>
             <div className="text-right">
               <div className="text-sm text-white/90 mb-1">{t('common.estimated')}</div>
-              <div className="text-5xl font-bold">£{estimatedPrice}</div>
-              <div className="text-sm text-white/90 mt-1">+ parts (if required)</div>
+              <div className="text-5xl font-bold">R$ {estimatedPrice}</div>
+              <div className="text-sm text-white/90 mt-1">+ peças (se necessário)</div>
             </div>
           </div>
         </Card>
@@ -178,7 +178,7 @@ export const SearchBooking = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-[#1EC6C6]">£{estimatedPrice}</div>
+                        <div className="text-3xl font-bold text-[#1EC6C6]">R$ {estimatedPrice}</div>
                         <div className="text-sm text-gray-600">{t('common.estimated')}</div>
                       </div>
                     </div>
