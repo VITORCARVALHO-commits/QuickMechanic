@@ -20,7 +20,8 @@ export const Login = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from || '/dashboard';
+  const vehicleData = location.state?.vehicleData;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +35,13 @@ export const Login = () => {
           title: "Welcome back!",
           description: `Logged in as ${result.user.name}`,
         });
-        navigate(from, { replace: true });
+        
+        // If coming from quote page, restore vehicle data
+        if (from === '/quote' && vehicleData) {
+          navigate(from, { replace: true, state: { vehicleData } });
+        } else {
+          navigate(from, { replace: true });
+        }
       } else {
         toast({
           title: "Login failed",
