@@ -71,6 +71,6 @@ def email_payment_confirmed(mechanic_email: str, mechanic_name: str, order_id: s
     <h2>Ótima notícia, {mechanic_name}!</h2>
     <p>O pagamento do pedido <strong>#{order_id}</strong> foi confirmado.</p>
     <p>O serviço está agendado. Acesse o dashboard para ver detalhes.</p>
-    <a href="https://fixconnect-12.preview.emergentagent.com/mechanic/dashboard" style="background:#27AE60;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Agenda</a>
+    <a href="{FRONTEND_URL}/mechanic/dashboard" style="background:#27AE60;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Ver Agenda</a>
     """
     return send_email(mechanic_email, subject, html)
