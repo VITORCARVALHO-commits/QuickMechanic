@@ -229,17 +229,17 @@ export const BookingPage = () => {
                 <h3 className="text-lg font-semibold text-[#0E1A2C] mb-4">Resumo do Orçamento</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between text-gray-700">
-                    <span>Labour</span>
-                    <span className="font-semibold">£{estimatedPrice}</span>
+                    <span>Mão de Obra</span>
+                    <span className="font-semibold">R$ {estimatedPrice}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
-                    <span>Parts (if required)</span>
-                    <span>TBD</span>
+                    <span>Peças (se necessário)</span>
+                    <span>A definir</span>
                   </div>
                   <div className="border-t pt-3 mt-3">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-[#0E1A2C]">Estimated Total</span>
-                      <span className="text-3xl font-bold text-[#1EC6C6]">£{estimatedPrice}</span>
+                      <span className="font-semibold text-[#0E1A2C]">Total Estimado</span>
+                      <span className="text-3xl font-bold text-[#1EC6C6]">R$ {estimatedPrice}</span>
                     </div>
                   </div>
                 </div>
