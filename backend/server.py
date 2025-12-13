@@ -1043,14 +1043,6 @@ async def mark_notification_read(notification_id: str, current_user: User = Depe
         logger.error(f"Error marking notification: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-                            "prebooking_paid": True,
-                            "status": "prebooked",
-                            "updated_at": datetime.now(timezone.utc).isoformat()
-                        }
-                    }
-                )
-            
             logger.info(f"Webhook processed: Payment confirmed for session {session_id}")
         
         return {"success": True, "received": True}
