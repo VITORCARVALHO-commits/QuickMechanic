@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await getCurrentUser();
       if (response.success) {
-        setUser(response.user);
+        setUser(response.data);
       }
     } catch (error) {
       console.error('Failed to load user:', error);
