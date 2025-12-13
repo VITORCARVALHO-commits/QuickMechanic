@@ -131,7 +131,7 @@ export const Services = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">{t('services.title')}</h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Serviços completos para seu veículo com garantia de 12 meses
+            Serviços completos para seu veículo com comodidade e rapidez
           </p>
         </div>
       </section>
@@ -203,10 +203,10 @@ export const Services = () => {
                 </div>
               </div>
               <div className="flex-grow text-center md:text-left">
-                <h2 className="text-3xl font-bold text-[#0E1A2C] mb-3">Garantia de 12 Meses</h2>
+                <h2 className="text-3xl font-bold text-[#0E1A2C] mb-3">Comodidade e Rapidez</h2>
                 <p className="text-xl text-gray-600">
-                  Todos os nossos serviços incluem garantia de 12 meses para peças e mão de obra. 
-                  Sua tranquilidade é nossa prioridade.
+                  Todos os nossos serviços são realizados com agilidade e sem você precisar sair de casa. 
+                  Sua comodidade é nossa prioridade.
                 </p>
               </div>
             </div>
