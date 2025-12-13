@@ -139,6 +139,18 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/auth/google/callback" 
+                  element={<GoogleCallback />} 
+                />
+                <Route 
+                  path="/admin/disputes" 
+                  element={
+                    <ProtectedRoute>
+                      <AdminDisputes />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />
