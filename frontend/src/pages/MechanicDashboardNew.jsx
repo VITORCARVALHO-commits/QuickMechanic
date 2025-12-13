@@ -221,11 +221,11 @@ export const MechanicDashboard = () => {
                   <span>{order.location}</span>
                 </div>
               </div>
-            </Card>
+            </EnhancedCard>
           ))}
 
           {activeTab === 'new' && availableOrders.length === 0 && (
-            <Card className="p-12 text-center">
+            <EnhancedCard className="p-12 text-center" hover={false}>
               <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">Nenhum pedido disponível no momento</p>
             </Card>
