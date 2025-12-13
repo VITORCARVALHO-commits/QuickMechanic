@@ -239,3 +239,71 @@ class MechanicQuote(BaseModel):
     status: str = "pending"  # pending, accepted, rejected
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
+
+# ===== SHOP/OFICINA MODELS =====
+class ShopInventoryItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    shop_id: str
+    part_id: str
+    part_name: str
+    part_code: str
+    quantity: int
+    price: float
+    location: Optional[str] = None  # Prateleira/local na oficina
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PartReservation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    mechanic_id: str
+    mechanic_name: str
+    shop_id: str
+    shop_name: str
+    order_id: str
+    part_id: str
+    part_name: str
+    part_code: Optional[str] = None
+    quantity: int
+    price: float
+    status: str  # pending, confirmed, rejected, picked_up, cancelled
+    pickup_code: Optional[str] = None
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    confirmed_at: Optional[datetime] = None
+    picked_up_at: Optional[datetime] = None
+
+class PickupCode(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    code: str  # 6-digit code
+    reservation_id: str
+    shop_id: str
+    mechanic_id: str
+    is_used: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime
+    used_at: Optional[datetime] = None
+
+# ===== NOTIFICATION MODELS =====
+class Notification(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    message: str
+    type: str  # order, payment, review, reservation, system
+    reference_id: Optional[str] = None  # order_id, reservation_id, etc
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    read_at: Optional[datetime] = None
+
+# ===== SERVICE STATUS HISTORY =====
+class ServiceStatusHistory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_id: str
+    status: str
+    changed_by: str  # user_id
+    changed_by_role: str  # client, mechanic, admin
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
