@@ -93,7 +93,7 @@ export const AdminDashboard = () => {
             <Wrench className="h-10 w-10 text-[#1EC6C6] mb-4" />
             <h3 className="font-bold text-lg mb-2">Aprovar Mecânicos</h3>
             <p className="text-sm text-gray-600">{stats?.pending_mechanics || 0} pendentes</p>
-          </Card>
+          </EnhancedCard>
 
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/orders')}>
             <ShoppingCart className="h-10 w-10 text-[#F39C12] mb-4" />
