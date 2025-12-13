@@ -193,53 +193,36 @@ class QuickMechanicTester:
             self.log_result("Create Vehicle", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_vehicle_search(self):
-        """Test vehicle search by plate"""
-        plate = "VO11WRE"
-        response = self.make_request("GET", f"/vehicle/plate/{plate}")
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if result.get("success") and result.get("data"):
-                self.log_result("Vehicle Search", True, f"Vehicle found for plate {plate}")
-                return True
-            else:
-                self.log_result("Vehicle Search", False, f"Vehicle not found for plate {plate}", result)
-                return False
-        else:
-            error_msg = response.text if response else "No response"
-            self.log_result("Vehicle Search", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
-            return False
-    
-    def test_create_vehicle(self):
-        """Test vehicle creation for client"""
-        if not self.client_token:
-            self.log_result("Create Vehicle", False, "No client token available")
+    def test_create_order(self):
+        """Test order creation by client - P0 Critical"""
+        if not self.client_token or not self.test_vehicle_id:
+            self.log_result("Create Order", False, "No client token or vehicle ID available")
             return False
         
         data = {
-            "plate": "VO11WRE",
-            "make": "Volkswagen",
-            "model": "Golf",
-            "year": "2011",
-            "color": "Blue",
-            "fuel": "Petrol"
+            "vehicle_id": self.test_vehicle_id,
+            "service": "Troca de óleo",
+            "location": "01310-100, São Paulo, SP",
+            "description": "Preciso trocar o óleo do meu carro",
+            "date": "2024-12-20",
+            "time": "14:00",
+            "location_type": "mobile"
         }
         
-        response = self.make_request("POST", "/vehicles", data, token=self.client_token)
+        response = self.make_request("POST", "/orders", data, token=self.client_token)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("data"):
-                self.test_vehicle_id = result["data"]["id"]
-                self.log_result("Create Vehicle", True, "Vehicle created successfully")
+                self.test_order_id = result["data"]["id"]
+                self.log_result("Create Order", True, "Order created successfully")
                 return True
             else:
-                self.log_result("Create Vehicle", False, "Vehicle creation failed", result)
+                self.log_result("Create Order", False, "Order creation failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Create Vehicle", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Create Order", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_add_parts_to_catalog(self):
