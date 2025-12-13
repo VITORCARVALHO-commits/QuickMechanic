@@ -67,35 +67,28 @@ class QuickMechanicTester:
             print(f"Request error for {method} {url}: {e}")
             return None
     
-    def test_auth_register_client(self):
-        """Test client registration"""
+    def test_client_login(self):
+        """Test client authentication - P0 Critical"""
         data = {
             "email": "client@test.com",
-            "password": "test123",
-            "name": "John Smith",
-            "phone": "+44 7700 900123",
-            "user_type": "client"
+            "password": "test123"
         }
         
-        response = self.make_request("POST", "/auth/register", data)
+        response = self.make_request("POST", "/auth/login", data)
         
         if response and response.status_code == 200:
             result = response.json()
             if result.get("success") and result.get("token"):
                 self.client_token = result["token"]
                 self.client_user = result["user"]
-                self.log_result("Client Registration", True, "Client registered successfully")
+                self.log_result("Client Login", True, "Client authenticated successfully")
                 return True
             else:
-                self.log_result("Client Registration", False, "Registration failed", result)
+                self.log_result("Client Login", False, "Login failed", result)
                 return False
-        elif response and response.status_code == 400:
-            # User already exists, try to login instead
-            self.log_result("Client Registration", True, "User already exists (expected in repeated tests)")
-            return True
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Client Registration", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Client Login", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_auth_register_mechanic(self):
