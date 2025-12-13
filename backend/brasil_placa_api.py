@@ -8,7 +8,7 @@ from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
-BRASIL_API_TOKEN = "b3a20d729702609850a1edad9f057e93"
+BRASIL_API_TOKEN = os.environ.get('BRASIL_API_TOKEN', '')
 BRASIL_API_URL = "https://wdapi2.com.br/consulta"
 
 
