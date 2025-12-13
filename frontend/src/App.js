@@ -129,6 +129,14 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/mechanic/earnings" 
+                  element={
+                    <ProtectedRoute>
+                      <MechanicEarnings />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />
