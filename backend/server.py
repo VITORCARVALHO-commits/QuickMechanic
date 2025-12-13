@@ -884,6 +884,146 @@ async def stripe_webhook(request: Request):
                     {"id": order_id},
                     {
                         "$set": {
+
+# ===== CHAT ENDPOINTS =====
+
+@api_router.get("/chat/{order_id}")
+async def get_chat_messages(order_id: str, current_user: User = Depends(get_current_user)):
+    """Get chat messages for an order"""
+    try:
+        messages = await db.messages.find(
+            {"order_id": order_id},
+            {"_id": 0}
+        ).sort("created_at", 1).to_list(1000)
+        
+        return {
+            "success": True,
+            "data": messages
+        }
+    except Exception as e:
+        logger.error(f"Error fetching messages: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== PHOTO UPLOAD ENDPOINTS =====
+
+@api_router.post("/photos/upload")
+async def upload_photo(
+    file: UploadFile,
+    order_id: str = Form(...),
+    photo_type: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload photo for order (before/after)"""
+    try:
+        # Simple base64 storage (for production, use S3/Cloud Storage)
+        import base64
+        contents = await file.read()
+        encoded = base64.b64encode(contents).decode()
+        
+        photo_doc = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "type": photo_type,
+            "filename": file.filename,
+            "data": encoded,  # In production, save to S3 and store URL
+            "uploaded_by": current_user.id,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.photos.insert_one(photo_doc)
+        
+        # Return without the base64 data
+        photo_response = {**photo_doc}
+        photo_response["url"] = f"data:image/jpeg;base64,{encoded[:100]}..."  # Placeholder
+        del photo_response["data"]
+        
+        return {
+            "success": True,
+            "data": photo_response
+        }
+    except Exception as e:
+        logger.error(f"Error uploading photo: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/photos/{photo_id}")
+async def delete_photo(photo_id: str, current_user: User = Depends(get_current_user)):
+    """Delete a photo"""
+    try:
+        result = await db.photos.delete_one({"id": photo_id, "uploaded_by": current_user.id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        
+        return {
+            "success": True,
+            "message": "Photo deleted"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting photo: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/photos/{order_id}")
+async def get_order_photos(order_id: str, current_user: User = Depends(get_current_user)):
+    """Get all photos for an order"""
+    try:
+        photos = await db.photos.find(
+            {"order_id": order_id},
+            {"_id": 0, "data": 0}  # Don't send base64 data in list
+        ).to_list(100)
+        
+        return {
+            "success": True,
+            "data": photos
+        }
+    except Exception as e:
+        logger.error(f"Error fetching photos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== NOTIFICATION ENDPOINTS =====
+
+@api_router.get("/notifications")
+async def get_notifications(current_user: User = Depends(get_current_user)):
+    """Get user notifications"""
+    try:
+        notifications = await db.notifications.find(
+            {"user_id": current_user.id},
+            {"_id": 0}
+        ).sort("created_at", -1).limit(50).to_list(50)
+        
+        unread_count = await db.notifications.count_documents({
+            "user_id": current_user.id,
+            "read": False
+        })
+        
+        return {
+            "success": True,
+            "data": notifications,
+            "unread_count": unread_count
+        }
+    except Exception as e:
+        logger.error(f"Error fetching notifications: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
+    """Mark notification as read"""
+    try:
+        await db.notifications.update_one(
+            {"id": notification_id, "user_id": current_user.id},
+            {"$set": {"read": True}}
+        )
+        
+        return {
+            "success": True,
+            "message": "Marked as read"
+        }
+    except Exception as e:
+        logger.error(f"Error marking notification: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
                             "prebooking_paid": True,
                             "status": "prebooked",
                             "updated_at": datetime.now(timezone.utc).isoformat()
