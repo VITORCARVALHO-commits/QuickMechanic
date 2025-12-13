@@ -103,6 +103,13 @@ function App() {
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/become-mechanic" element={<BecomeMechanic />} />
+                <Route path="/precos" element={<Precos />} />
+                <Route path="/contato" element={<Contato />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/termos" element={<Termos />} />
+                <Route path="/privacidade" element={<Privacidade />} />
+                <Route path="/cancelamento" element={<Cancelamento />} />
+                <Route path="/parceiros/oficina" element={<ParceirosOficina />} />
                 <Route 
                   path="/payment-success" 
                   element={
