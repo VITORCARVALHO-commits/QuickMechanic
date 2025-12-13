@@ -26,6 +26,7 @@ from brasil_placa_api import search_brasil_placa, validate_brasil_plate
 from auth import hash_password, verify_password, create_access_token, decode_token
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 from email_service import email_new_order_to_mechanic, email_quote_to_client, email_payment_confirmed
+from fastapi import UploadFile, Form
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
