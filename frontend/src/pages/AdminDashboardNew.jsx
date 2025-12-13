@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/card';
+import { EnhancedCard } from '../components/ui/enhanced-card';
+import { StatCard } from '../components/ui/stat-card';
+import { SkeletonList } from '../components/ui/skeleton';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Users, Wrench, DollarSign, ShoppingCart, TrendingUp, AlertTriangle } from 'lucide-react';
