@@ -374,6 +374,21 @@ async def create_quote(quote_data: QuoteCreate, current_user: User = Depends(get
         
         logger.info(f"Quote created: {order.id}")
         
+        # Notify active mechanics (simple matching - can be improved with geolocation)
+        mechanics = await db.users.find(
+            {"user_type": "mechanic", "is_active": True, "approval_status": "approved"},
+            {"_id": 0, "email": 1, "name": 1}
+        ).to_list(10)
+        
+        for mechanic in mechanics:
+            email_new_order_to_mechanic(
+                mechanic['email'],
+                mechanic['name'],
+                order.id,
+                quote_data.service,
+                quote_data.location
+            )
+        
         return {
             "success": True,
             "data": order,
