@@ -1090,6 +1090,24 @@ async def mechanic_send_quote(
                 "$set": {
                     "status": "quoted",
                     "mechanic_id": current_user.id,
+                    "final_price": total_price,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        logger.info(f"Mechanic {current_user.id} sent quote for order {order_id}")
+        
+        return {
+            "success": True,
+            "data": quote,
+            "message": "Orçamento enviado com sucesso"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sending quote: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ===== MECHANIC AGENDA & SERVICE TRACKING =====
 
