@@ -251,14 +251,14 @@ export const BookingPage = () => {
                 </div>
               </Card>
 
-              {/* Guarantee */}
+              {/* Convenience */}
               <Card className="p-6 bg-gradient-to-br from-[#27AE60]/5 to-white border-2 border-[#27AE60]/20">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-[#27AE60] rounded-full flex items-center justify-center mx-auto mb-3">
                     <Star className="h-6 w-6 text-white" />
                   </div>
-                  <h4 className="font-bold text-[#0E1A2C] mb-2">12-Month Guarantee</h4>
-                  <p className="text-sm text-gray-600">Parts & labour covered</p>
+                  <h4 className="font-bold text-[#0E1A2C] mb-2">Comodidade e Rapidez</h4>
+                  <p className="text-sm text-gray-600">Sem sair de casa</p>
                 </div>
               </Card>
             </div>
