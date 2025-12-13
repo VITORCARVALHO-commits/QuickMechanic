@@ -77,9 +77,10 @@ const DashboardRouter = () => {
 
 function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <BrowserRouter>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <BrowserRouter>
           <div className="App min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-grow">
