@@ -22,10 +22,12 @@ export const BookingQuote = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { vehicleData, plateSearch } = location.state || {};
+  const { vehicleData: initialVehicleData, plateSearch: initialPlateSearch } = location.state || {};
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedService, setSelectedService] = useState(null);
+  const [vehicleData, setVehicleData] = useState(initialVehicleData);
+  const [plateSearch, setPlateSearch] = useState(initialPlateSearch);
   const [bookingData, setBookingData] = useState({
     serviceType: '',
     postcode: '',
