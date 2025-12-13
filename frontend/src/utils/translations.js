@@ -202,7 +202,7 @@ export const translations = {
       hero: {
         title: 'Trusted Car Repairs',
         subtitle: 'At Your Doorstep',
-        description: 'Instant quotes. Verified mechanics. 12-month guarantee.',
+        description: 'Instant quotes. Verified mechanics. Convenience without leaving home.',
         cta: 'Get Free Quote'
       },
       quote: {
@@ -230,8 +230,8 @@ export const translations = {
           desc: 'All professionals are certified and rated.'
         },
         feature3: {
-          title: '12-Month Guarantee',
-          desc: 'Service and parts guaranteed for one year.'
+          title: 'Convenience & Speed',
+          desc: 'Fast service without leaving home.'
         },
         feature4: {
           title: 'Service at Your Home',
