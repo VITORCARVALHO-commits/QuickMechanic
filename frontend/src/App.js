@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import "./styles/improvements.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
