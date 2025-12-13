@@ -1497,13 +1497,6 @@ async def resolve_dispute(
         logger.error(f"Error resolving dispute: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-            }
-        }
-    except Exception as e:
-        logger.error(f"Error fetching stats: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @api_router.get("/admin/orders")
 async def get_all_orders(admin: User = Depends(require_admin)):
     """Get all orders for admin"""
