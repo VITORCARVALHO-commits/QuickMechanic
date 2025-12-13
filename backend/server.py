@@ -1808,6 +1808,348 @@ async def root():
 
 # Health check
 @api_router.get("/health")
+
+
+# ===== SHOP/OFICINA ENDPOINTS =====
+@api_router.post("/shop/inventory")
+async def add_inventory_item(
+    item: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add item to shop inventory"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can add inventory")
+    
+    inventory_item = {
+        "id": str(uuid4()),
+        "shop_id": current_user['id'],
+        "part_id": item['part_id'],
+        "part_name": item['part_name'],
+        "part_code": item.get('part_code', ''),
+        "quantity": item['quantity'],
+        "price": item['price'],
+        "location": item.get('location'),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.shop_inventory.insert_one(inventory_item)
+    return {"success": True, "item": inventory_item}
+
+@api_router.get("/shop/inventory")
+async def get_shop_inventory(current_user: dict = Depends(get_current_user)):
+    """Get shop inventory"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can view their inventory")
+    
+    items = await db.shop_inventory.find(
+        {"shop_id": current_user['id']},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    return {"success": True, "items": items}
+
+@api_router.put("/shop/inventory/{item_id}")
+async def update_inventory_item(
+    item_id: str,
+    updates: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update inventory item"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can update inventory")
+    
+    updates['updated_at'] = datetime.now(timezone.utc)
+    
+    result = await db.shop_inventory.update_one(
+        {"id": item_id, "shop_id": current_user['id']},
+        {"$set": updates}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    return {"success": True, "message": "Item updated"}
+
+@api_router.delete("/shop/inventory/{item_id}")
+async def delete_inventory_item(
+    item_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete inventory item"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can delete inventory")
+    
+    result = await db.shop_inventory.delete_one(
+        {"id": item_id, "shop_id": current_user['id']}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    return {"success": True, "message": "Item deleted"}
+
+# ===== PART RESERVATION ENDPOINTS =====
+@api_router.post("/reservations/create")
+async def create_reservation(
+    reservation_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mechanic creates part reservation"""
+    if current_user.get('user_type') != 'mechanic':
+        raise HTTPException(status_code=403, detail="Only mechanics can create reservations")
+    
+    # Get shop info
+    shop = await db.users.find_one({"id": reservation_data['shop_id']}, {"_id": 0})
+    if not shop:
+        raise HTTPException(status_code=404, detail="Shop not found")
+    
+    reservation = {
+        "id": str(uuid4()),
+        "mechanic_id": current_user['id'],
+        "mechanic_name": current_user['name'],
+        "shop_id": reservation_data['shop_id'],
+        "shop_name": shop['name'],
+        "order_id": reservation_data['order_id'],
+        "part_id": reservation_data['part_id'],
+        "part_name": reservation_data['part_name'],
+        "part_code": reservation_data.get('part_code'),
+        "quantity": reservation_data['quantity'],
+        "price": reservation_data['price'],
+        "status": "pending",
+        "notes": reservation_data.get('notes'),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.part_reservations.insert_one(reservation)
+    
+    # Create notification for shop
+    await db.notifications.insert_one({
+        "id": str(uuid4()),
+        "user_id": shop['id'],
+        "title": "Nova Pré-Reserva",
+        "message": f"{current_user['name']} solicitou {reservation_data['quantity']}x {reservation_data['part_name']}",
+        "type": "reservation",
+        "reference_id": reservation['id'],
+        "is_read": False,
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    return {"success": True, "reservation": reservation}
+
+@api_router.get("/reservations/my-reservations")
+async def get_my_reservations(current_user: dict = Depends(get_current_user)):
+    """Get reservations for current user (mechanic or shop)"""
+    query = {}
+    
+    if current_user.get('user_type') == 'mechanic':
+        query = {"mechanic_id": current_user['id']}
+    elif current_user.get('user_type') == 'shop':
+        query = {"shop_id": current_user['id']}
+    else:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    reservations = await db.part_reservations.find(query, {"_id": 0}).to_list(1000)
+    return {"success": True, "reservations": reservations}
+
+@api_router.put("/reservations/{reservation_id}/confirm")
+async def confirm_reservation(
+    reservation_id: str,
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Shop confirms or rejects reservation"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can confirm reservations")
+    
+    reservation = await db.part_reservations.find_one(
+        {"id": reservation_id, "shop_id": current_user['id']},
+        {"_id": 0}
+    )
+    
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    action = data.get('action')  # 'confirmed' or 'rejected'
+    
+    if action == 'confirmed':
+        # Generate pickup code
+        pickup_code = ''.join(random.choices(string.digits, k=6))
+        expires_at = datetime.now(timezone.utc) + timedelta(days=2)
+        
+        code_doc = {
+            "id": str(uuid4()),
+            "code": pickup_code,
+            "reservation_id": reservation_id,
+            "shop_id": current_user['id'],
+            "mechanic_id": reservation['mechanic_id'],
+            "is_used": False,
+            "created_at": datetime.now(timezone.utc),
+            "expires_at": expires_at
+        }
+        
+        await db.pickup_codes.insert_one(code_doc)
+        
+        await db.part_reservations.update_one(
+            {"id": reservation_id},
+            {
+                "$set": {
+                    "status": "confirmed",
+                    "pickup_code": pickup_code,
+                    "confirmed_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Notify mechanic
+        await db.notifications.insert_one({
+            "id": str(uuid4()),
+            "user_id": reservation['mechanic_id'],
+            "title": "Pré-Reserva Confirmada",
+            "message": f"Código de retirada: {pickup_code}. Válido até {expires_at.strftime('%d/%m/%Y')}",
+            "type": "reservation",
+            "reference_id": reservation_id,
+            "is_read": False,
+            "created_at": datetime.now(timezone.utc)
+        })
+        
+        return {"success": True, "pickup_code": pickup_code}
+    
+    elif action == 'rejected':
+        await db.part_reservations.update_one(
+            {"id": reservation_id},
+            {
+                "$set": {
+                    "status": "rejected",
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Notify mechanic
+        await db.notifications.insert_one({
+            "id": str(uuid4()),
+            "user_id": reservation['mechanic_id'],
+            "title": "Pré-Reserva Recusada",
+            "message": f"Peça não disponível: {reservation['part_name']}",
+            "type": "reservation",
+            "reference_id": reservation_id,
+            "is_read": False,
+            "created_at": datetime.now(timezone.utc)
+        })
+        
+        return {"success": True, "message": "Reservation rejected"}
+    
+    raise HTTPException(status_code=400, detail="Invalid action")
+
+@api_router.post("/reservations/{reservation_id}/pickup")
+async def confirm_pickup(
+    reservation_id: str,
+    code_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Validate pickup code and complete reservation"""
+    if current_user.get('user_type') != 'shop':
+        raise HTTPException(status_code=403, detail="Only shops can confirm pickup")
+    
+    code = code_data.get('code')
+    
+    # Validate code
+    code_doc = await db.pickup_codes.find_one(
+        {
+            "code": code,
+            "reservation_id": reservation_id,
+            "shop_id": current_user['id'],
+            "is_used": False
+        },
+        {"_id": 0}
+    )
+    
+    if not code_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+    
+    if code_doc['expires_at'] < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Code expired")
+    
+    # Mark as used
+    await db.pickup_codes.update_one(
+        {"id": code_doc['id']},
+        {
+            "$set": {
+                "is_used": True,
+                "used_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # Update reservation
+    await db.part_reservations.update_one(
+        {"id": reservation_id},
+        {
+            "$set": {
+                "status": "picked_up",
+                "picked_up_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # Update inventory (reduce quantity)
+    reservation = await db.part_reservations.find_one({"id": reservation_id}, {"_id": 0})
+    
+    await db.shop_inventory.update_one(
+        {
+            "shop_id": current_user['id'],
+            "part_id": reservation['part_id']
+        },
+        {
+            "$inc": {"quantity": -reservation['quantity']},
+            "$set": {"updated_at": datetime.now(timezone.utc)}
+        }
+    )
+    
+    return {"success": True, "message": "Pickup confirmed"}
+
+# ===== NOTIFICATIONS ENDPOINTS =====
+@api_router.get("/notifications")
+async def get_notifications(current_user: dict = Depends(get_current_user)):
+    """Get user notifications"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(50)
+    
+    unread_count = await db.notifications.count_documents({
+        "user_id": current_user['id'],
+        "is_read": False
+    })
+    
+    return {
+        "success": True,
+        "notifications": notifications,
+        "unread_count": unread_count
+    }
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(
+    notification_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mark notification as read"""
+    await db.notifications.update_one(
+        {"id": notification_id, "user_id": current_user['id']},
+        {
+            "$set": {
+                "is_read": True,
+                "read_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    return {"success": True}
+
 async def health_check():
     return {"status": "healthy"}
 
