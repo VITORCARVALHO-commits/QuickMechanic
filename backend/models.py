@@ -33,6 +33,7 @@ class User(BaseModel):
     years_experience: Optional[int] = None
     mobile_service: Optional[bool] = False
     workshop_service: Optional[bool] = False
+    approval_status: Optional[str] = "approved"  # pending_approval, approved, rejected
 
 class UserResponse(BaseModel):
     id: str
