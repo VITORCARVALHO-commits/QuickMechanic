@@ -4,6 +4,7 @@ import { Wrench, Menu, X, User, LogOut } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { NotificationBell } from './NotificationBell';
 import { Button } from './ui/button';
 
 export const Navbar = () => {
