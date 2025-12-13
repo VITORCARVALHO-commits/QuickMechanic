@@ -193,11 +193,11 @@ export const MechanicDashboard = () => {
                 <DollarSign className="h-5 w-5 mr-2" />
                 Enviar Orçamento
               </Button>
-            </Card>
+            </EnhancedCard>
           ))}
 
           {activeTab === 'my' && myOrders.map((order) => (
-            <Card key={order.id} className="p-6">
+            <EnhancedCard key={order.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-[#0E1A2C]">Pedido #{order.id.slice(0,8)}</h3>
