@@ -103,6 +103,22 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/admin/mechanics" 
+                  element={
+                    <ProtectedRoute>
+                      <AdminMechanicsApproval />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/mechanic/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <MechanicDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />
