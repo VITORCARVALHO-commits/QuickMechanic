@@ -28,6 +28,13 @@ import { HowItWorks } from "./pages/HowItWorks";
 import { Services } from "./pages/Services";
 import { BecomeMechanic } from "./pages/BecomeMechanic";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
+import { Precos } from "./pages/Precos";
+import { Contato } from "./pages/Contato";
+import { FAQ } from "./pages/FAQ";
+import { Termos } from "./pages/Termos";
+import { Privacidade } from "./pages/Privacidade";
+import { Cancelamento } from "./pages/Cancelamento";
+import { ParceirosOficina } from "./pages/ParceirosOficina";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requireAuth = true }) => {
