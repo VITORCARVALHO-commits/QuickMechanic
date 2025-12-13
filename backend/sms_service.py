@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', '')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://clickmecanico.emergent.host')
 
 def send_sms(to_phone: str, message: str):
     """Send SMS via Twilio"""
@@ -43,5 +44,5 @@ def sms_reminder_1h(client_name: str, client_phone: str, service: str, time: str
 
 def sms_service_completed(client_name: str, client_phone: str, order_id: str):
     """Notify service completed"""
-    message = f"Olá {client_name}! Seu serviço #{order_id} foi concluído. Avalie o mecânico: https://fixconnect-12.preview.emergentagent.com/dashboard"
+    message = f"Olá {client_name}! Seu serviço #{order_id} foi concluído. Avalie o mecânico: {FRONTEND_URL}/dashboard"
     return send_sms(client_phone, message)
