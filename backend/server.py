@@ -895,6 +895,11 @@ async def stripe_webhook(request: Request):
                         }
                     }
                 )
+        
+        return {"received": True}
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ===== CHAT ENDPOINTS =====
 
