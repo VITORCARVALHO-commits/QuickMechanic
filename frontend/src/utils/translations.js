@@ -240,17 +240,17 @@ export const translations = {
       },
       howItWorks: {
         title: 'How it works',
-        subtitle: 'Car repairs made simple. Get competitive quotes from local mechanics in just 4 easy steps. Pay only £12 to secure your booking!',
+        subtitle: 'Car repairs made simple. Get competitive quotes from local mechanics in just 4 easy steps. Convenience without leaving home and guaranteed speed!',
         step1: {
           title: 'Search Your Vehicle',
-          desc: 'Find your car instantly with UK registration',
-          details: 'Enter your UK vehicle registration number and we\'ll automatically fetch all your car details from the DVLA database. No manual entry needed - we make it quick and easy!'
+          desc: 'Find your car instantly with license plate',
+          details: 'Enter your vehicle license plate and we\'ll automatically fetch all your car details from the Brazilian database. No manual entry needed - we make it quick and easy!'
         },
         step2: {
-          title: 'Book & Pay £12 Deposit',
+          title: 'Book & Pay R$ 50 Deposit',
           desc: 'Secure your booking with a small deposit',
-          details: 'Choose your service, preferred date and location. Pay just £12 to confirm your booking - this will be deducted from your final bill. The deposit prevents fake bookings and guarantees serious enquiries.',
-          depositInfo: 'Why £12 deposit? It prevents fake bookings and ensures serious requests. This amount is fully deducted from your final bill!'
+          details: 'Choose your service, preferred date and location. Pay just R$ 50 to confirm your booking - this will be deducted from your final bill. The deposit prevents fake bookings and guarantees serious enquiries.',
+          depositInfo: 'Why R$ 50 deposit? It prevents fake bookings and ensures serious requests. This amount is fully deducted from your final bill!'
         },
         step3: {
           title: 'Get Quotes from Mechanics',
@@ -266,8 +266,8 @@ export const translations = {
           title: 'Why Choose QuickMechanic?',
           subtitle: 'Benefits that make the difference',
           guarantee: {
-            title: '12-Month Guarantee',
-            desc: 'Full warranty on all services and parts. Your safety is our top priority.'
+            title: 'Convenience & Speed',
+            desc: 'Fast service without leaving home. Your convenience is our top priority.'
           },
           fast: {
             title: 'Fast Response',
@@ -279,13 +279,13 @@ export const translations = {
           },
           pricing: {
             title: 'Fair Pricing',
-            desc: 'No hidden fees. £12 deposit deducted from final bill. Transparent pricing.'
+            desc: 'No hidden fees. R$ 50 deposit deducted from final bill. Transparent pricing.'
           }
         },
         pricing: {
           title: 'How Our Pricing Works',
           deposit: {
-            title: '£12 Pre-booking Deposit:',
+            title: 'R$ 50 Pre-booking Deposit:',
             desc: 'Secures your booking and prevents fake requests. Fully deducted from your final bill.'
           },
           competitive: {
@@ -299,7 +299,7 @@ export const translations = {
         },
         cta: {
           title: 'Ready to Get Started?',
-          subtitle: 'Get competitive quotes from local mechanics in minutes. Just £12 to secure your booking!',
+          subtitle: 'Get competitive quotes from local mechanics in minutes. Just R$ 50 to secure your booking!',
           button: 'Search Your Vehicle Now'
         }
       },
