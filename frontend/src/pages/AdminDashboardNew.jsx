@@ -52,54 +52,39 @@ export const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA]">
+    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0E1A2C] transition-colors">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#0E1A2C]">Admin Dashboard</h1>
-          <p className="text-gray-600">Visão geral do sistema</p>
+        <div className="mb-8 fade-in">
+          <h1 className="text-3xl font-bold text-[#0E1A2C] dark:text-[#F5F7FA]">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Visão geral do sistema</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Clientes</p>
-                <p className="text-3xl font-bold text-[#1EC6C6]">{stats?.total_clients || 0}</p>
-              </div>
-              <Users className="h-12 w-12 text-[#1EC6C6]" />
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Mecânicos Ativos</p>
-                <p className="text-3xl font-bold text-[#27AE60]">{stats?.active_mechanics || 0}</p>
-              </div>
-              <Wrench className="h-12 w-12 text-[#27AE60]" />
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pedidos Hoje</p>
-                <p className="text-3xl font-bold text-[#F39C12]">{stats?.orders_today || 0}</p>
-              </div>
-              <ShoppingCart className="h-12 w-12 text-[#F39C12]" />
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Receita Mês</p>
-                <p className="text-2xl font-bold text-green-600">R$ {stats?.revenue_month?.toFixed(2) || '0.00'}</p>
-              </div>
-              <DollarSign className="h-12 w-12 text-green-600" />
-            </div>
-          </Card>
+          <StatCard
+            title="Total Clientes"
+            value={stats?.total_clients || 0}
+            icon={Users}
+            color="primary"
+          />
+          <StatCard
+            title="Mecânicos Ativos"
+            value={stats?.active_mechanics || 0}
+            icon={Wrench}
+            color="success"
+          />
+          <StatCard
+            title="Pedidos Hoje"
+            value={stats?.orders_today || 0}
+            icon={ShoppingCart}
+            color="warning"
+          />
+          <StatCard
+            title="Receita Mês"
+            value={`R$ ${stats?.revenue_month?.toFixed(2) || '0.00'}`}
+            icon={DollarSign}
+            color="success"
+          />
         </div>
 
         {/* Quick Actions */}
