@@ -73,6 +73,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Socket.IO integration
+from socket_manager import sio
+import socketio
+socket_app = socketio.ASGIApp(sio, app)
+
 # ===== AUTH DEPENDENCY =====
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Get current authenticated user from JWT token"""
