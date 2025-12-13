@@ -105,7 +105,7 @@ export const PaymentPage = () => {
           {/* Security Badge */}
           <div className="flex items-center justify-center gap-2 text-gray-600 mb-6">
             <Shield className="h-5 w-5 text-[#27AE60]" />
-            <span className="text-sm">Secure payment powered by QuickMechanic</span>
+            <span className="text-sm">Secure payment powered by ClickMecanico</span>
           </div>
 
           {/* Action Buttons */}

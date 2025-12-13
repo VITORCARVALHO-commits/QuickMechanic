@@ -61,7 +61,7 @@ export const Login = () => {
             <LogIn className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-[#0E1A2C] mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to your QuickMechanic account</p>
+          <p className="text-gray-600">Sign in to your ClickMecanico account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

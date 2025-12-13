@@ -51,7 +51,7 @@ export const Register = () => {
       if (result.success) {
         toast({
           title: "Account created!",
-          description: `Welcome to QuickMechanic, ${result.user.name}!`,
+          description: `Welcome to ClickMecanico, ${result.user.name}!`,
         });
         navigate('/dashboard');
       } else {
@@ -80,7 +80,7 @@ export const Register = () => {
             <UserPlus className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-[#0E1A2C] mb-2">Create Account</h1>
-          <p className="text-gray-600">Join QuickMechanic today</p>
+          <p className="text-gray-600">Join ClickMecanico today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
