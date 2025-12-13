@@ -393,7 +393,7 @@ class QuickMechanicTester:
         """Test admin authentication - P1 High"""
         data = {
             "email": "admin@quickmechanic.com",
-            "password": "test123"
+            "password": "admin123"
         }
         
         response = self.make_request("POST", "/auth/login", data)
