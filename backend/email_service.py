@@ -34,7 +34,7 @@ def send_email(to_email: str, subject: str, html_content: str):
 # Email templates
 def email_new_order_to_mechanic(mechanic_email: str, mechanic_name: str, order_id: str, service: str, location: str):
     """Notify mechanic about new order"""
-    subject = f"Novo Pedido #{order_id} - QuickMechanic"
+    subject = f"Novo Pedido #{order_id} - ClickMecanico"
     html = f"""
     <h2>Olá {mechanic_name}!</h2>
     <p>Você tem um novo pedido disponível:</p>

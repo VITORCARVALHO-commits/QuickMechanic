@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from typing import Optional
 
 # Configuração
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'quickmechanic-secret-key-change-in-production')
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'clickmecanico-secret-key-change-in-production')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 
