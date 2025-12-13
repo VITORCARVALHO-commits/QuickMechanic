@@ -890,6 +890,11 @@ async def stripe_webhook(request: Request):
                     {"id": order_id},
                     {
                         "$set": {
+                            "payment_status": "succeeded",
+                            "status": "paid"
+                        }
+                    }
+                )
 
 # ===== CHAT ENDPOINTS =====
 
