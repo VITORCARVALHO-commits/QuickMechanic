@@ -42,7 +42,13 @@ export const AdminDashboard = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">Carregando...</div>;
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0E1A2C]">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <SkeletonList count={4} />
+        </div>
+      </div>
+    );
   }
 
   return (
