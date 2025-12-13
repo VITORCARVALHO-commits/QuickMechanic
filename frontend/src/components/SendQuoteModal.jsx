@@ -13,7 +13,7 @@ export const SendQuoteModal = ({ order, onClose, onSuccess }) => {
     parts_price: '0',
     estimated_time: '',
     notes: '',
-    warranty: '3 meses'
+    warranty: 'Serviço rápido e sem sair de casa'
   });
 
   const handleSubmit = async (e) => {
@@ -131,10 +131,10 @@ export const SendQuoteModal = ({ order, onClose, onSuccess }) => {
 
           <div>
             <label className="text-sm font-semibold text-[#0E1A2C] mb-2 block">
-              Garantia
+              Diferenciais do Serviço
             </label>
             <Input
-              placeholder="Ex: 3 meses"
+              placeholder="Ex: Atendimento rápido, sem sair de casa"
               value={formData.warranty}
               onChange={(e) => setFormData({...formData, warranty: e.target.value})}
             />
