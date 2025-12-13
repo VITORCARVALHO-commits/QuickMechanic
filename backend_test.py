@@ -225,61 +225,26 @@ class QuickMechanicTester:
             self.log_result("Create Order", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_add_parts_to_catalog(self):
-        """Test AutoParts adding parts to catalog"""
-        if not self.autoparts_token:
-            self.log_result("Add Parts to Catalog", False, "No autoparts token available")
+    def test_get_client_quotes(self):
+        """Test client getting their quotes - P0 Critical"""
+        if not self.client_token:
+            self.log_result("Get Client Quotes", False, "No client token available")
             return False
         
-        parts = [
-            {
-                "name": "Brake Pads - Front Set",
-                "description": "High quality ceramic brake pads for front wheels",
-                "price": 45.99,
-                "stock": 10,
-                "car_make": "Volkswagen",
-                "car_model": "Golf",
-                "service_type": "brakes",
-                "part_number": "BP-VW-GOLF-001"
-            },
-            {
-                "name": "Oil Filter",
-                "description": "Premium oil filter for engine maintenance",
-                "price": 12.50,
-                "stock": 25,
-                "car_make": "Volkswagen",
-                "car_model": "Golf",
-                "service_type": "oil_change",
-                "part_number": "OF-VW-GOLF-001"
-            },
-            {
-                "name": "Air Filter",
-                "description": "High-flow air filter for better engine performance",
-                "price": 18.75,
-                "stock": 15,
-                "car_make": "Volkswagen",
-                "car_model": "Golf",
-                "service_type": "maintenance",
-                "part_number": "AF-VW-GOLF-001"
-            }
-        ]
+        response = self.make_request("GET", "/quotes/my-quotes", token=self.client_token)
         
-        success_count = 0
-        for part_data in parts:
-            response = self.make_request("POST", "/autoparts/parts", part_data, token=self.autoparts_token)
-            
-            if response and response.status_code == 200:
-                result = response.json()
-                if result.get("success") and result.get("data"):
-                    if not self.test_part_id:  # Store first part ID for later tests
-                        self.test_part_id = result["data"]["id"]
-                    success_count += 1
-        
-        if success_count == len(parts):
-            self.log_result("Add Parts to Catalog", True, f"Successfully added {success_count} parts to catalog")
-            return True
+        if response and response.status_code == 200:
+            result = response.json()
+            if result.get("success"):
+                quotes = result.get("data", [])
+                self.log_result("Get Client Quotes", True, f"Retrieved {len(quotes)} quotes")
+                return True
+            else:
+                self.log_result("Get Client Quotes", False, "Failed to get quotes", result)
+                return False
         else:
-            self.log_result("Add Parts to Catalog", False, f"Only added {success_count}/{len(parts)} parts")
+            error_msg = response.text if response else "No response"
+            self.log_result("Get Client Quotes", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_create_order_needing_parts(self):
