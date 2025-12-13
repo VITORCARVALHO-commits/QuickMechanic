@@ -120,6 +120,14 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/mechanic/agenda" 
+                  element={
+                    <ProtectedRoute>
+                      <MechanicAgenda />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             <Footer />
