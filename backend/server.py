@@ -1308,6 +1308,181 @@ async def get_admin_stats(admin: User = Depends(require_admin)):
                 "revenue_month": revenue_month,
                 "open_disputes": 0,  # TODO: Implement disputes
                 "recent_activity": []
+
+# ===== GOOGLE OAUTH =====
+
+@api_router.post("/auth/google")
+async def google_auth(google_data: dict):
+    """Authenticate with Google OAuth"""
+    try:
+        from google_oauth import verify_google_token
+        
+        token = google_data.get("token")
+        if not token:
+            raise HTTPException(status_code=400, detail="Token required")
+        
+        user_info = await verify_google_token(token)
+        if not user_info:
+            raise HTTPException(status_code=401, detail="Invalid Google token")
+        
+        email = user_info.get("email")
+        name = user_info.get("name")
+        
+        # Check if user exists
+        existing_user = await db.users.find_one({"email": email}, {"_id": 0})
+        
+        if existing_user:
+            # User exists, login
+            token = create_access_token({"sub": existing_user["id"]})
+            return {
+                "success": True,
+                "token": token,
+                "user": existing_user,
+                "message": "Login successful"
+            }
+        else:
+            # Create new user
+            new_user = User(
+                email=email,
+                name=name,
+                password_hash="google_oauth",  # No password for OAuth users
+                user_type="client"
+            )
+            
+            user_dict = new_user.model_dump()
+            user_dict['created_at'] = user_dict['created_at'].isoformat()
+            
+            await db.users.insert_one(user_dict)
+            
+            token = create_access_token({"sub": new_user.id})
+            
+            return {
+                "success": True,
+                "token": token,
+                "user": new_user,
+                "message": "Account created successfully"
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Google auth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== DISPUTES SYSTEM =====
+
+@api_router.post("/disputes")
+async def create_dispute(dispute_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a dispute"""
+    try:
+        dispute = {
+            "id": str(uuid.uuid4()),
+            "order_id": dispute_data.get("order_id"),
+            "client_id": current_user.id,
+            "complaint": dispute_data.get("complaint"),
+            "dispute_type": dispute_data.get("dispute_type", "quality"),  # quality, payment, other
+            "status": "open",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.disputes.insert_one(dispute)
+        
+        # Notify admin
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": "admin",
+            "title": "Nova Disputa",
+            "message": f"Disputa criada para pedido #{dispute_data.get('order_id')[:8]}",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        logger.info(f"Dispute created: {dispute['id']}")
+        
+        return {
+            "success": True,
+            "data": dispute,
+            "message": "Disputa criada com sucesso"
+        }
+    except Exception as e:
+        logger.error(f"Error creating dispute: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/disputes")
+async def get_disputes(admin: User = Depends(require_admin)):
+    """Get all disputes"""
+    try:
+        disputes = await db.disputes.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        
+        return {
+            "success": True,
+            "data": disputes
+        }
+    except Exception as e:
+        logger.error(f"Error fetching disputes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/admin/disputes/{dispute_id}/resolve")
+async def resolve_dispute(
+    dispute_id: str,
+    resolution_data: dict,
+    admin: User = Depends(require_admin)
+):
+    """Resolve a dispute"""
+    try:
+        dispute = await db.disputes.find_one({"id": dispute_id}, {"_id": 0})
+        if not dispute:
+            raise HTTPException(status_code=404, detail="Dispute not found")
+        
+        await db.disputes.update_one(
+            {"id": dispute_id},
+            {
+                "$set": {
+                    "status": "resolved",
+                    "decision": resolution_data.get("decision"),
+                    "resolution_notes": resolution_data.get("resolution_notes"),
+                    "resolved_at": datetime.now(timezone.utc).isoformat(),
+                    "resolved_by": admin.id
+                }
+            }
+        )
+        
+        # Notify client and mechanic
+        order = await db.quotes.find_one({"id": dispute["order_id"]}, {"_id": 0})
+        if order:
+            # Notify client
+            await db.notifications.insert_one({
+                "id": str(uuid.uuid4()),
+                "user_id": dispute["client_id"],
+                "title": "Disputa Resolvida",
+                "message": f"Sua disputa foi resolvida. Decisão: {resolution_data.get('decision')}",
+                "read": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            
+            # Notify mechanic
+            if order.get("mechanic_id"):
+                await db.notifications.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "user_id": order["mechanic_id"],
+                    "title": "Disputa Resolvida",
+                    "message": f"Disputa do pedido #{dispute['order_id'][:8]} foi resolvida",
+                    "read": False,
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                })
+        
+        logger.info(f"Dispute {dispute_id} resolved by {admin.id}")
+        
+        return {
+            "success": True,
+            "message": "Dispute resolved"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error resolving dispute: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
             }
         }
     except Exception as e:
