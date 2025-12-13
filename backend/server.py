@@ -796,7 +796,7 @@ async def get_stripe_status(session_id: str, current_user: User = Depends(get_cu
             }
         
         # Poll Stripe for latest status
-        host_url = "https://quickmechanic.com"  # Will be replaced in production
+        host_url = "https://clickmecanico.com"  # Will be replaced in production
         webhook_url = f"{host_url}/api/webhook/stripe"
         stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
         
@@ -1793,7 +1793,7 @@ async def reject_mechanic(mechanic_id: str, admin: User = Depends(require_admin)
 # Root endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "QuickMechanic API - Sistema de Consulta de Veículos"}
+    return {"message": "ClickMecanico API - Sistema de Consulta de Veículos"}
 
 # Health check
 @api_router.get("/health")
