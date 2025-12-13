@@ -1510,13 +1510,6 @@ async def get_all_orders(admin: User = Depends(require_admin)):
     except Exception as e:
         logger.error(f"Error fetching orders: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-                    "final_price": total_price,
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
-            }
-        )
         
         # Send email to client
         client = await db.users.find_one({"id": order["client_id"]}, {"_id": 0})
