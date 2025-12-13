@@ -156,8 +156,12 @@ export const ClientDashboard = () => {
         </Button>
 
         <div className="space-y-4">
-          {orders.map((order) => (
-            <Card key={order.id} className="p-6">
+          {orders.map((order, index) => (
+            <EnhancedCard 
+              key={order.id} 
+              className="p-6"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-[#0E1A2C]">Pedido #{order.id.slice(0,8)}</h3>
