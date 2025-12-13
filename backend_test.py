@@ -299,34 +299,25 @@ class QuickMechanicTester:
             self.log_result("Mechanic Send Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
-    def test_search_parts(self):
-        """Test mechanic searching for compatible parts"""
-        if not self.mechanic_token:
-            self.log_result("Search Parts", False, "No mechanic token available")
+    def test_client_approve_quote(self):
+        """Test client approving mechanic quote - P0 Critical"""
+        if not self.client_token or not self.test_order_id:
+            self.log_result("Client Approve Quote", False, "No client token or order ID available")
             return False
         
-        # Search for oil change parts for Volkswagen Golf
-        params = "?car_make=Volkswagen&car_model=Golf&service_type=oil_change"
-        response = self.make_request("GET", f"/parts/search{params}")
+        response = self.make_request("POST", f"/quotes/{self.test_order_id}/approve", token=self.client_token)
         
         if response and response.status_code == 200:
             result = response.json()
-            if result.get("success") and result.get("data"):
-                parts = result["data"]
-                if len(parts) > 0:
-                    # Update test_part_id with a part from search results
-                    self.test_part_id = parts[0]["id"]
-                    self.log_result("Search Parts", True, f"Found {len(parts)} compatible parts")
-                    return True
-                else:
-                    self.log_result("Search Parts", False, "No parts found for search criteria")
-                    return False
+            if result.get("success"):
+                self.log_result("Client Approve Quote", True, "Quote approved successfully")
+                return True
             else:
-                self.log_result("Search Parts", False, "Parts search failed", result)
+                self.log_result("Client Approve Quote", False, "Quote approval failed", result)
                 return False
         else:
             error_msg = response.text if response else "No response"
-            self.log_result("Search Parts", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
+            self.log_result("Client Approve Quote", False, f"HTTP {response.status_code if response else 'No response'}", error_msg)
             return False
     
     def test_mechanic_prereserve_part(self):
