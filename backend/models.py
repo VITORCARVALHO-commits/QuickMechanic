@@ -201,3 +201,42 @@ class PayoutRequest(BaseModel):
     status: str = "pending"  # pending, approved, paid, rejected
     requested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     processed_at: Optional[datetime] = None
+
+# ===== REVIEW MODELS =====
+class ReviewCreate(BaseModel):
+    order_id: str
+    mechanic_id: str
+    rating: int  # 1-5
+    comment: Optional[str] = None
+
+class Review(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_id: str
+    client_id: str
+    mechanic_id: str
+    rating: int  # 1-5 stars
+    comment: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ===== MECHANIC QUOTE MODELS =====
+class MechanicQuoteCreate(BaseModel):
+    order_id: str
+    labor_price: float
+    parts_price: Optional[float] = 0.0
+    estimated_time: Optional[str] = None  # "2h 30min"
+    notes: Optional[str] = None
+    warranty: Optional[str] = None
+
+class MechanicQuote(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_id: str
+    mechanic_id: str
+    labor_price: float
+    parts_price: float = 0.0
+    total_price: float
+    estimated_time: Optional[str] = None
+    notes: Optional[str] = None
+    warranty: Optional[str] = None
+    status: str = "pending"  # pending, accepted, rejected
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
