@@ -53,17 +53,17 @@ export const translations = {
       },
       howItWorks: {
         title: 'Como funciona',
-        subtitle: 'Reparos de carro simplificados. Obtenha cotações competitivas de mecânicos locais em apenas 4 passos fáceis. Pague apenas £12 para garantir sua reserva!',
+        subtitle: 'Reparos de carro simplificados. Obtenha cotações competitivas de mecânicos locais em apenas 4 passos fáceis. Comodidade sem precisar sair de casa e rapidez garantida!',
         step1: {
           title: 'Pesquise Seu Veículo',
-          desc: 'Encontre seu carro instantaneamente com matrícula UK',
-          details: 'Digite o número de matrícula do seu veículo UK e buscaremos automaticamente todos os detalhes do seu carro na base de dados DVLA. Sem entrada manual necessária - tornamos rápido e fácil!'
+          desc: 'Encontre seu carro instantaneamente com a placa',
+          details: 'Digite a placa do seu veículo e buscaremos automaticamente todos os detalhes do seu carro na base de dados brasileira. Sem entrada manual necessária - tornamos rápido e fácil!'
         },
         step2: {
-          title: 'Reserve e Pague Depósito de £12',
+          title: 'Reserve e Pague Depósito de R$ 50',
           desc: 'Garanta sua reserva com um pequeno depósito',
-          details: 'Escolha seu serviço, data e local preferidos. Pague apenas £12 para confirmar sua reserva - isso será deduzido da sua conta final. O depósito previne reservas falsas e garante consultas sérias.',
-          depositInfo: 'Por que depósito de £12? Previne reservas falsas e garante solicitações sérias. Este valor é totalmente deduzido da sua conta final!'
+          details: 'Escolha seu serviço, data e local preferidos. Pague apenas R$ 50 para confirmar sua reserva - isso será deduzido da sua conta final. O depósito previne reservas falsas e garante consultas sérias.',
+          depositInfo: 'Por que depósito de R$ 50? Previne reservas falsas e garante solicitações sérias. Este valor é totalmente deduzido da sua conta final!'
         },
         step3: {
           title: 'Receba Cotações de Mecânicos',
@@ -79,8 +79,8 @@ export const translations = {
           title: 'Por que escolher QuickMechanic?',
           subtitle: 'Benefícios que fazem a diferença',
           guarantee: {
-            title: 'Garantia de 12 Meses',
-            desc: 'Garantia total em todos os serviços e peças. Sua segurança é nossa prioridade.'
+            title: 'Comodidade e Rapidez',
+            desc: 'Atendimento rápido sem precisar sair de casa. Sua comodidade é nossa prioridade.'
           },
           fast: {
             title: 'Resposta Rápida',
@@ -92,13 +92,13 @@ export const translations = {
           },
           pricing: {
             title: 'Preços Justos',
-            desc: 'Sem taxas ocultas. Depósito de £12 deduzido da conta final. Preços transparentes.'
+            desc: 'Sem taxas ocultas. Depósito de R$ 50 deduzido da conta final. Preços transparentes.'
           }
         },
         pricing: {
           title: 'Como Funciona Nossa Precificação',
           deposit: {
-            title: 'Depósito de £12 para Pré-Reserva:',
+            title: 'Depósito de R$ 50 para Pré-Reserva:',
             desc: 'Garante sua reserva e previne solicitações falsas. Totalmente deduzido da sua conta final.'
           },
           competitive: {
@@ -112,7 +112,7 @@ export const translations = {
         },
         cta: {
           title: 'Pronto para Começar?',
-          subtitle: 'Obtenha cotações competitivas de mecânicos locais em minutos. Apenas £12 para garantir sua reserva!',
+          subtitle: 'Obtenha cotações competitivas de mecânicos locais em minutos. Apenas R$ 50 para garantir sua reserva!',
           button: 'Pesquise Seu Veículo Agora'
         }
       },
