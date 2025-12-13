@@ -33,12 +33,12 @@ def send_sms(to_phone: str, message: str):
 
 def sms_reminder_24h(client_name: str, client_phone: str, service: str, date: str, time: str):
     """Send 24h reminder"""
-    message = f"Olá {client_name}! Lembrete: seu serviço '{service}' está agendado para amanhã ({date}) às {time}. QuickMechanic"
+    message = f"Olá {client_name}! Lembrete: seu serviço '{service}' está agendado para amanhã ({date}) às {time}. ClickMecanico"
     return send_sms(client_phone, message)
 
 def sms_reminder_1h(client_name: str, client_phone: str, service: str, time: str):
     """Send 1h reminder"""
-    message = f"Olá {client_name}! Seu mecânico chegará em 1 hora (às {time}). QuickMechanic"
+    message = f"Olá {client_name}! Seu mecânico chegará em 1 hora (às {time}). ClickMecanico"
     return send_sms(client_phone, message)
 
 def sms_service_completed(client_name: str, client_phone: str, order_id: str):
