@@ -220,7 +220,6 @@ class Review(BaseModel):
 
 # ===== MECHANIC QUOTE MODELS =====
 class MechanicQuoteCreate(BaseModel):
-    order_id: str
     labor_price: float
     parts_price: Optional[float] = 0.0
     estimated_time: Optional[str] = None  # "2h 30min"
