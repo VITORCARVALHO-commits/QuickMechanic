@@ -3,9 +3,10 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { SendQuoteModal } from '../components/SendQuoteModal';
 import { toast } from '../hooks/use-toast';
-import { Car, MapPin, Clock, CheckCircle, Loader2, DollarSign, AlertCircle } from 'lucide-react';
+import { Car, MapPin, Clock, CheckCircle, Loader2, DollarSign, AlertCircle, Calendar } from 'lucide-react';
 
 export const MechanicDashboard = () => {
   const { user } = useAuth();
